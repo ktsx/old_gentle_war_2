@@ -812,8 +812,9 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(
 		return nullptr;
 	}
 
-	if (reallyscale)
+	if (reallyscale) {
 		rendobj->Scale(scale);	//this also makes it unique
+	}
 
 	Make_Unique(rendobj,reallyscale,reallycolor);
 
@@ -1408,8 +1409,11 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(const char * name,float scal
 	if (!rendobj) return nullptr;
 
 	if (!isGranny)
-	{	Make_Unique(rendobj,reallyscale,reallyhsv_shift);
-		if (reallyscale) rendobj->Scale(scale);
+	{
+		Make_Unique(rendobj,reallyscale,reallyhsv_shift);
+		if (reallyscale) {
+			rendobj->Scale(scale);
+		}
 		if (reallyhsv_shift) Recolor_Asset(rendobj,hsv_shift);
 	}
 	else

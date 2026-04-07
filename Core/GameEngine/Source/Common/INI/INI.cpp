@@ -225,13 +225,16 @@ UnsignedInt INI::loadFileDirectory( AsciiString fileDirName, INILoadType loadTyp
 		iniFile.concat(ext);
 	}
 
+
 	if (TheFileSystem->doesFileExist(iniFile.str()))
 	{
 		filesRead += load(iniFile, loadType, pXfer);
 	}
 
+
 	// Load any additional ini files from a "filename" directory and its subdirectories.
 	filesRead += loadDirectory(iniDir, loadType, pXfer, subdirs);
+
 
 	// Expect to open and load at least one file.
 	if (filesRead == 0)

@@ -29,7 +29,9 @@
 
 #pragma once
 
+#ifndef __EMSCRIPTEN__
 #include <windows.h>
+#endif
 
 class ProfileFuncLevelTracer
 {
@@ -89,13 +91,13 @@ public:
   struct Profile
   {
     /// call count
-    __int64 callCount;
+    long long callCount;
 
     /// pure time
-    __int64 tickPure;
+    long long tickPure;
 
     /// total time
-    __int64 tickTotal;
+    long long tickTotal;
 
     /// caller list
     UnsignedMap caller;
@@ -267,10 +269,10 @@ private:
     unsigned retVal;
 
     /// enter tick count
-    __int64 tickEnter;
+    long long tickEnter;
 
     /// time spend in called functions
-    __int64 tickSubTime;
+    long long tickSubTime;
   };
 
   /// map of functions

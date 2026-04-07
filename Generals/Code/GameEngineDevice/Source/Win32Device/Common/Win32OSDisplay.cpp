@@ -26,6 +26,10 @@
 // John McDonald, December 2002
 ////////////////////////////////////////////////////////////
 
+// GeneralsX @build BenderAI 09/03/2026 - Win32OSDisplay uses Windows-only APIs.
+// On non-Windows (Emscripten/Linux), provide stub implementations.
+#ifdef _WIN32
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "Common/OSDisplay.h"
@@ -133,3 +137,22 @@ void OSDisplaySetBusyState(Bool busyDisplay, Bool busySystem)
 
 	::SetThreadExecutionState(state);
 }
+
+#else // !_WIN32
+
+// Stub implementations for non-Windows platforms (Emscripten/Linux).
+// The GeneralsMD SDL3 device layer supersedes these at runtime in the web-port.
+#include "Common/OSDisplay.h"
+#include "Common/AsciiString.h"
+
+OSDisplayButtonType OSDisplayWarningBox(AsciiString /*p*/, AsciiString /*m*/, UnsignedInt /*buttonFlags*/, UnsignedInt /*otherFlags*/)
+{
+	return OSDBT_OK;
+}
+
+void OSDisplaySetBusyState(Bool /*busyDisplay*/, Bool /*busySystem*/)
+{
+	// No-op on non-Windows
+}
+
+#endif // _WIN32

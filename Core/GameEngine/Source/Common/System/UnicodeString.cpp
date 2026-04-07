@@ -45,6 +45,7 @@
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
 
 #include "Common/CriticalSection.h"
+#include <emscripten/emscripten.h>
 
 
 // -----------------------------------------------------
@@ -56,9 +57,16 @@
 void UnicodeString::validate() const
 {
 	if (!m_data) return;
-	DEBUG_ASSERTCRASH(m_data->m_refCount > 0, ("m_refCount is zero"));
-	DEBUG_ASSERTCRASH(m_data->m_numCharsAllocated > 0, ("m_numCharsAllocated is zero"));
-	DEBUG_ASSERTCRASH(wcslen(m_data->peek())+1 <= m_data->m_numCharsAllocated,("str is too long for storage"));
+	if (!(m_data->m_refCount > 0)) {
+		fflush(stderr);
+	}
+	if (!(m_data->m_numCharsAllocated > 0)) {
+		fflush(stderr);
+	}
+	int len = wcslen(m_data->peek());
+	if (!(len + 1 <= m_data->m_numCharsAllocated)) {
+		fflush(stderr);
+	}
 }
 #endif
 
@@ -394,7 +402,61 @@ void UnicodeString::format_va(const WideChar* format, va_list args)
 {
 	validate();
 	WideChar buf[MAX_FORMAT_BUF_LEN];
-	const int result = vswprintf(buf, sizeof(buf)/sizeof(WideChar), format, args);
+
+	const WideChar* active_format = format;
+#ifndef _WIN32
+	// Translate format specifiers strings from MSVC-style to Standard-style
+	WideChar translatedFormat[MAX_FORMAT_BUF_LEN];
+	int fOut = 0;
+	bool inFormat = false;
+	for (int i = 0; format[i] != 0 && fOut < MAX_FORMAT_BUF_LEN - 3; ++i) {
+		WideChar c = format[i];
+		if (!inFormat) {
+			if (c == '%') inFormat = true;
+			translatedFormat[fOut++] = c;
+		} else {
+			if (c == '%') {
+				inFormat = false; // "%%" escapes %
+				translatedFormat[fOut++] = c;
+			} else if (c == 'h' || c == 'w' || c == 'l' || c == 'L' || c == 'I' || c == 'z' || c == 't' || c == 'j') {
+				// length modifiers: keep track of them by just outputting them
+				translatedFormat[fOut++] = c;
+			} else if (c == 'c' || c == 'C' || c == 'd' || c == 'i' || c == 'o' || c == 'u' || c == 'x' || c == 'X' || c == 'e' || c == 'E' || c == 'f' || c == 'g' || c == 'G' || c == 'a' || c == 'A' || c == 'n' || c == 'p') {
+				inFormat = false;
+                if (c == 'c') {
+                    if (i > 0 && format[i-1] != 'l' && format[i-1] != 'w' && format[i-1] != 'h') {
+                        translatedFormat[fOut++] = 'l';
+                    } else if (i > 0 && format[i-1] == 'h') {
+                        fOut--;
+                    }
+                    translatedFormat[fOut++] = 'c';
+                } else if (c == 'C') {
+                    translatedFormat[fOut++] = 'c';
+                } else {
+				    translatedFormat[fOut++] = c;
+                }
+			} else if (c == 's') {
+				inFormat = false;
+				if (i > 0 && format[i-1] != 'l' && format[i-1] != 'w' && format[i-1] != 'h') {
+                    translatedFormat[fOut++] = 'l';
+                } else if (i > 0 && format[i-1] == 'h') {
+                    fOut--;
+                }
+				translatedFormat[fOut++] = 's';
+			} else if (c == 'S') {
+				inFormat = false;
+				translatedFormat[fOut++] = 's';
+			} else {
+                // width, precision, flags, etc.
+				translatedFormat[fOut++] = c;
+			}
+		}
+	}
+	translatedFormat[fOut] = 0;
+	active_format = translatedFormat;
+#endif
+
+	const int result = vswprintf(buf, sizeof(buf)/sizeof(WideChar), active_format, args);
 	if (result >= 0)
 	{
 		set(buf);
@@ -402,7 +464,20 @@ void UnicodeString::format_va(const WideChar* format, va_list args)
 	}
 	else
 	{
-		DEBUG_CRASH(("UnicodeString::format_va failed with code:%d", result));
+        char safeFormat[256];
+        for (int i=0; i<255; i++) {
+            safeFormat[i] = (char)format[i];
+            if (format[i] == 0) break;
+        }
+        safeFormat[255] = 0;
+        char safeTrans[256];
+        for (int i=0; i<255; i++) {
+            safeTrans[i] = (char)active_format[i];
+            if (active_format[i] == 0) break;
+        }
+        safeTrans[255] = 0;
+        
+        DEBUG_CRASH(("UnicodeString::format_va failed with code:%d format:'%s' trans:'%s'", result, safeFormat, safeTrans));
 	}
 }
 

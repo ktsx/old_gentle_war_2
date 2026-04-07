@@ -45,6 +45,9 @@
 #ifdef _WIN32
 #include <tchar.h>
 #endif
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 
 
@@ -389,6 +392,11 @@ StringClass::operator[] (int index) const
 inline TCHAR &
 StringClass::operator[] (int index)
 {
+	if (!(index >= 0 && index < Get_Length ())) {
+#ifdef __EMSCRIPTEN__
+		emscripten_log(EM_LOG_ERROR | EM_LOG_C_STACK, "StringClass::operator[] OOB: idx=%d len=%d", index, Get_Length());
+#endif
+	}
 	WWASSERT (index >= 0 && index < Get_Length ());
 	return m_Buffer[index];
 }
@@ -715,6 +723,7 @@ StringClass::Allocate_Buffer (int length)
 	// bytes required to hold the header.
 	//
 	char *buffer = W3DNEWARRAY char[(sizeof (TCHAR) * length) + sizeof (StringClass::_HEADER)];
+
 
 	//
 	//	Fill in the fields of the header

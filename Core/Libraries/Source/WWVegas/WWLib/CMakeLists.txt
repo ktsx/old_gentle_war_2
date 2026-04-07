@@ -175,15 +175,27 @@ target_include_directories(core_wwlib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_precompile_headers(core_wwlib PRIVATE
-    [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
-    always.h
-    STLUtils.h
-    win.h
-    WWCommon.h
-    wwstring.h
-    <windows.h>
-)
+# GeneralsX @feature WebPort 09/03/2026 — windows.h not available on Emscripten
+if(EMSCRIPTEN)
+    target_precompile_headers(core_wwlib PRIVATE
+        [["Utility/CppMacros.h"]]
+        always.h
+        STLUtils.h
+        win.h
+        WWCommon.h
+        wwstring.h
+    )
+else()
+    target_precompile_headers(core_wwlib PRIVATE
+        [["Utility/CppMacros.h"]]
+        always.h
+        STLUtils.h
+        win.h
+        WWCommon.h
+        wwstring.h
+        <windows.h>
+    )
+endif()
 
 target_link_libraries(core_wwlib PRIVATE
     core_wwcommon

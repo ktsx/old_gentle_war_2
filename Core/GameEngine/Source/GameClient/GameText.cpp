@@ -944,7 +944,12 @@ Bool GameTextManager::parseCSF( const Char *filename )
 
 			if ( len )
 			{
-				file->read ( m_tbuffer, len*sizeof(WideChar) );
+				unsigned short* tempBuf = new unsigned short[len];
+				file->read ( tempBuf, len*sizeof(unsigned short) );
+				for (int i=0; i<len; i++) {
+					m_tbuffer[i] = (WideChar)tempBuf[i];
+				}
+				delete[] tempBuf;
 			}
 
 			if ( num == 0 )
@@ -959,7 +964,7 @@ Bool GameTextManager::parseCSF( const Char *filename )
 
 					while ( *ptr )
 					{
-						*ptr = ~*ptr;
+						*ptr = (~*ptr) & 0xFFFF;
 						ptr++;
 					}
 				}

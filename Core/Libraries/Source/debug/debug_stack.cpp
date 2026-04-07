@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -403,3 +404,5 @@ int DebugStackwalk::StackWalk(Signature &sig, struct _CONTEXT *ctx)
 
 	return sig.m_numAddr;
 }
+
+#endif

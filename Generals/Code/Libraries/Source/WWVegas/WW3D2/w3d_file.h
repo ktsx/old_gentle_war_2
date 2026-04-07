@@ -37,6 +37,10 @@
 
 #pragma once
 
+// GeneralsX @build BenderAI 09/03/2026 Shared guard to prevent double-inclusion from Generals+GeneralsMD include paths
+#ifndef W3D_FILE_H_SYMBOLS_DEFINED
+#define W3D_FILE_H_SYMBOLS_DEFINED
+
 #include "always.h"
 #include "bittype.h"
 #include "iostruct.h"
@@ -2271,3 +2275,5 @@ struct W3dShdSubMeshHeaderStruct
 ** Include the obsolete structures and chunk ID's
 */
 #include "w3d_obsolete.h"
+
+#endif // W3D_FILE_H_SYMBOLS_DEFINED

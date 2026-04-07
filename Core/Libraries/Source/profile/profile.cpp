@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -87,7 +88,7 @@ void ProfileFreeMemory(void *ptr)
 
 //////////////////////////////////////////////////////////////////////////////
 
-static _int64 GetClockCyclesFast()
+static long long GetClockCyclesFast()
 {
   // this is where we're adding our internal result functions
   Profile::AddResultFunction(ProfileResultFileCSV::Create,
@@ -101,7 +102,7 @@ static _int64 GetClockCyclesFast()
 
   // measure clock cycles 3 times for 20 msec each
   // then take the 2 counts that are closest, average
-  _int64 n[3];
+  long long n[3];
   for (int k=0;k<3;k++)
   {
     // wait for end of current tick
@@ -109,7 +110,7 @@ static _int64 GetClockCyclesFast()
     while (timeGetTime()<timeEnd);
 
     // get cycles
-    _int64 start,startQPC,endQPC;
+    long long start,startQPC,endQPC;
     QueryPerformanceCounter((LARGE_INTEGER *)&startQPC);
     ProfileGetTime(start);
     timeEnd+=20;
@@ -120,7 +121,7 @@ static _int64 GetClockCyclesFast()
     // convert to 1 second
     if (QueryPerformanceCounter((LARGE_INTEGER *)&endQPC))
     {
-      _int64 freq;
+      long long freq;
       QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
       n[k]=(n[k]*freq)/(endQPC-startQPC);
     }
@@ -131,11 +132,11 @@ static _int64 GetClockCyclesFast()
   }
 
   // find two closest values
-  _int64 d01=n[1]-n[0],d02=n[2]-n[0],d12=n[2]-n[1];
+  long long d01=n[1]-n[0],d02=n[2]-n[0],d12=n[2]-n[1];
   if (d01<0) d01=-d01;
   if (d02<0) d02=-d02;
   if (d12<0) d12=-d12;
-  _int64 avg;
+  long long avg;
   if (d01<d02)
   {
     avg=d01<d12?n[0]+n[1]:n[1]+n[2];
@@ -154,7 +155,7 @@ unsigned Profile::m_rec;
 char **Profile::m_recNames;
 unsigned Profile::m_names;
 Profile::FrameName *Profile::m_frameNames;
-_int64 Profile::m_clockCycles=GetClockCyclesFast();
+long long Profile::m_clockCycles=GetClockCyclesFast();
 Profile::PatternListEntry *Profile::firstPatternEntry;
 Profile::PatternListEntry *Profile::lastPatternEntry;
 
@@ -335,7 +336,7 @@ void Profile::ClearTotals()
   ProfileId::ClearTotals();
 }
 
-_int64 Profile::GetClockCyclesPerSecond()
+long long Profile::GetClockCyclesPerSecond()
 {
   return m_clockCycles;
 }
@@ -383,3 +384,5 @@ static void ProfileShutdown()
 }
 
 int profileTracerInit=atexit(ProfileShutdown);
+
+#endif

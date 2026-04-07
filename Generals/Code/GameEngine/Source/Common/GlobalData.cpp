@@ -1174,6 +1174,7 @@ void GlobalData::parseGameDataDefinition( INI* ini )
 	TheWritableGlobalData->m_userDataDir.clear();
 
 	char temp[_MAX_PATH];
+#ifdef _WIN32
 	if (::SHGetSpecialFolderPath(nullptr, temp, CSIDL_PERSONAL, true))
 	{
 		if (temp[strlen(temp)-1] != '\\')
@@ -1183,6 +1184,13 @@ void GlobalData::parseGameDataDefinition( INI* ini )
 		CreateDirectory(temp, nullptr);
 		TheWritableGlobalData->m_userDataDir = temp;
 	}
+#else
+	strcpy(temp, "UserData/");
+	strcat(temp, TheWritableGlobalData->m_userDataLeafName.str());
+	strcat(temp, "/");
+	CreateDirectory(temp, nullptr);
+	TheWritableGlobalData->m_userDataDir = temp;
+#endif
 
 	// override INI values with user preferences
 	OptionPreferences optionPref;

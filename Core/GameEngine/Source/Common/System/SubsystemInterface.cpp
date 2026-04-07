@@ -157,10 +157,16 @@ void SubsystemInterfaceList::initSubsystem(SubsystemInterface* sys, const char* 
 	sys->init();
 
 	INI ini;
-	if (path1)
-		ini.loadFileDirectory(path1, INI_LOAD_OVERWRITE, pXfer );
-	if (path2)
+	if (path1) {
+    try {
+      ini.loadFileDirectory(path1, INI_LOAD_OVERWRITE, pXfer );
+    } catch (INIError e) {
+      if (e != INI_CANT_OPEN_FILE) throw e;
+    }
+  }
+	if (path2) {
 		ini.loadFileDirectory(path2, INI_LOAD_OVERWRITE, pXfer );
+  }
 
 	m_subsystems.push_back(sys);
 }

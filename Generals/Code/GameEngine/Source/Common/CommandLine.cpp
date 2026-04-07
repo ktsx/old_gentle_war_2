@@ -37,7 +37,17 @@
 #include "GameNetwork/NetworkDefs.h"
 #include "trim.h"
 
-
+#ifndef _WIN32
+    // GeneralsX @build BenderAI 09/03/2026 WebPort - _S_IFDIR is a Windows-specific name
+    #ifndef __EMSCRIPTEN__
+    #include "file_compat.h"
+    #endif
+    #include <sys/stat.h>
+    #ifndef _S_IFDIR
+    #define _S_IFDIR S_IFDIR
+    #endif
+    #define _stat stat
+#endif
 
 
 Bool TheDebugIgnoreSyncErrors = FALSE;
@@ -1374,6 +1384,7 @@ static void parseCommandLine(const CommandLineParam* params, int numParams)
 {
 	std::vector<char*> argv;
 
+#ifdef _WIN32
 	std::string cmdLine = GetCommandLineA();
 	char *token = nextParam(&cmdLine[0], "\" ");
 	while (token != nullptr)
@@ -1381,6 +1392,16 @@ static void parseCommandLine(const CommandLineParam* params, int numParams)
 		argv.push_back(strtrim(token));
 		token = nextParam(nullptr, "\" ");
 	}
+#else
+	// GeneralsX @build BenderAI 09/03/2026 WebPort - Use POSIX argc/argv on non-Windows
+	// Include argv[0] (program name) to match GetCommandLineA() behavior
+	extern char **__argv;
+	extern int __argc;
+	for (int i = 0; i < __argc; i++)
+	{
+		argv.push_back(__argv[i]);
+	}
+#endif
 	int argc = argv.size();
 
 	int arg = 1;

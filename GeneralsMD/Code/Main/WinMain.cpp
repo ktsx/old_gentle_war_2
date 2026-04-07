@@ -788,6 +788,45 @@ static LONG WINAPI UnHandledExceptionFilter( struct _EXCEPTION_POINTERS* e_info 
 // WinMain ====================================================================
 /** Application entry point */
 //=============================================================================
+#if defined(__EMSCRIPTEN__)
+int main(int argc, char** argv)
+{
+	Int exitcode = 1;
+
+	try {
+		TheAsciiStringCriticalSection = &critSec1;
+		TheUnicodeStringCriticalSection = &critSec2;
+		TheDmaCriticalSection = &critSec3;
+		TheMemoryPoolCriticalSection = &critSec4;
+		TheDebugLogCriticalSection = &critSec5;
+
+		initMemoryManager();
+
+		CommandLine::parseCommandLineForStartup();
+
+		TheVersion = NEW Version;
+		TheVersion->setVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILDNUM, VERSION_LOCALBUILDNUM,
+			AsciiString(VERSION_BUILDUSER), AsciiString(VERSION_BUILDLOC),
+			AsciiString(__TIME__), AsciiString(__DATE__));
+
+		exitcode = GameMain();
+		
+		delete TheVersion;
+		TheVersion = nullptr;
+
+		shutdownMemoryManager();
+	}
+	catch (...)
+	{
+	}
+
+	TheUnicodeStringCriticalSection = nullptr;
+	TheDmaCriticalSection = nullptr;
+	TheMemoryPoolCriticalSection = nullptr;
+
+	return exitcode;
+}
+#else
 Int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                       LPSTR lpCmdLine, Int nCmdShow )
 {
@@ -951,6 +990,7 @@ Int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return exitcode;
 
 }
+#endif
 
 // CreateGameEngine ===========================================================
 /** Create the Win32 game engine we're going to use */

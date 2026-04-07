@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -130,3 +131,5 @@ void DebugIONet::Delete()
   this->~DebugIONet();
   DebugFreeMemory(this);
 }
+
+#endif

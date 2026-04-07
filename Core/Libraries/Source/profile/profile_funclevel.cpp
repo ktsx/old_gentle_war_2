@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -193,7 +194,7 @@ void ProfileFuncLevelTracer::Enter(unsigned addr, unsigned esp, unsigned ret)
 unsigned ProfileFuncLevelTracer::Leave(unsigned esp)
 {
   // get current "time"
-  __int64 cur;
+  long long cur;
   ProfileGetTime(cur);
 
   while (usedStack>0)
@@ -217,7 +218,7 @@ unsigned ProfileFuncLevelTracer::Leave(unsigned esp)
     f->glob.callCount++;
 
     // add total time
-    __int64 delta=cur-s.tickEnter;
+    long long delta=cur-s.tickEnter;
     if (!f->depth)
       f->glob.tickTotal+=delta;
 
@@ -617,7 +618,7 @@ unsigned ProfileFuncLevel::Id::GetLine() const
   return func->funcLine;
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetCalls(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetCalls(unsigned frame) const
 {
   if (!m_funcPtr)
     return 0;
@@ -634,7 +635,7 @@ unsigned _int64 ProfileFuncLevel::Id::GetCalls(unsigned frame) const
   }
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetTime(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetTime(unsigned frame) const
 {
   if (!m_funcPtr)
     return 0;
@@ -651,7 +652,7 @@ unsigned _int64 ProfileFuncLevel::Id::GetTime(unsigned frame) const
   }
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetFunctionTime(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetFunctionTime(unsigned frame) const
 {
   if (!m_funcPtr)
     return 0;
@@ -755,17 +756,17 @@ unsigned ProfileFuncLevel::Id::GetLine() const
   return 0;
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetCalls(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetCalls(unsigned frame) const
 {
   return 0;
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetTime(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetTime(unsigned frame) const
 {
   return 0;
 }
 
-unsigned _int64 ProfileFuncLevel::Id::GetFunctionTime(unsigned frame) const
+unsigned long long ProfileFuncLevel::Id::GetFunctionTime(unsigned frame) const
 {
   return 0;
 }
@@ -793,3 +794,5 @@ ProfileFuncLevel::ProfileFuncLevel()
 
 ProfileFuncLevel ProfileFuncLevel::Instance;
 HANDLE ProfileFastCS::testEvent=::CreateEvent(nullptr,FALSE,FALSE,"");
+
+#endif

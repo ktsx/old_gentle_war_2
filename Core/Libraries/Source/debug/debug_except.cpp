@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -412,3 +413,5 @@ LONG __stdcall DebugExceptionhandler::ExceptionFilter(struct _EXCEPTION_POINTERS
   // Now die
   return EXCEPTION_EXECUTE_HANDLER;
 }
+
+#endif // __EMSCRIPTEN__

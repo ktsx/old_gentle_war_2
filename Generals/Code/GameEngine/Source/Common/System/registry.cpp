@@ -33,6 +33,7 @@
 
 Bool  getStringFromRegistry(HKEY root, AsciiString path, AsciiString key, AsciiString& val)
 {
+	#ifdef _WIN32
 	HKEY handle;
 	unsigned char buffer[256];
 	unsigned long size = 256;
@@ -52,10 +53,14 @@ Bool  getStringFromRegistry(HKEY root, AsciiString path, AsciiString key, AsciiS
 	}
 
 	return FALSE;
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key, UnsignedInt& val)
 {
+	#ifdef _WIN32
 	HKEY handle;
 	unsigned char buffer[4];
 	unsigned long size = 4;
@@ -75,10 +80,14 @@ Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key, Un
 	}
 
 	return FALSE;
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool setStringInRegistry( HKEY root, AsciiString path, AsciiString key, AsciiString val)
 {
+	#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -94,10 +103,14 @@ Bool setStringInRegistry( HKEY root, AsciiString path, AsciiString key, AsciiStr
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool setUnsignedIntInRegistry( HKEY root, AsciiString path, AsciiString key, UnsignedInt val)
 {
+	#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -113,6 +126,9 @@ Bool setUnsignedIntInRegistry( HKEY root, AsciiString path, AsciiString key, Uns
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiString& val)
@@ -121,12 +137,16 @@ Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiStrin
 
 	fullPath.concat(path);
 	DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
+	#ifdef _WIN32
 	if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val))
 	{
 		return TRUE;
 	}
 
 	return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val);
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
@@ -139,12 +159,16 @@ Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
 
 	fullPath.concat(path);
 	DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
+	#ifdef _WIN32
 	if (getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val))
 	{
 		return TRUE;
 	}
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
+	#else
+	return FALSE;
+	#endif
 }
 
 Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key, UnsignedInt& val)
@@ -157,12 +181,16 @@ Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key, UnsignedInt& 
 
 	fullPath.concat(path);
 	DEBUG_LOG(("GetUnsignedIntFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
+	#ifdef _WIN32
 	if (getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val))
 	{
 		return TRUE;
 	}
 
 	return getUnsignedIntFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val);
+	#else
+	return FALSE;
+	#endif
 }
 
 AsciiString GetRegistryLanguage()

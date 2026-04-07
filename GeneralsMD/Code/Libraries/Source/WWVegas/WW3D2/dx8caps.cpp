@@ -43,7 +43,9 @@
 #include "formconv.h"
 #pragma warning (disable : 4201)		// nonstandard extension - nameless struct
 #include <windows.h>
+#ifndef _UNIX
 #include <mmsystem.h>
+#endif
 
 static StringClass CapsWorkString;
 
@@ -556,7 +558,7 @@ void DX8Caps::Compute_Caps(WW3DFormat display_format, const D3DADAPTER_IDENTIFIE
 	VendorId=Define_Vendor(adapter_id.VendorId);
 	// Make a guess - if driver doesn't intruduce itself and the name starts with 3, what could it possibly be?
 	if (VendorId==VENDOR_UNKNOWN) {
-		if (DriverDLL[0]=='3') VendorId=VENDOR_3DFX;
+		if (DriverDLL.Get_Length() > 0 && DriverDLL[0]=='3') VendorId=VENDOR_3DFX;
 	}
 	COMPACTLOG(("%s\t",VendorNames[VendorId]));
 	DXLOG(("Video Card Chip Vendor: %s\r\n",VendorNames[VendorId]));

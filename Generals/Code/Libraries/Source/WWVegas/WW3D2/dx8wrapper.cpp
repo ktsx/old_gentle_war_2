@@ -48,6 +48,11 @@
 #endif
 
 #include "dx8wrapper.h"
+#ifdef __EMSCRIPTEN__
+#include "windows_base.h"
+#else
+#include "module_compat.h"  // GeneralsX @feature WebPort — LoadLibrary/GetProcAddress/FreeLibrary stubs
+#endif
 #include "dx8webbrowser.h"
 #include "dx8fvf.h"
 #include "dx8vertexbuffer.h"
@@ -1920,7 +1925,7 @@ void DX8Wrapper::Draw(
 
 #ifdef MESH_RENDER_SNAPSHOT_ENABLED
 	if (WW3D::Is_Snapshot_Activated()) {
-		unsigned long passes=0;
+		DWORD passes=0;  // GeneralsX @feature WebPort — DWORD = uint32_t; unsigned long is 64-bit on wasm64
 		SNAPSHOT_SAY(("ValidateDevice:"));
 		HRESULT res=D3DDevice->ValidateDevice(&passes);
 		switch (res) {

@@ -16,23 +16,29 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// This file contains string macros and alias functions to help compiling on non-windows platforms
+// This file contains string macros and alias functions to help compiling on
+// non-windows platforms
 #pragma once
 #include <ctype.h>
 
-typedef const char* LPCSTR;
-typedef char* LPSTR;
+typedef const char *LPCSTR;
+typedef char *LPSTR;
 
 // String functions
+#ifdef __cplusplus
+extern "C" {
+#endif
 inline char *_strlwr(char *str) {
   for (int i = 0; str[i] != '\0'; i++) {
     str[i] = tolower(str[i]);
   }
   return str;
 }
+#ifdef __cplusplus
+}
+#endif
 
 #define strlwr _strlwr
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
-

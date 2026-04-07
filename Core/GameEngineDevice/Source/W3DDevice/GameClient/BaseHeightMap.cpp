@@ -304,8 +304,9 @@ BaseHeightMapRenderObjClass::BaseHeightMapRenderObjClass()
 	m_roadBuffer = NEW W3DRoadBuffer;
 #endif
 #if ENABLE_CONFIGURABLE_SHROUD
-	if (TheGlobalData->m_shroudOn)
+	if (TheGlobalData->m_shroudOn) {
 		m_shroud = NEW W3DShroud;
+	}
 #else
 	m_shroud = NEW W3DShroud;
 #endif

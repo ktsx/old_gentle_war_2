@@ -1365,7 +1365,6 @@ void InGameUI::init()
 	/**@ todo we used to put in the hint spy translator, but it's difficult
 	to order the translators when the code is not centralized so it has
 	been moved to where all the other translators are attached in game client */
-
 	// create the tactical view
 	if (TheDisplay)
 	{
@@ -1379,12 +1378,8 @@ void InGameUI::init()
 	}
 	TheTacticalView->setDefaultView(0.0f, 0.0f, 1.0f);
 
-	/** @todo this may be the wrong place to create the sidebar, but for now
-	this is where it lives */
 	createControlBar();
 
-	/** @todo This may be the wrong place to create the replay menu, but for now
-	this is where it lives */
 	createReplayControl();
 
 	// create the command bar
@@ -1397,6 +1392,7 @@ void InGameUI::init()
 
 	setDrawRMBScrollAnchor(TheGlobalData->m_drawScrollAnchor);
 	setMoveRMBScrollAnchor(TheGlobalData->m_moveScrollAnchor);
+	
 
 }
 

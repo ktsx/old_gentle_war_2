@@ -698,8 +698,13 @@ void W3DDisplay::init()
 		{
 			SortingRendererClass::SetMinVertexBufferSize(1);
 		}
-		if (WW3D::Init( ApplicationHWnd ) != WW3D_ERROR_OK)
+		fprintf(stderr, "DEBUG_CRAZY: W3DDisplay::init calling WW3D::Init\n");
+		WW3DErrorType ww3derr = WW3D::Init( ApplicationHWnd );
+		fprintf(stderr, "DEBUG_CRAZY: WW3D::Init returned %d\n", (int)ww3derr);
+		if (ww3derr != WW3D_ERROR_OK) {
+			fprintf(stderr, "DEBUG_CRAZY: Throwing ERROR_INVALID_D3D!\n");
 			throw ERROR_INVALID_D3D;	//failed to initialize.  User probably doesn't have DX 8.1
+		}
 
 		WW3D::Set_Prelit_Mode( WW3D::PRELIT_MODE_LIGHTMAP_MULTI_PASS );
 		WW3D::Set_Collision_Box_Display_Mask(0x00);	///<set to 0xff to make collision boxes visible
@@ -806,11 +811,14 @@ void W3DDisplay::init()
 		init3DScene();
 		W3DShaderManager::init();
 
+		fprintf(stderr, "DEBUG_CRAZY: W3DShaderManager::init() finished\n");
+
 		// Create and initialize the debug display
 		m_nativeDebugDisplay = NEW W3DDebugDisplay();
 		m_debugDisplay = m_nativeDebugDisplay;
 		if ( m_nativeDebugDisplay )
 		{
+			fprintf(stderr, "DEBUG_CRAZY: Creating W3DDebugDisplay\n");
 			m_nativeDebugDisplay->init();
 			GameFont *font;
 
@@ -827,9 +835,12 @@ void W3DDisplay::init()
 			m_nativeDebugDisplay->setFont( font );
 			m_nativeDebugDisplay->setFontHeight( 13 );
 			m_nativeDebugDisplay->setFontWidth( 9 );
+			fprintf(stderr, "DEBUG_CRAZY: Created W3DDebugDisplay\n");
 		}
 
+		fprintf(stderr, "DEBUG_CRAZY: Calling DX8WebBrowser::Initialize()\n");
 		DX8WebBrowser::Initialize();
+		fprintf(stderr, "DEBUG_CRAZY: DX8WebBrowser::Initialize() finished\n");
 	}
 
 	// we're now online

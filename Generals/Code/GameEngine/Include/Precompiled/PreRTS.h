@@ -44,50 +44,65 @@ class STLSpecialAlloc;
 #if defined(__GNUC__) && defined(_WIN32)
     #include <Utility/atl_compat.h>
 #endif
+#ifdef _WIN32
 #include <atlbase.h>
+#endif
 #include <windows.h>
 
 #include <assert.h>
 #include <ctype.h>
-#include <direct.h>
-#include <excpt.h>
+#ifdef _WIN32
+    #include <direct.h>
+    #include <excpt.h>
+#endif
 #include <float.h>
 #include <Utility/fstream_adapter.h>
-#include <imagehlp.h>
-#include <io.h>
-#include <limits.h>
-#include <lmcons.h>
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#include <mapicode.h>
+#ifdef _WIN32
+    #include <imagehlp.h>
+    #include <io.h>
+    #include <lmcons.h>
 #endif
+#if defined(_MSC_VER) && _MSC_VER < 1300
+    #include <mapicode.h>
+#endif
+#include <limits.h>
 #include <math.h>
 #include <memory.h>
-#include <mmsystem.h>
-#include <objbase.h>
-#include <ocidl.h>
-#include <process.h>
-#include <shellapi.h>
-#include <shlobj.h>
-#include <shlguid.h>
-#include <snmp.h>
+#ifdef _WIN32
+    #include <mmsystem.h>
+    #include <objbase.h>
+    #include <ocidl.h>
+    #include <process.h>
+    #include <shellapi.h>
+    #include <shlobj.h>
+    #include <shlguid.h>
+    #include <snmp.h>
+#endif
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <sys/timeb.h>
+#ifdef _WIN32
+    #include <sys/timeb.h>
+#endif
 #include <sys/types.h>
-#include <tchar.h>
+#ifdef _WIN32
+    #include <tchar.h>
+#endif
 #include <time.h>
-#include <vfw.h>
-#include <winerror.h>
-#include <wininet.h>
-#include <winreg.h>
-
-#ifndef DIRECTINPUT_VERSION
-#	define DIRECTINPUT_VERSION	0x800
+#ifdef _WIN32
+    #include <vfw.h>
+    #include <winerror.h>
+    #include <wininet.h>
+    #include <winreg.h>
 #endif
 
-#include <dinput.h>
+#ifdef _WIN32
+    #ifndef DIRECTINPUT_VERSION
+        #define DIRECTINPUT_VERSION	0x800
+    #endif
+    #include <dinput.h>
+#endif
 
 //------------------------------------------------------------------------------------ STL Includes
 // srj sez: no, include STLTypesdefs below, instead, thanks

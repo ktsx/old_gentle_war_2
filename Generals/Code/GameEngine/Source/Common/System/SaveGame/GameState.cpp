@@ -60,7 +60,14 @@
 #include "GameLogic/TerrainLogic.h"
 
 
+#ifndef _WIN32
+#include <unistd.h>
+#define _access access
+#define SetCurrentDirectory chdir
+#endif
+
 // PUBLIC DATA ////////////////////////////////////////////////////////////////////////////////////
+
 GameState *TheGameState = nullptr;
 
 // PRIVATE DATA ///////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +213,7 @@ GameState::SnapshotBlock *GameState::findBlockInfoByToken( AsciiString token, Sn
 // This allows regional formats such as Europe (English) to use 24-hour and DD/MM/YYYY formats in-game.
 UnicodeString getUnicodeDateBuffer(SYSTEMTIME timeVal)
 {
+#ifdef _WIN32
 	// setup date buffer for local region date format
 	#define DATE_BUFFER_SIZE 256
 	OSVERSIONINFO	osvi;
@@ -234,10 +242,16 @@ UnicodeString getUnicodeDateBuffer(SYSTEMTIME timeVal)
 	displayDateBuffer.set(dateBuffer);
 	return displayDateBuffer;
 	//displayDateBuffer.format( L"%ls", dateBuffer );
+#else
+	UnicodeString displayDateBuffer;
+	displayDateBuffer.set(L"01/01/2000"); // Stub for non-Windows platforms
+	return displayDateBuffer;
+#endif
 }
 
 UnicodeString getUnicodeTimeBuffer(SYSTEMTIME timeVal)
 {
+#ifdef _WIN32
 	// setup time buffer for local region time format
 	UnicodeString displayTimeBuffer;
 	OSVERSIONINFO	osvi;
@@ -267,6 +281,11 @@ UnicodeString getUnicodeTimeBuffer(SYSTEMTIME timeVal)
 								 ARRAY_SIZE(timeBuffer) );
 	displayTimeBuffer.set(timeBuffer);
 	return displayTimeBuffer;
+#else
+	UnicodeString displayTimeBuffer;
+	displayTimeBuffer.set(L"12:00 PM"); // Stub for non-Windows platforms
+	return displayTimeBuffer;
+#endif
 }
 
 

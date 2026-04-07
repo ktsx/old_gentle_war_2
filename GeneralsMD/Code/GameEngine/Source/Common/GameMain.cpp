@@ -33,6 +33,30 @@
 #include "Common/ReplaySimulation.h"
 
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+
+void EmscriptenMainLoop()
+{
+	if (TheGameEngine && !TheGameEngine->getQuitting())
+	{
+		TheGameEngine->update();
+		if (TheFramePacer)
+		{
+			TheFramePacer->update();
+		}
+	}
+	else
+	{
+		emscripten_cancel_main_loop();
+		delete TheFramePacer;
+		TheFramePacer = nullptr;
+		delete TheGameEngine;
+		TheGameEngine = nullptr;
+	}
+}
+#endif
+
 /**
  * This is the entry point for the game system.
  */
@@ -52,14 +76,20 @@ Int GameMain()
 	else
 	{
 		// run it
+#if defined(__EMSCRIPTEN__)
+		emscripten_set_main_loop(EmscriptenMainLoop, 0, 1);
+#else
 		TheGameEngine->execute();
+#endif
 	}
 
+#if !defined(__EMSCRIPTEN__)
 	// since execute() returned, we are exiting the game
 	delete TheFramePacer;
 	TheFramePacer = nullptr;
 	delete TheGameEngine;
 	TheGameEngine = nullptr;
+#endif
 
 	return exitcode;
 }

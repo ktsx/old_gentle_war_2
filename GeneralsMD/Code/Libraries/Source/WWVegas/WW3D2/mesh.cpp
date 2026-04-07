@@ -1152,7 +1152,8 @@ WW3DErrorType MeshClass::Load_W3D(ChunkLoadClass & cload)
 	/*
 	** Create and read in the model...
 	*/
-	if (Model->Load_W3D(cload) != WW3D_ERROR_OK) {
+	WW3DErrorType model_result = Model->Load_W3D(cload);
+	if (model_result != WW3D_ERROR_OK) {
 		Free();
 		return WW3D_ERROR_LOAD_FAILED;
 	}

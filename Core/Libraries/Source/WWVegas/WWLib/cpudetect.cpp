@@ -919,7 +919,13 @@ void CPUDetectClass::Init_Memory()
 #endif // defined(_MSC_VER) && _MSC_VER < 1300
 
 #else
-#warning FIX Init_Memory()
+	// TheSuperHackers @hack WebPort - Faking 1GB to pass 'didMemPass()' since GlobalMemoryStatus is undefined.
+	TotalPhysicalMemory     = 1024ull * 1024 * 1024;
+	AvailablePhysicalMemory = 1024ull * 1024 * 1024;
+	TotalPageMemory         = 1024ull * 1024 * 1024;
+	AvailablePageMemory     = 1024ull * 1024 * 1024;
+	TotalVirtualMemory      = 1024ull * 1024 * 1024;
+	AvailableVirtualMemory  = 1024ull * 1024 * 1024;
 #endif // WIN32
 }
 

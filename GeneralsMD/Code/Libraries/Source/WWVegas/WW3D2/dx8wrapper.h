@@ -116,11 +116,15 @@ extern bool _DX8SingleThreaded;
 void DX8_Assert();
 void Log_DX8_ErrorCode(unsigned res);
 
-WWINLINE void DX8_ErrorCode(unsigned res)
+void Log_DX8_ErrorCode(unsigned res, const char *file, int line);
+
+WWINLINE void DX8_ErrorCode_Internal(unsigned res, const char *file, int line)
 {
 	if (res==D3D_OK) return;
-	Log_DX8_ErrorCode(res);
+	Log_DX8_ErrorCode(res, file, line);
 }
+
+#define DX8_ErrorCode(res) DX8_ErrorCode_Internal(res, __FILE__, __LINE__)
 
 #ifdef WWDEBUG
 #define DX8CALL_HRES(x,res) DX8_Assert(); res = DX8Wrapper::_Get_D3D_Device8()->x; DX8_ErrorCode(res); number_of_DX8_calls++;
@@ -128,9 +132,9 @@ WWINLINE void DX8_ErrorCode(unsigned res)
 #define DX8CALL_D3D(x) DX8_Assert(); DX8_ErrorCode(DX8Wrapper::_Get_D3D8()->x); number_of_DX8_calls++;
 #define DX8_THREAD_ASSERT() if (_DX8SingleThreaded) { WWASSERT_PRINT(DX8Wrapper::_Get_Main_Thread_ID()==ThreadClass::_Get_Current_Thread_ID(),"DX8Wrapper::DX8 calls must be called from the main thread!"); }
 #else
-#define DX8CALL_HRES(x,res) res = DX8Wrapper::_Get_D3D_Device8()->x; number_of_DX8_calls++;
-#define DX8CALL(x) DX8Wrapper::_Get_D3D_Device8()->x; number_of_DX8_calls++;
-#define DX8CALL_D3D(x) DX8Wrapper::_Get_D3D8()->x; number_of_DX8_calls++;
+#define DX8CALL_HRES(x,res) res = DX8Wrapper::_Get_D3D_Device8()->x; DX8_ErrorCode(res);
+#define DX8CALL(x) DX8_ErrorCode(DX8Wrapper::_Get_D3D_Device8()->x);
+#define DX8CALL_D3D(x) DX8_ErrorCode(DX8Wrapper::_Get_D3D8()->x); number_of_DX8_calls++;
 #define DX8_THREAD_ASSERT() ;
 #endif
 

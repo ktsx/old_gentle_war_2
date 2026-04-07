@@ -35,7 +35,11 @@
 #include "Common/GameEngine.h"
 #include "GameLogic/GameLogic.h"
 #include "GameNetwork/NetworkInterface.h"
+// GeneralsX @build BenderAI 09/03/2026 - Miles Sound System is Windows-only;
+// Emscripten/Linux web-port uses OpenAL via the GeneralsMD SDL3 device layer.
+#ifdef _WIN32
 #include "MilesAudioDevice/MilesAudioManager.h"
+#endif
 #include "Win32Device/Common/Win32BIGFileSystem.h"
 #include "Win32Device/Common/Win32LocalFileSystem.h"
 #include "W3DDevice/Common/W3DModuleFactory.h"
@@ -97,5 +101,10 @@ inline ParticleSystemManager* Win32GameEngine::createParticleSystemManager() { r
 
 inline NetworkInterface *Win32GameEngine::createNetwork() { return NetworkInterface::createNetwork(); }
 inline Radar *Win32GameEngine::createRadar() { return NEW W3DRadar; }
+#ifdef _WIN32
 inline WebBrowser *Win32GameEngine::createWebBrowser() { return NEW CComObject<W3DWebBrowser>; }
 inline AudioManager *Win32GameEngine::createAudioManager() { return NEW MilesAudioManager; }
+#else
+inline WebBrowser *Win32GameEngine::createWebBrowser() { return nullptr; }
+inline AudioManager *Win32GameEngine::createAudioManager() { return nullptr; }
+#endif

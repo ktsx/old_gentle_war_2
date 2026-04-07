@@ -147,7 +147,7 @@ void ControlBar::showBuildTooltipLayout( GameWindow *cmdButton )
 		if(!passedWaitTime)
 			return;
 	}
-	else if( !m_buildToolTipLayout->isHidden() )
+	else if( m_buildToolTipLayout && !m_buildToolTipLayout->isHidden() )
 	{
 		if(useAnimation && TheGlobalData->m_animateWindows && !theAnimateWindowManager->isReversed())
 			theAnimateWindowManager->reverseAnimateWindow();
@@ -693,6 +693,8 @@ void ControlBar::deleteBuildTooltipLayout()
 {
 	m_showBuildToolTipLayout = FALSE;
 	prevWindow= nullptr;
+	if(!m_buildToolTipLayout)
+		return;
 	m_buildToolTipLayout->hide(TRUE);
 //	if(!m_buildToolTipLayout)
 //		return;

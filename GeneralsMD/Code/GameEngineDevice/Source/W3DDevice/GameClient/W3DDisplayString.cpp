@@ -112,7 +112,6 @@ W3DDisplayString::~W3DDisplayString()
 //=============================================================================
 void W3DDisplayString::notifyTextChanged()
 {
-
 	// extend functionality
 	DisplayString::notifyTextChanged();
 	if(TheGlobalLanguageData)
@@ -141,7 +140,6 @@ void W3DDisplayString::notifyTextChanged()
 	// reset data for our text renderer
 	m_textRenderer.Reset();
 	m_textRendererHotKey.Reset();
-
 }
 
 // W3DDisplayString::Draw =====================================================

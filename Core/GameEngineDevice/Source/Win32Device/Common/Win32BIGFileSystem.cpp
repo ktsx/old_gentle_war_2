@@ -61,12 +61,16 @@ void Win32BIGFileSystem::init() {
 
 #if RTS_ZEROHOUR
     // load original Generals assets
+#if defined(__EMSCRIPTEN__)
+    // Emscripten relies on BigVFS which preloads all .big files from the server, no need to query registry.
+#else
     AsciiString installPath;
     GetStringFromGeneralsRegistry("", "InstallPath", installPath );
     //@todo this will need to be ramped up to a crash for release
     DEBUG_ASSERTCRASH(!installPath.isEmpty(), ("Be 1337! Go install Generals!"));
     if (!installPath.isEmpty())
       loadBigFilesFromDirectory(installPath, "*.big");
+#endif
 #endif
 }
 

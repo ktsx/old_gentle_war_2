@@ -900,7 +900,9 @@ void WaterRenderObjClass::ReAcquireResources()
 	}
 
 	if (m_waterTrackSystem)
+	{
 		m_waterTrackSystem->ReAcquireResources();
+	}
 
 	if (W3DShaderManager::getChipset() >= DC_GENERIC_PIXEL_SHADER_1_1)
 	{
@@ -1076,8 +1078,6 @@ Int WaterRenderObjClass::init(Real waterLevel, Real dx, Real dy, SceneClass *par
 
 	//Setup material for regular water
 	m_vertexMaterialClass=VertexMaterialClass::Get_Preset(VertexMaterialClass::PRELIT_DIFFUSE);
-
-
 
 	m_shaderClass = zFillAlphaShader;//ShaderClass::_PresetAlphaShader;ShaderClass::_PresetOpaqueShader;//detailOpaqueShader;
 	m_shaderClass.Set_Cull_Mode(ShaderClass::CULL_MODE_DISABLE);	//water should be visible from both sides

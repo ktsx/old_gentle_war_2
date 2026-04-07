@@ -20,6 +20,9 @@
 
 #include <cstddef> // std::size_t, std::ptrdiff_t
 #include <new> // std::bad_alloc
+#ifndef _WIN32
+#include <cstdlib> // malloc, free on non-Windows
+#endif
 
 
 namespace stl
@@ -65,7 +68,11 @@ public:
 		if (n > max_size())
 			throw std::bad_alloc();
 
+		#ifdef _WIN32
 		void* p = GlobalAlloc(GMEM_FIXED, n * sizeof(T));
+		#else
+		void* p = ::malloc(n * sizeof(T));
+		#endif
 		if (!p)
 			throw std::bad_alloc();
 		return static_cast<pointer>(p);
@@ -73,7 +80,11 @@ public:
 
 	void deallocate(pointer p, size_type)
 	{
+		#ifdef _WIN32
 		GlobalFree(p);
+		#else
+		::free(p);
+		#endif
 	}
 
 	void construct(pointer p, const T& val)

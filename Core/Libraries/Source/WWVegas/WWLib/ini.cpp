@@ -95,6 +95,7 @@
 #include "XPIPE.h"
 #include "XSTRAW.h"
 #include <malloc.h>
+#include <new>      // placement new for INIClass::Initialize
 #ifdef _UNIX
 #include <ctype.h>
 #endif
@@ -143,16 +144,39 @@ bool INIClass::Is_Loaded() const
 
 void INIClass::Initialize()
 {
-	SectionList = W3DNEW List<INISection *> ();
-	SectionIndex = W3DNEW IndexClass<int, INISection *> ();
+	// Use malloc/placement-new instead of W3DNEW to bypass the DMA pool.
+	// Both List<INISection*> (28 bytes) and IndexClass<int,INISection*> (20 bytes)
+	// land in dmaPool_32.  A double-free elsewhere creates a self-cycle in that
+	// pool's free-list, causing allocateSingleBlock to return the same address for
+	// both objects; IndexClass construction then memset-zeroes the List vtable,
+	// producing a "function signature mismatch" crash on the first virtual call.
+	// Allocating from the system heap guarantees distinct, uncorrupted addresses.
+	void* slMem = malloc(sizeof(List<INISection *>));
+	SectionList = new(slMem) List<INISection *>();
+	void* siMem = malloc(sizeof(IndexClass<int, INISection *>));
+	SectionIndex = new(siMem) IndexClass<int, INISection *>();
 	Filename = nstrdup("<unknown>");
 }
 
 void INIClass::Shutdown()
 {
-	delete SectionList;
-	delete SectionIndex;
-	delete[] Filename;
+	// Pair with the malloc-based allocation in Initialize().
+	// Use explicit (non-virtual) destructor call + free instead of delete,
+	// so we never touch a potentially-corrupted vtable.
+	if (SectionList) {
+		SectionList->List<INISection *>::~List();
+		free(SectionList);
+		SectionList = nullptr;
+	}
+	if (SectionIndex) {
+		SectionIndex->IndexClass<int, INISection *>::~IndexClass();
+		free(SectionIndex);
+		SectionIndex = nullptr;
+	}
+	if (Filename) {
+		delete[] Filename;
+		Filename = nullptr;
+	}
 }
 
 /***********************************************************************************************
@@ -270,7 +294,6 @@ bool INIClass::Clear(char const * section, char const * entry)
 	if (section == nullptr) {
 		SectionList->Delete();
 		SectionIndex->Clear();
-
 		delete[] Filename;
 		Filename = nstrdup("<unknown>");
 	} else {

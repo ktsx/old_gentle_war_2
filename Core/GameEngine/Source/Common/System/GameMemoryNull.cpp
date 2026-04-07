@@ -109,8 +109,8 @@ void initMemoryManager()
 {
 	if (TheMemoryPoolFactory == nullptr && TheDynamicMemoryAllocator == nullptr)
 	{
-		TheMemoryPoolFactory = new (malloc(sizeof MemoryPoolFactory)) MemoryPoolFactory;
-		TheDynamicMemoryAllocator = new (malloc(sizeof DynamicMemoryAllocator)) DynamicMemoryAllocator;
+		TheMemoryPoolFactory = new (malloc(sizeof(MemoryPoolFactory))) MemoryPoolFactory;
+		TheDynamicMemoryAllocator = new (malloc(sizeof(DynamicMemoryAllocator))) DynamicMemoryAllocator;
 
 		DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
 		DEBUG_LOG(("*** Initialized the Null Memory Manager"));
@@ -155,6 +155,28 @@ void shutdownMemoryManager()
 	DEBUG_SHUTDOWN();
 }
 
+
+// --- Stubs for symbols normally provided by GameMemory.cpp / GameMemoryInit.cpp ---
+// These files are not compiled in null-memory mode, but these symbols
+// may still be referenced by other translation units.
+
+bool g_isDma32TracingEnabledNow = false;
+
+void userMemoryManagerGetDmaParms(Int *numSubPools, const PoolInitRec **pParms)
+{
+	if (numSubPools) *numSubPools = 0;
+	if (pParms) *pParms = nullptr;
+}
+
+void userMemoryManagerInitPools()
+{
+}
+
+void userMemoryAdjustPoolSize(const char * /*poolName*/, Int& /*initialAllocationCount*/, Int& /*overflowAllocationCount*/)
+{
+}
+
+// --- Global operator new/delete overloads ---
 
 #ifndef DISABLE_GAMEMEMORY_NEW_OPERATORS
 

@@ -548,8 +548,10 @@ Int W3DGameWindow::winSetText( UnicodeString newText )
 	// extending functionality
 	GameWindow::winSetText( newText );
 
-	// rebuild the sentence in our text renderer
-	m_textRenderer.Build_Sentence( m_instData.getText().str(),nullptr, nullptr );
+	// rebuild the sentence in our text renderer (guard against null Font — can happen when
+	// winSetText is called before setFont during gadget initialization)
+	if( m_textRenderer.Peek_Font() != nullptr )
+		m_textRenderer.Build_Sentence( m_instData.getText().str(),nullptr, nullptr );
 
 	// this is a visual change
 	m_needPolyDraw = TRUE;

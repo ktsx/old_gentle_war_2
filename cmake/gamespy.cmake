@@ -8,3 +8,12 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(gamespy)
+
+# GeneralsX @feature WebPort 09/03/2026 — Emscripten: GameSpy SDK needs __linux__ for _UNIX path
+# The SDK's gsplatform.h checks __linux__ to define _UNIX (socket headers, time_t, etc.)
+# Emscripten is POSIX-like but doesn't define __linux__; gsinterface propagates to all modules
+if(EMSCRIPTEN)
+    if(TARGET gsinterface)
+        target_compile_definitions(gsinterface INTERFACE __linux__=1)
+    endif()
+endif()

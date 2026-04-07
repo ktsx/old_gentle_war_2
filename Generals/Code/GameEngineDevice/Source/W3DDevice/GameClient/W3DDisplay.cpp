@@ -37,7 +37,13 @@ static void drawFramerateBar();
 #include <numeric>
 #include <stdlib.h>
 #include <windows.h>
+#ifdef _WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+// _access is available as access() on POSIX
+#define _access(path, mode) access((path), (mode))
+#endif
 #include <time.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
@@ -2803,6 +2809,7 @@ void W3DDisplay::setShroudLevel( Int x, Int y, CellShroudStatus setting )
 
 //=============================================================================
 ///Utility function to dump data into a .BMP file
+#ifdef _WIN32
 static void CreateBMPFile(LPTSTR pszFile, char *image, Int width, Int height)
 {
 	HANDLE hf;                  // file handle
@@ -2877,6 +2884,12 @@ static void CreateBMPFile(LPTSTR pszFile, char *image, Int width, Int height)
 	// Free memory.
 	LocalFree( (HLOCAL) pbmi);
 }
+#else
+static void CreateBMPFile(LPTSTR /*pszFile*/, char * /*image*/, Int /*width*/, Int /*height*/)
+{
+	// Bitmap screenshot not supported on non-Windows
+}
+#endif // _WIN32
 
 ///Save Screen Capture to a file
 void W3DDisplay::takeScreenShot()

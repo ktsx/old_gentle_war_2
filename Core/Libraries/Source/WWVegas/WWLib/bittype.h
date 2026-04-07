@@ -51,13 +51,19 @@ typedef float				float32;
 typedef double				float64;
 
 typedef unsigned long   DWORD;
+#define _DWORD_DEFINED
 typedef unsigned short	WORD;
+#define _WORD_DEFINED
 typedef unsigned char   BYTE;
+#define _BYTE_DEFINED
 typedef int             BOOL;
+#define _BOOL_DEFINED
 typedef unsigned short	USHORT;
 typedef const char *		LPCSTR;
 typedef unsigned int    UINT;
+#define _UINT_DEFINED
 typedef unsigned long   ULONG;
+#define _ULONG_DEFINED
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #ifndef _WCHAR_T_DEFINED

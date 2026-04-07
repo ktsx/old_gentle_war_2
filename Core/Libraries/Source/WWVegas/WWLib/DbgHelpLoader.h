@@ -20,6 +20,8 @@
 
 #include "always.h"
 
+#ifndef __EMSCRIPTEN__
+
 #include <win.h>
 #include <imagehlp.h> // Must be included after Windows.h
 #include <set>
@@ -214,3 +216,5 @@ private:
 	bool m_failed;
 	bool m_loadedFromSystem;
 };
+
+#endif // !__EMSCRIPTEN__

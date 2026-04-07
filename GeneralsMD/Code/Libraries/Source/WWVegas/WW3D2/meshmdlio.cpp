@@ -421,7 +421,6 @@ WW3DErrorType MeshModelClass::Load_W3D(ChunkLoadClass & cload)
 	return WW3D_ERROR_OK;
 
 Error:
-
 	return WW3D_ERROR_LOAD_FAILED;
 }
 

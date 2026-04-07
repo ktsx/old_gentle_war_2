@@ -49,7 +49,12 @@
 #include "Common/Registry.h"
 #include "W3DDevice/GameClient/W3DFileSystem.h"
 
+#ifdef _WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+#define _access(path, mode) access((path), (mode))
+#endif
 
 // DEFINES ////////////////////////////////////////////////////////////////////////////////////////
 

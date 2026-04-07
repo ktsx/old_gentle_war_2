@@ -63,8 +63,10 @@ enum
 //-------------------------------------------------------------------------------------------------
 /** Status return codes for the INI reader */
 //-------------------------------------------------------------------------------------------------
-enum
+enum INIError : unsigned int
 {
+	INI_OK = 0,
+	INI_EOF,
 	// we map all of these to the same "real" error code, because
 	// we generally don't care why it failed; but since the code distinguishes,
 	// I didn't want to wipe out that intelligence. if we ever need to distinguish

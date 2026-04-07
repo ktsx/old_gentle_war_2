@@ -1334,6 +1334,7 @@ GameWindow *GameWindowManager::winCreate( GameWindow *parent,
 {
 	GameWindow *window;
 
+
 	// allocate new window
 	window = allocateNewWindow();
 	if( window == nullptr )
@@ -1830,8 +1831,9 @@ GameWindow *GameWindowManager::gogoGadgetPushButton( GameWindow *parent,
 
 	// assign text from label
 	UnicodeString text = winTextLabelToText( instData->m_textLabelString );
-	if( text.getLength() )
+	if( text.getLength() ) {
 		GadgetButtonSetText( button, text );
+	}
 
 	return button;
 

@@ -17,72 +17,81 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWAudio                                                      *
+ *                 Project Name : WWAudio *
  *                                                                                             *
  *                     $Archive:: /Commando/Code/WWAudio/Utils.h          $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 8/24/01 4:37p                                               $*
+ *                     $Modtime:: 8/24/01 4:37p $*
  *                                                                                             *
- *                    $Revision:: 4                                                           $*
+ *                    $Revision:: 4 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #pragma once
 
-#pragma warning (push, 3)
+#pragma warning(push, 3)
 #include "mss.h"
-#pragma warning (pop)
+#include <windows.h>
+#pragma warning(pop)
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Macros
 //
-#define SAFE_DELETE(pobject) { delete pobject; pobject = nullptr; }
+#define SAFE_DELETE(pobject)                                                   \
+  {                                                                            \
+    delete pobject;                                                            \
+    pobject = nullptr;                                                         \
+  }
 
-#define SAFE_DELETE_ARRAY(pobject) { delete [] pobject; pobject = nullptr; }
+#define SAFE_DELETE_ARRAY(pobject)                                             \
+  {                                                                            \
+    delete[] pobject;                                                          \
+    pobject = nullptr;                                                         \
+  }
 
-#define SAFE_FREE(pobject) { ::free (pobject); pobject = nullptr; }
-
+#define SAFE_FREE(pobject)                                                     \
+  {                                                                            \
+    ::free(pobject);                                                           \
+    pobject = nullptr;                                                         \
+  }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 //	MMSLockClass
 //
 /////////////////////////////////////////////////////////////////////////////
-class MMSLockClass
-{
-	public:
-		MMSLockClass () { ::AIL_lock (); }
-		~MMSLockClass () { ::AIL_unlock (); }
+class MMSLockClass {
+public:
+  MMSLockClass() { ::AIL_lock(); }
+  ~MMSLockClass() { ::AIL_unlock(); }
 
-
-	static CRITICAL_SECTION _MSSLockCriticalSection;
+  static CRITICAL_SECTION _MSSLockCriticalSection;
 };
-
 
 ////////////////////////////////////////////////////////////////////////////
 //
 //  Get_Filename_From_Path
 //
-__inline LPCTSTR
-Get_Filename_From_Path (LPCTSTR path)
-{
-	// Find the last occurrence of the directory deliminator
-	LPCTSTR filename = ::strrchr (path, '\\');
-	if (filename != nullptr) {
-		// Increment past the directory deliminator
-		filename ++;
-	} else {
-		filename = path;
-	}
+__inline LPCTSTR Get_Filename_From_Path(LPCTSTR path) {
+  // Find the last occurrence of the directory deliminator
+  LPCTSTR filename = ::strrchr(path, '\\');
+  if (filename != nullptr) {
+    // Increment past the directory deliminator
+    filename++;
+  } else {
+    filename = path;
+  }
 
-	// Return the filename part of the path
-	return filename;
+  // Return the filename part of the path
+  return filename;
 }

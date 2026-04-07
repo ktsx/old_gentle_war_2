@@ -37,6 +37,11 @@ static void Create_Hash_Name(StringClass& name, const StringClass& thumb_name)
 {
 	name=thumb_name;
 	int len=name.Get_Length();
+	if (len < 4) {
+		// Empty or too-short name — can't strip extension, just lowercase as-is
+		_strlwr(name.Peek_Buffer());
+		return;
+	}
 	WWASSERT(stricmp(&name[len-4],".tga") == 0 || stricmp(&name[len-4],".dds") == 0);
 	name[len-4]='\0';
 	_strlwr(name.Peek_Buffer());

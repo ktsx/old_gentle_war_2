@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -102,7 +103,7 @@ ProfileHighLevel::Block::Block(const char *name)
 
 ProfileHighLevel::Block::~Block()
 {
-  _int64 end;
+  long long end;
   ProfileGetTime(end);
   end-=m_start;
 
@@ -340,3 +341,5 @@ ProfileHighLevel::ProfileHighLevel()
 }
 
 ProfileHighLevel ProfileHighLevel::Instance;
+
+#endif

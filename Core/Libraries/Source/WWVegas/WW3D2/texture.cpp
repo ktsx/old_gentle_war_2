@@ -1050,7 +1050,9 @@ TextureClass* Load_Texture(ChunkLoadClass & cload)
 	TextureClass *newtex = nullptr;
 
 	char name[256];
-	if (cload.Open_Chunk () && (cload.Cur_Chunk_ID () == W3D_CHUNK_TEXTURE))
+	name[0] = 0;
+	bool outer_open = cload.Open_Chunk();
+	if (outer_open && (cload.Cur_Chunk_ID () == W3D_CHUNK_TEXTURE))
 	{
 
 		W3dTextureInfoStruct texinfo;

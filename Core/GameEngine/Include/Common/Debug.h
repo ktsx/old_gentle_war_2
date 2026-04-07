@@ -45,6 +45,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 class AsciiString;
 
 #define NO_RELEASE_DEBUG_LOGGING
@@ -223,10 +225,10 @@ DEBUG_EXTERN_C void ReleaseCrashLocalized(const AsciiString& p, const AsciiStrin
 class SimpleProfiler
 {
 private:
-	__int64 m_freq;
-	__int64 m_startThisSession;
-	__int64 m_totalThisSession;
-	__int64 m_totalAllSessions;
+	long long m_freq;
+	long long m_startThisSession;
+	long long m_totalThisSession;
+	long long m_totalAllSessions;
 	int			m_numSessions;
 
 public:

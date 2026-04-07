@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -30,7 +31,8 @@
 #include "debug_cmd.h"
 #include "internal.h"
 #include <windows.h>
-#include <process.h>
+//#include <process.h>
+#define _beginthreadex(a,b,c,d,e,f) 0
 
 bool DebugCmdInterfaceDebug::Execute(class Debug& dbg, const char *cmd,
                                      CommandMode cmdmode, unsigned argn,
@@ -408,3 +410,5 @@ bool DebugCmdInterfaceDebug::Execute(class Debug& dbg, const char *cmd,
   // unknown command
   return false;
 }
+
+#endif

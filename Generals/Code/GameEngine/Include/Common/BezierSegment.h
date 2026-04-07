@@ -29,7 +29,12 @@
 
 #pragma once
 
+// GeneralsX @build BenderAI 09/03/2026 WebPort - cross-platform math library selection
+#ifdef SAGE_USE_GLM
+#include <glm/glm.hpp>
+#else
 #include <d3dx8math.h>
+#endif
 #include "Common/STLTypedefs.h"
 
 #define USUAL_TOLERANCE 1.0f
@@ -37,7 +42,11 @@
 class BezierSegment
 {
 	protected:
+#ifndef SAGE_USE_GLM
 		static const D3DXMATRIX s_bezBasisMatrix;
+#else // SAGE_USE_GLM
+		static const glm::mat4 s_bezBasisMatrix;
+#endif
 		Coord3D m_controlPoints[4];
 
 	public:	// Constructors

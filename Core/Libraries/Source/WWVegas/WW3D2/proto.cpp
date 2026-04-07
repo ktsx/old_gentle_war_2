@@ -125,7 +125,9 @@ PrototypeClass * MeshLoaderClass::Load_W3D(ChunkLoadClass & cload)
 		return nullptr;
 	}
 
-	if (mesh->Load_W3D(cload) != WW3D_ERROR_OK) {
+	WW3DErrorType load_result = mesh->Load_W3D(cload);
+
+	if (load_result != WW3D_ERROR_OK) {
 
 		// if the load failed, delete the mesh
 		assert(mesh->Num_Refs() == 1);

@@ -16,6 +16,8 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __EMSCRIPTEN__ // Windows debug help not available
+
 #include "DbgHelpLoader.h"
 
 
@@ -360,3 +362,4 @@ BOOL DbgHelpLoader::miniDumpWriteDump(
 	return FALSE;
 }
 #endif
+#endif // !__EMSCRIPTEN__

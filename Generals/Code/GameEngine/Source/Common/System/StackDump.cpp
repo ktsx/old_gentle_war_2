@@ -44,6 +44,7 @@ void WriteStackLine(void*address, void (*callback)(const char*));
 //*****************************************************************************
 //	Mis-named globals :-)
 //*****************************************************************************
+#ifdef _WIN32
 static CONTEXT gsContext;
 
 
@@ -632,7 +633,16 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 	DEBUG_LOG(( "********** END EXCEPTION DUMP ****************" ));
 	DEBUG_LOG_RAW(("\n"));
 }
+#else
 
+void StackDumpDefaultHandler(const char*line) {}
+void StackDump(void (*callback)(const char*)) {}
+void StackDumpFromContext(DWORD eip,DWORD esp,DWORD ebp, void (*callback)(const char*)) {}
+void FillStackAddresses(void**addresses, unsigned int count, unsigned int skip) {}
+void StackDumpFromAddresses(void**addresses, unsigned int count, void (*callback)(const char *)) {}
+void DumpExceptionInfo( unsigned int u, void* e_info ) {}
+
+#endif
 
 #pragma pack(pop)
 

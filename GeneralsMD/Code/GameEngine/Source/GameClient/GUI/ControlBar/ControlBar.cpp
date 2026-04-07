@@ -1421,7 +1421,7 @@ void ControlBar::update()
 
 
 
-	if( !m_buildToolTipLayout->isHidden())
+	if( m_buildToolTipLayout && !m_buildToolTipLayout->isHidden())
 	{
 		m_buildToolTipLayout->runUpdate();
 		m_showBuildToolTipLayout = FALSE;

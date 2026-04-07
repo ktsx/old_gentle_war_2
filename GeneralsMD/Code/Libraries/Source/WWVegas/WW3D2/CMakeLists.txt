@@ -242,16 +242,27 @@ target_compile_definitions(z_ww3d2 PRIVATE
     $<$<BOOL:${IS_VS6_BUILD}>:WINVER=0x0500>
 )
 
-target_precompile_headers(z_ww3d2 PRIVATE
-    [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
-    dx8wrapper.h
-    [["always.h"]]
-    [["STLUtils.h"]]
-    [["win.h"]]
-    [["WWCommon.h"]]
-    [["wwstring.h"]]
-    <windows.h>
-)
+if(EMSCRIPTEN)
+    target_precompile_headers(z_ww3d2 PRIVATE
+        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["always.h"]]
+        [["STLUtils.h"]]
+        [["win.h"]]
+        [["WWCommon.h"]]
+        [["wwstring.h"]]
+    )
+else()
+    target_precompile_headers(z_ww3d2 PRIVATE
+        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        dx8wrapper.h
+        [["always.h"]]
+        [["STLUtils.h"]]
+        [["win.h"]]
+        [["WWCommon.h"]]
+        [["wwstring.h"]]
+        <windows.h>
+    )
+endif()
 
 target_link_libraries(z_ww3d2 PRIVATE
     core_wwdebug
@@ -259,3 +270,10 @@ target_link_libraries(z_ww3d2 PRIVATE
     z_wwcommon
     zi_always
 )
+
+# GeneralsX @feature WebPort 09/03/2026 — GLES3 wrapper sources (DX8->WebGL 2.0 translation layer)
+# GLES3_WEB_SOURCES is defined in cmake/web.cmake and included at top-level configure time.
+if(EMSCRIPTEN)
+    target_sources(z_ww3d2 PRIVATE ${GLES3_WEB_SOURCES})
+    target_compile_options(z_ww3d2 PRIVATE "-sUSE_SDL=2")
+endif()

@@ -50,6 +50,15 @@
 #include "Common/Debug.h"
 #include "Common/Errors.h"
 
+// Emscripten/UNIX compat: _stricmp is MSVC-specific
+#if !defined(_MSC_VER) && !defined(_stricmp)
+#  include <strings.h>
+#  define _stricmp  strcasecmp
+#  define _strnicmp strncasecmp
+#endif
+
+
+
 class UnicodeString;
 
 // -----------------------------------------------------

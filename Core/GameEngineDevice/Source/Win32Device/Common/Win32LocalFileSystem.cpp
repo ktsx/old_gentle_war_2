@@ -34,6 +34,11 @@
 #include "Win32Device/Common/Win32LocalFile.h"
 #include <io.h>
 
+#if defined(__EMSCRIPTEN__)
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
+
 Win32LocalFileSystem::Win32LocalFileSystem() : LocalFileSystem()
 {
 }
@@ -116,6 +121,19 @@ void Win32LocalFileSystem::reset()
 Bool Win32LocalFileSystem::doesFileExist(const Char *filename) const
 {
 	//USE_PERF_TIMER(Win32LocalFileSystem_doesFileExist)
+#if defined(__EMSCRIPTEN__)
+	// Emscripten MEMFS is case-sensitive and BigVFS mounts all placeholders lowercase
+	char normPath[1024];
+	strncpy(normPath, filename, sizeof(normPath) - 1);
+	normPath[sizeof(normPath) - 1] = '\0';
+	for (int i = 0; normPath[i] != '\0'; ++i) {
+		if (normPath[i] == '\\') normPath[i] = '/';
+		normPath[i] = tolower(normPath[i]);
+	}
+	if (_access(normPath, 0) == 0) {
+		return TRUE;
+	}
+#endif
 	if (_access(filename, 0) == 0) {
 		return TRUE;
 	}
@@ -124,6 +142,82 @@ Bool Win32LocalFileSystem::doesFileExist(const Char *filename) const
 
 void Win32LocalFileSystem::getFileListInDirectory(const AsciiString& currentDirectory, const AsciiString& originalDirectory, const AsciiString& searchName, FilenameList & filenameList, Bool searchSubdirectories) const
 {
+#if defined(__EMSCRIPTEN__)
+	
+	AsciiString fullDir = originalDirectory;
+	fullDir.concat(currentDirectory);
+	
+	char normDir[1024];
+	strncpy(normDir, fullDir.str(), sizeof(normDir) - 1);
+	normDir[sizeof(normDir) - 1] = '\0';
+	for (int i = 0; normDir[i] != '\0'; ++i) {
+		if (normDir[i] == '\\') normDir[i] = '/';
+		normDir[i] = tolower(normDir[i]);
+	}
+	
+	// Strip trailing slash for opendir
+	int len = strlen(normDir);
+	if (len > 0 && normDir[len-1] == '/') normDir[len-1] = '\0';
+	if (strlen(normDir) == 0) strcpy(normDir, ".");
+	
+	DIR *dir = opendir(normDir);
+	if (dir) {
+		struct dirent *ent;
+		while ((ent = readdir(dir)) != nullptr) {
+			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) continue;
+			
+			AsciiString newFilename = originalDirectory;
+			newFilename.concat(currentDirectory);
+			newFilename.concat(ent->d_name);
+			
+			// In Emscripten MEMFS, d_type is usually reliable, but fallback to stat if needed
+			bool is_dir = (ent->d_type == DT_DIR);
+			if (ent->d_type == DT_UNKNOWN) {
+				struct stat st;
+				char fullPath[1024];
+				snprintf(fullPath, sizeof(fullPath), "%s/%s", normDir, ent->d_name);
+				if (stat(fullPath, &st) == 0) {
+					is_dir = S_ISDIR(st.st_mode);
+				}
+			}
+			
+			if (is_dir) {
+				if (searchSubdirectories) {
+					AsciiString tempsearchstr = currentDirectory;
+					tempsearchstr.concat(ent->d_name);
+					tempsearchstr.concat('\\');
+					getFileListInDirectory(tempsearchstr, originalDirectory, searchName, filenameList, searchSubdirectories);
+				}
+			} else {
+				// Wildcard match check
+				bool match = false;
+				const char *searchStr = searchName.str();
+				
+				if (strcmp(searchStr, "*") == 0 || strcmp(searchStr, "*.*") == 0) {
+					match = true;
+				} else if (searchStr[0] == '*') {
+					const char *ext = &searchStr[1];
+					if (AsciiString(ent->d_name).endsWithNoCase(ext)) {
+						match = true;
+					}
+				} else {
+					if (AsciiString(ent->d_name).compareNoCase(searchName) == 0) {
+						match = true;
+					}
+				}
+				
+				if (match) {
+					if (filenameList.find(newFilename) == filenameList.end()) {
+						filenameList.insert(newFilename);
+					}
+				}
+			}
+		}
+		closedir(dir);
+	}
+	return;
+#endif
+
 	HANDLE fileHandle = nullptr;
 	WIN32_FIND_DATA findData;
 

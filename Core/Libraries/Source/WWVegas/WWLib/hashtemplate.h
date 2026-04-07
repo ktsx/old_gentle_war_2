@@ -38,6 +38,7 @@
 
 #include "always.h"
 #include "wwstring.h"
+#include <cstring> // for memcpy (WASM alignment-safe hash)
 
 // Class for providing hash values
 
@@ -415,7 +416,8 @@ template <> inline unsigned int HashTemplateKeyClass<StringClass>::Get_Hash_Valu
 		}
 		return hval;
 	}
-	unsigned int hval = *((const unsigned int*)(buffer+len-8));
+	unsigned int hval;
+	memcpy(&hval, buffer+len-8, sizeof(unsigned int)); // safe for WASM alignment
 	hval = hval + (hval>>5) + (hval>>10) + (hval >> 20);
 	return hval;
 }

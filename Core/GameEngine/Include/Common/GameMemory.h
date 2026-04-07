@@ -45,6 +45,8 @@
 
 #pragma once
 
+extern bool g_isDma32TracingEnabledNow;
+
 // Turn off memory pool checkpointing for now.
 #ifndef DISABLE_MEMORYPOOL_CHECKPOINTING
 	#define DISABLE_MEMORYPOOL_CHECKPOINTING 1
@@ -61,7 +63,11 @@
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 
+#ifndef __EMSCRIPTEN__
 #include <new.h>
+#else
+#include <new>
+#endif
 #include <Utility/stdio_adapter.h>
 #ifdef MEMORYPOOL_OVERRIDE_MALLOC
 	#include <malloc.h>
@@ -72,6 +78,8 @@
 #include "Lib/BaseType.h"
 #include "Common/Debug.h"
 #include "Common/Errors.h"
+
+extern Bool g_enableDmaPool32Tracing;
 
 // MACROS //////////////////////////////////////////////////////////////////
 
@@ -471,16 +479,14 @@ public:
 		Bool debugIsBlockInDma(void *pBlock);
 
 		/// return true iff the pool is a subpool of this dma
-		Bool debugIsPoolInDma(MemoryPool *pool);
 
 	#endif	// MEMORYPOOL_DEBUG
 };
 
-// ----------------------------------------------------------------------------
-#ifdef MEMORYPOOL_DEBUG
-enum { MAX_SPECIAL_USED = 256 };
-#endif
+extern bool g_enableDmaPool32Tracing;
 
+// ----------------------------------------------------------------------------
+// FORWARD DECLARATIONS
 // ----------------------------------------------------------------------------
 /**
 	The class that manages all the MemoryPools and DynamicMemoryAllocators.

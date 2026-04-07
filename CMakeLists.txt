@@ -25,6 +25,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(FeatureSummary)
 include(CMakeDependentOption)
 
+# Use ccache if available to speed up incremental builds
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    message(STATUS "ccache found: ${CCACHE_PROGRAM} (enabled for C/C++)")
+else()
+    message(STATUS "ccache not found. Incremental builds may be slower.")
+endif()
+
 # We don't support in tree builds, so help people make the right choice.
 if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     message(FATAL_ERROR "Building in-source is not supported! Create a build dir and remove ${CMAKE_SOURCE_DIR}/CMakeCache.txt")
@@ -49,9 +59,19 @@ if(MINGW)
 endif()
 
 # Find/Add build dependencies and stubs shared by all projects
-if((WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows") AND ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-    include(cmake/miles.cmake)
-    include(cmake/bink.cmake)
+# Miles/Bink headers needed by WWAudio even on non-Win32 (stub library provides mss.h/bink.h)
+# GeneralsX @feature WebPort 09/03/2026 — Include on all platforms (stubs are header-only)
+include(cmake/miles.cmake)
+include(cmake/bink.cmake)
+
+# Always include DX8 headers (needed for both Windows and Linux builds)
+# On Windows: min-dx8-sdk headers
+# On Linux: DXVK headers (for D3D8→Vulkan translation)
+# On Web: GLES3 wrapper headers (for DX8→WebGL 2.0 translation)
+# GeneralsX @feature WebPort 09/03/2026
+if(EMSCRIPTEN)
+    include(cmake/web.cmake)
+else()
     include(cmake/dx8.cmake)
 endif()
 

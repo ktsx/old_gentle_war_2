@@ -23,153 +23,203 @@
 #include <string>
 
 #define WIN32_LEAN_AND_MEAN
+#ifndef __EMSCRIPTEN__
 #include <windows.h>
+#endif
 
 #include "Registry.h"
 
-bool  getStringFromRegistry(HKEY root, std::string path, std::string key, std::string& val)
-{
-	HKEY handle;
-	unsigned char buffer[256];
-	unsigned long size = 256;
-	unsigned long type;
-	int returnValue;
+#ifdef __EMSCRIPTEN__
 
-	if ((returnValue = RegOpenKeyEx( root, path.c_str(), 0, KEY_READ, &handle )) == ERROR_SUCCESS)
-	{
-		returnValue = RegQueryValueEx(handle, key.c_str(), nullptr, &type, (unsigned char *) &buffer, &size);
-		RegCloseKey( handle );
-	}
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		val = (char *)buffer;
-		return true;
-	}
-
-	return false;
+bool getStringFromRegistry(void *root, std::string path, std::string key,
+                           std::string &val) {
+  return false;
+}
+bool getUnsignedIntFromRegistry(void *root, std::string path, std::string key,
+                                unsigned int &val) {
+  return false;
+}
+bool setStringInRegistry(void *root, std::string path, std::string key,
+                         std::string val) {
+  return false;
+}
+bool setUnsignedIntInRegistry(void *root, std::string path, std::string key,
+                              unsigned int val) {
+  return false;
+}
+bool GetStringFromRegistry(std::string path, std::string key,
+                           std::string &val) {
+  return false;
+}
+bool GetUnsignedIntFromRegistry(std::string path, std::string key,
+                                unsigned int &val) {
+  return false;
+}
+bool SetStringInRegistry(std::string path, std::string key, std::string val) {
+  return false;
+}
+bool SetUnsignedIntInRegistry(std::string path, std::string key,
+                              unsigned int val) {
+  return false;
 }
 
-bool getUnsignedIntFromRegistry(HKEY root, std::string path, std::string key, unsigned int& val)
-{
-	HKEY handle;
-	unsigned long buffer;
-	unsigned long size = sizeof(buffer);
-	unsigned long type;
-	int returnValue;
+#else
 
-	if ((returnValue = RegOpenKeyEx( root, path.c_str(), 0, KEY_READ, &handle )) == ERROR_SUCCESS)
-	{
-		returnValue = RegQueryValueEx(handle, key.c_str(), nullptr, &type, (unsigned char *) &buffer, &size);
-		RegCloseKey( handle );
-	}
+bool getStringFromRegistry(HKEY root, std::string path, std::string key,
+                           std::string &val) {
+  HKEY handle;
+  unsigned char buffer[256];
+  unsigned long size = 256;
+  unsigned long type;
+  int returnValue;
 
-	if (returnValue == ERROR_SUCCESS)
-	{
-		val = buffer;
-		return true;
-	}
+  if ((returnValue = RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &handle)) ==
+      ERROR_SUCCESS) {
+    returnValue = RegQueryValueEx(handle, key.c_str(), nullptr, &type,
+                                  (unsigned char *)&buffer, &size);
+    RegCloseKey(handle);
+  }
 
-	return false;
+  if (returnValue == ERROR_SUCCESS) {
+    val = (char *)buffer;
+    return true;
+  }
+
+  return false;
 }
 
-bool setStringInRegistry( HKEY root, std::string path, std::string key, std::string val)
-{
-	HKEY handle;
-	unsigned long type;
-	unsigned long returnValue;
-	int size;
-	char lpClass[] = "REG_NONE";
+bool getUnsignedIntFromRegistry(HKEY root, std::string path, std::string key,
+                                unsigned int &val) {
+  HKEY handle;
+  unsigned long buffer;
+  unsigned long size = sizeof(buffer);
+  unsigned long type;
+  int returnValue;
 
-	if ((returnValue = RegCreateKeyEx( root, path.c_str(), 0, lpClass, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &handle, nullptr )) == ERROR_SUCCESS)
-	{
-		type = REG_SZ;
-		size = val.length()+1;
-		returnValue = RegSetValueEx(handle, key.c_str(), 0, type, (unsigned char *)val.c_str(), size);
-		RegCloseKey( handle );
-	}
+  if ((returnValue = RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &handle)) ==
+      ERROR_SUCCESS) {
+    returnValue = RegQueryValueEx(handle, key.c_str(), nullptr, &type,
+                                  (unsigned char *)&buffer, &size);
+    RegCloseKey(handle);
+  }
 
-	return (returnValue == ERROR_SUCCESS);
+  if (returnValue == ERROR_SUCCESS) {
+    val = buffer;
+    return true;
+  }
+
+  return false;
 }
 
-bool setUnsignedIntInRegistry( HKEY root, std::string path, std::string key, unsigned int val)
-{
-	HKEY handle;
-	unsigned long type;
-	unsigned long returnValue;
-	int size;
-	char lpClass[] = "REG_NONE";
+bool setStringInRegistry(HKEY root, std::string path, std::string key,
+                         std::string val) {
+  HKEY handle;
+  unsigned long type;
+  unsigned long returnValue;
+  int size;
+  char lpClass[] = "REG_NONE";
 
-	if ((returnValue = RegCreateKeyEx( root, path.c_str(), 0, lpClass, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &handle, nullptr )) == ERROR_SUCCESS)
-	{
-		type = REG_DWORD;
-		size = 4;
-		returnValue = RegSetValueEx(handle, key.c_str(), 0, type, (unsigned char *)&val, size);
-		RegCloseKey( handle );
-	}
+  if ((returnValue = RegCreateKeyEx(root, path.c_str(), 0, lpClass,
+                                    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr,
+                                    &handle, nullptr)) == ERROR_SUCCESS) {
+    type = REG_SZ;
+    size = val.length() + 1;
+    returnValue = RegSetValueEx(handle, key.c_str(), 0, type,
+                                (unsigned char *)val.c_str(), size);
+    RegCloseKey(handle);
+  }
 
-	return (returnValue == ERROR_SUCCESS);
+  return (returnValue == ERROR_SUCCESS);
 }
 
-bool GetStringFromRegistry(std::string path, std::string key, std::string& val)
-{
+bool setUnsignedIntInRegistry(HKEY root, std::string path, std::string key,
+                              unsigned int val) {
+  HKEY handle;
+  unsigned long type;
+  unsigned long returnValue;
+  int size;
+  char lpClass[] = "REG_NONE";
+
+  if ((returnValue = RegCreateKeyEx(root, path.c_str(), 0, lpClass,
+                                    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr,
+                                    &handle, nullptr)) == ERROR_SUCCESS) {
+    type = REG_DWORD;
+    size = 4;
+    returnValue = RegSetValueEx(handle, key.c_str(), 0, type,
+                                (unsigned char *)&val, size);
+    RegCloseKey(handle);
+  }
+
+  return (returnValue == ERROR_SUCCESS);
+}
+
+bool GetStringFromRegistry(std::string path, std::string key,
+                           std::string &val) {
 #if RTS_GENERALS
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
 
-	fullPath.append(path);
-	if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(), key.c_str(), val))
-	{
-		return true;
-	}
+  fullPath.append(path);
+  if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(), key.c_str(),
+                            val)) {
+    return true;
+  }
 
-	return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.c_str(), key.c_str(), val);
+  return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.c_str(),
+                               key.c_str(), val);
 }
 
-bool GetUnsignedIntFromRegistry(std::string path, std::string key, unsigned int& val)
-{
+bool GetUnsignedIntFromRegistry(std::string path, std::string key,
+                                unsigned int &val) {
 #if RTS_GENERALS
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
 
-	fullPath.append(path);
-	if (getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(), key.c_str(), val))
-	{
-		return true;
-	}
+  fullPath.append(path);
+  if (getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(),
+                                 key.c_str(), val)) {
+    return true;
+  }
 
-	return getUnsignedIntFromRegistry(HKEY_LOCAL_MACHINE, fullPath.c_str(), key.c_str(), val);
+  return getUnsignedIntFromRegistry(HKEY_LOCAL_MACHINE, fullPath.c_str(),
+                                    key.c_str(), val);
 }
 
-bool SetStringInRegistry( std::string path, std::string key, std::string val)
-{
+bool SetStringInRegistry(std::string path, std::string key, std::string val) {
 #if RTS_GENERALS
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
-	fullPath.append(path);
+  fullPath.append(path);
 
-	// TheSuperHackers @fix bobtista 12/02/2026 Always write to HKCU. Per-user settings belong
-	// in HKEY_CURRENT_USER and writes there should always succeed without admin privileges.
-	return setStringInRegistry( HKEY_CURRENT_USER, fullPath, key, val );
+  // TheSuperHackers @fix bobtista 12/02/2026 Always write to HKCU. Per-user
+  // settings belong in HKEY_CURRENT_USER and writes there should always succeed
+  // without admin privileges.
+  return setStringInRegistry(HKEY_CURRENT_USER, fullPath, key, val);
 }
 
-bool SetUnsignedIntInRegistry( std::string path, std::string key, unsigned int val)
-{
+bool SetUnsignedIntInRegistry(std::string path, std::string key,
+                              unsigned int val) {
 #if RTS_GENERALS
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
-	fullPath.append(path);
+  fullPath.append(path);
 
-	// TheSuperHackers @fix bobtista 12/02/2026 Always write to HKCU. Per-user settings belong
-	// in HKEY_CURRENT_USER and writes there should always succeed without admin privileges.
-	return setUnsignedIntInRegistry( HKEY_CURRENT_USER, fullPath, key, val );
+  // TheSuperHackers @fix bobtista 12/02/2026 Always write to HKCU. Per-user
+  // settings belong in HKEY_CURRENT_USER and writes there should always succeed
+  // without admin privileges.
+  return setUnsignedIntInRegistry(HKEY_CURRENT_USER, fullPath, key, val);
 }
 
+#endif

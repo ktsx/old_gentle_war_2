@@ -1,3 +1,10 @@
+# GeneralsX @build BenderAI 09/03/2026 - g_generals is a Windows/Linux desktop-only target.
+# The web port (Emscripten) uses z_generals from GeneralsMD exclusively.
+# Skip g_generals entirely for Emscripten to avoid compiling Windows-only WinMain.cpp.
+if(EMSCRIPTEN)
+    return()
+endif()
+
 add_executable(g_generals WIN32)
 
 # Use a binary name that doesn't conflict with original game.

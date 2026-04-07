@@ -18,7 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -26,177 +27,217 @@
 // Simple interface for storing/retrieving registry values
 // Author: Matthew D. Campbell, December 2001
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
+#include "PreRTS.h" // This must go first in EVERY cpp file in the GameEngine
 
 #include "Common/Registry.h"
 
+#ifndef _WIN32
 
-Bool  getStringFromRegistry(HKEY root, AsciiString path, AsciiString key, AsciiString& val)
-{
-	HKEY handle;
-	unsigned char buffer[256];
-	unsigned long size = 256;
-	unsigned long type;
-	int returnValue;
-
-	if ((returnValue = RegOpenKeyEx( root, path.str(), 0, KEY_READ, &handle )) == ERROR_SUCCESS)
-	{
-		returnValue = RegQueryValueEx(handle, key.str(), nullptr, &type, (unsigned char *) &buffer, &size);
-		RegCloseKey( handle );
-	}
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		val = (char *)buffer;
-		return TRUE;
-	}
-
-	return FALSE;
+Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key,
+                                   AsciiString &val) {
+  return FALSE;
+}
+Bool GetStringFromRegistry(AsciiString path, AsciiString key,
+                           AsciiString &val) {
+  return FALSE;
+}
+Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key,
+                                UnsignedInt &val) {
+  return FALSE;
 }
 
-Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key, UnsignedInt& val)
-{
-	HKEY handle;
-	unsigned char buffer[4];
-	unsigned long size = 4;
-	unsigned long type;
-	int returnValue;
-
-	if ((returnValue = RegOpenKeyEx( root, path.str(), 0, KEY_READ, &handle )) == ERROR_SUCCESS)
-	{
-		returnValue = RegQueryValueEx(handle, key.str(), nullptr, &type, (unsigned char *) &buffer, &size);
-		RegCloseKey( handle );
-	}
-
-	if (returnValue == ERROR_SUCCESS)
-	{
-		val = *(UnsignedInt *)buffer;
-		return TRUE;
-	}
-
-	return FALSE;
+AsciiString GetRegistryLanguage() {
+  static AsciiString val = "english";
+  return val;
 }
 
-Bool setStringInRegistry( HKEY root, AsciiString path, AsciiString key, AsciiString val)
-{
-	HKEY handle;
-	unsigned long type;
-	unsigned long returnValue;
-	int size;
-	char lpClass[] = "REG_NONE";
-
-	if ((returnValue = RegCreateKeyEx( root, path.str(), 0, lpClass, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &handle, nullptr )) == ERROR_SUCCESS)
-	{
-		type = REG_SZ;
-		size = val.getLength()+1;
-		returnValue = RegSetValueEx(handle, key.str(), 0, type, (unsigned char *)val.str(), size);
-		RegCloseKey( handle );
-	}
-
-	return (returnValue == ERROR_SUCCESS);
+AsciiString GetRegistryGameName() {
+  static AsciiString val = "GeneralsMPTest";
+  return val;
 }
 
-Bool setUnsignedIntInRegistry( HKEY root, AsciiString path, AsciiString key, UnsignedInt val)
-{
-	HKEY handle;
-	unsigned long type;
-	unsigned long returnValue;
-	int size;
-	char lpClass[] = "REG_NONE";
+UnsignedInt GetRegistryVersion() { return 65536; }
 
-	if ((returnValue = RegCreateKeyEx( root, path.str(), 0, lpClass, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &handle, nullptr )) == ERROR_SUCCESS)
-	{
-		type = REG_DWORD;
-		size = 4;
-		returnValue = RegSetValueEx(handle, key.str(), 0, type, (unsigned char *)&val, size);
-		RegCloseKey( handle );
-	}
+UnsignedInt GetRegistryMapPackVersion() { return 65536; }
 
-	return (returnValue == ERROR_SUCCESS);
+#else // _WIN32
+
+Bool getStringFromRegistry(HKEY root, AsciiString path, AsciiString key,
+                           AsciiString &val) {
+  HKEY handle;
+  unsigned char buffer[256];
+  unsigned long size = 256;
+  unsigned long type;
+  int returnValue;
+
+  if ((returnValue = RegOpenKeyEx(root, path.str(), 0, KEY_READ, &handle)) ==
+      ERROR_SUCCESS) {
+    returnValue = RegQueryValueEx(handle, key.str(), nullptr, &type,
+                                  (unsigned char *)&buffer, &size);
+    RegCloseKey(handle);
+  }
+
+  if (returnValue == ERROR_SUCCESS) {
+    val = (char *)buffer;
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
-Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiString& val)
-{
-	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key,
+                                UnsignedInt &val) {
+  HKEY handle;
+  unsigned char buffer[4];
+  unsigned long size = 4;
+  unsigned long type;
+  int returnValue;
 
-	fullPath.concat(path);
-	DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
-	if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val))
-	{
-		return TRUE;
-	}
+  if ((returnValue = RegOpenKeyEx(root, path.str(), 0, KEY_READ, &handle)) ==
+      ERROR_SUCCESS) {
+    returnValue = RegQueryValueEx(handle, key.str(), nullptr, &type,
+                                  (unsigned char *)&buffer, &size);
+    RegCloseKey(handle);
+  }
 
-	return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val);
+  if (returnValue == ERROR_SUCCESS) {
+    val = *(UnsignedInt *)buffer;
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
-Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
-{
+Bool setStringInRegistry(HKEY root, AsciiString path, AsciiString key,
+                         AsciiString val) {
+  HKEY handle;
+  unsigned long type;
+  unsigned long returnValue;
+  int size;
+  char lpClass[] = "REG_NONE";
+
+  if ((returnValue = RegCreateKeyEx(root, path.str(), 0, lpClass,
+                                    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr,
+                                    &handle, nullptr)) == ERROR_SUCCESS) {
+    type = REG_SZ;
+    size = val.getLength() + 1;
+    returnValue = RegSetValueEx(handle, key.str(), 0, type,
+                                (unsigned char *)val.str(), size);
+    RegCloseKey(handle);
+  }
+
+  return (returnValue == ERROR_SUCCESS);
+}
+
+Bool setUnsignedIntInRegistry(HKEY root, AsciiString path, AsciiString key,
+                              UnsignedInt val) {
+  HKEY handle;
+  unsigned long type;
+  unsigned long returnValue;
+  int size;
+  char lpClass[] = "REG_NONE";
+
+  if ((returnValue = RegCreateKeyEx(root, path.str(), 0, lpClass,
+                                    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr,
+                                    &handle, nullptr)) == ERROR_SUCCESS) {
+    type = REG_DWORD;
+    size = 4;
+    returnValue =
+        RegSetValueEx(handle, key.str(), 0, type, (unsigned char *)&val, size);
+    RegCloseKey(handle);
+  }
+
+  return (returnValue == ERROR_SUCCESS);
+}
+
+Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key,
+                                   AsciiString &val) {
+  AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+
+  fullPath.concat(path);
+  DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(),
+             key.str()));
+  if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(),
+                            val)) {
+    return TRUE;
+  }
+
+  return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(),
+                               val);
+}
+
+Bool GetStringFromRegistry(AsciiString path, AsciiString key,
+                           AsciiString &val) {
 #if RTS_GENERALS
-	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
 
-	fullPath.concat(path);
-	DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
-	if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val))
-	{
-		return TRUE;
-	}
+  fullPath.concat(path);
+  DEBUG_LOG(("GetStringFromRegistry - looking in %s for key %s", fullPath.str(),
+             key.str()));
+  if (getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(),
+                            val)) {
+    return TRUE;
+  }
 
-	return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val);
+  return getStringFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(),
+                               val);
 }
 
-Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key, UnsignedInt& val)
-{
+Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key,
+                                UnsignedInt &val) {
 #if RTS_GENERALS
-	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
+  AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 #elif RTS_ZEROHOUR
-	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
+  AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and "
+                         "Conquer Generals Zero Hour";
 #endif
 
-	fullPath.concat(path);
-	DEBUG_LOG(("GetUnsignedIntFromRegistry - looking in %s for key %s", fullPath.str(), key.str()));
-	if (getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val))
-	{
-		return TRUE;
-	}
+  fullPath.concat(path);
+  DEBUG_LOG(("GetUnsignedIntFromRegistry - looking in %s for key %s",
+             fullPath.str(), key.str()));
+  if (getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(),
+                                 val)) {
+    return TRUE;
+  }
 
-	return getUnsignedIntFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(), key.str(), val);
+  return getUnsignedIntFromRegistry(HKEY_LOCAL_MACHINE, fullPath.str(),
+                                    key.str(), val);
 }
 
-AsciiString GetRegistryLanguage()
-{
-	static Bool cached = FALSE;
-	// NOTE: static causes a memory leak, but we have to keep it because the value is cached.
-	static AsciiString val = "english";
-	if (cached) {
-		return val;
-	} else {
-		cached = TRUE;
-	}
+AsciiString GetRegistryLanguage() {
+  static Bool cached = FALSE;
+  // NOTE: static causes a memory leak, but we have to keep it because the value
+  // is cached.
+  static AsciiString val = "english";
+  if (cached) {
+    return val;
+  } else {
+    cached = TRUE;
+  }
 
-	GetStringFromRegistry("", "Language", val);
-	return val;
+  GetStringFromRegistry("", "Language", val);
+  return val;
 }
 
-AsciiString GetRegistryGameName()
-{
-	AsciiString val = "GeneralsMPTest";
-	GetStringFromRegistry("", "SKU", val);
-	return val;
+AsciiString GetRegistryGameName() {
+  AsciiString val = "GeneralsMPTest";
+  GetStringFromRegistry("", "SKU", val);
+  return val;
 }
 
-UnsignedInt GetRegistryVersion()
-{
-	UnsignedInt val = 65536;
-	GetUnsignedIntFromRegistry("", "Version", val);
-	return val;
+UnsignedInt GetRegistryVersion() {
+  UnsignedInt val = 65536;
+  GetUnsignedIntFromRegistry("", "Version", val);
+  return val;
 }
 
-UnsignedInt GetRegistryMapPackVersion()
-{
-	UnsignedInt val = 65536;
-	GetUnsignedIntFromRegistry("", "MapPackVersion", val);
-	return val;
+UnsignedInt GetRegistryMapPackVersion() {
+  UnsignedInt val = 65536;
+  GetUnsignedIntFromRegistry("", "MapPackVersion", val);
+  return val;
 }
+#endif

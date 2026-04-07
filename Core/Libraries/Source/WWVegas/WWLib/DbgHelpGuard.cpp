@@ -16,6 +16,8 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef __EMSCRIPTEN__ // Windows debug help not available
+
 #include "DbgHelpGuard.h"
 
 #include "DbgHelpLoader.h"
@@ -47,3 +49,4 @@ void DbgHelpGuard::deactivate()
 		m_needsUnload = false;
 	}
 }
+#endif // !__EMSCRIPTEN__

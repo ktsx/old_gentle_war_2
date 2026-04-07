@@ -469,7 +469,8 @@ WW3DErrorType VertexMaterialClass::Load_W3D(ChunkLoadClass & cload)
 	unsigned int mapping1_arg_len = 0U;
 
 	while (cload.Open_Chunk()) {
-		switch (cload.Cur_Chunk_ID()) {
+		uint32 cid = cload.Cur_Chunk_ID();
+		switch (cid) {
 			case W3D_CHUNK_VERTEX_MATERIAL_NAME:
 				cload.Read(&name,cload.Cur_Chunk_Length());
 				hasname = true;
@@ -505,6 +506,7 @@ WW3DErrorType VertexMaterialClass::Load_W3D(ChunkLoadClass & cload)
 	}
 
 	Parse_W3dVertexMaterialStruct(vmat);
+
 	Parse_Mapping_Args(vmat,mapping0_arg_buffer,mapping1_arg_buffer);
 
 	delete [] mapping0_arg_buffer;
@@ -545,10 +547,14 @@ void VertexMaterialClass::Parse_W3dVertexMaterialStruct(const W3dVertexMaterialS
 
 void VertexMaterialClass::Parse_Mapping_Args(const W3dVertexMaterialStruct & vmat,char * mapping0_arg_buffer,char * mapping1_arg_buffer)
 {
-
 	// Read an INIClass from the mapping argument buffer - this will be used
 	// to initialize any special mappers used.
-	INIClass mapping0_arg_ini;
+	// Heap-allocate to prevent Asyncify virtual-dtor call_indirect crash.
+	// Stack-local INIClass with virtual ~INIClass() fires call_indirect at
+	// function return; during Asyncify rewind the vtable ptr can be stale.
+	// Explicit heap + reference keeps all switch-case code unchanged.
+	INIClass* ini0_ptr = new INIClass();
+	INIClass& mapping0_arg_ini = *ini0_ptr;
 	if (mapping0_arg_buffer) {
 
 		int mapping0_arg_len = strlen(mapping0_arg_buffer);
@@ -564,7 +570,8 @@ void VertexMaterialClass::Parse_Mapping_Args(const W3dVertexMaterialStruct & vma
 		delete [] extended_arg_buffer;
 		extended_arg_buffer = nullptr;
 	}
-	INIClass mapping1_arg_ini;
+	INIClass* ini1_ptr = new INIClass();
+	INIClass& mapping1_arg_ini = *ini1_ptr;
 	if (mapping1_arg_buffer) {
 
 		int mapping1_arg_len = strlen(mapping1_arg_buffer);
@@ -935,6 +942,19 @@ void VertexMaterialClass::Parse_Mapping_Args(const W3dVertexMaterialStruct & vma
 		default:
 			break;
 	}
+
+	// Explicit non-virtual destructor call to avoid call_indirect vtable
+	// dispatch. The vtable pointer gets corrupted between the first and second
+	// mesh's Parse_Mapping_Args calls (Asyncify REWIND side-effect). Calling
+	// ClassName::~ClassName() directly generates a WASM 'call' (not
+	// 'call_indirect'), bypassing the vtable entirely. Safe here because we
+	// know the exact type (new INIClass(), never a derived class).
+	ini1_ptr->INIClass::~INIClass();
+	::operator delete(ini1_ptr);
+	ini1_ptr = nullptr;
+	ini0_ptr->INIClass::~INIClass();
+	::operator delete(ini0_ptr);
+	ini0_ptr = nullptr;
 }
 
 

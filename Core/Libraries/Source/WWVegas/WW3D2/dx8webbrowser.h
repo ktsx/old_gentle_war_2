@@ -32,22 +32,26 @@
 
 #pragma once
 
-#include <windows.h>
 #include "d3d8.h"
+#include <windows.h>
 
 // ***********************************
 // Set this to 0 to remove all embedded browser code.
 //
-#define ENABLE_EMBEDDED_BROWSER		1
+#ifdef __EMSCRIPTEN__
+#define ENABLE_EMBEDDED_BROWSER 0
+#else
+#define ENABLE_EMBEDDED_BROWSER 1
+#endif
 //
 // ***********************************
 
-#if ENABLE_EMBEDDED_BROWSER
+// These options must match the browser option bits defined in the BrowserEngine
+// code. Look in febrowserengine.h
+#define BROWSEROPTION_SCROLLBARS 0x0001
+#define BROWSEROPTION_3DBORDER 0x0002
 
-// These options must match the browser option bits defined in the BrowserEngine code.
-// Look in febrowserengine.h
-#define BROWSEROPTION_SCROLLBARS		0x0001
-#define BROWSEROPTION_3DBORDER		0x0002
+#if ENABLE_EMBEDDED_BROWSER
 
 struct IDirect3DDevice8;
 
@@ -56,35 +60,58 @@ struct IDirect3DDevice8;
 **
 ** DX8 interface wrapper class.  This encapsulates the BrowserEngine interface.
 */
-class DX8WebBrowser
-{
+class DX8WebBrowser {
 public:
+  static bool Initialize(
+      const char *badpageurl = 0, const char *loadingpageurl = 0,
+      const char *mousefilename = 0,
+      const char *mousebusyfilename = 0); // Initialize the Embedded Browser
 
-	static bool			Initialize(	const char* badpageurl = 0,
-											const char* loadingpageurl = 0,
-											const char* mousefilename = 0,
-											const char* mousebusyfilename = 0);			//Initialize the Embedded Browser
+  static void
+  Shutdown(); // Shutdown the embedded browser.  Will close any open browsers.
 
-	static void			Shutdown();			// Shutdown the embedded browser.  Will close any open browsers.
+  static void Update(); // Copies all browser contexts to D3D Image surfaces.
+  static void
+  Render(int backbufferindex); // Draws all browsers to the backbuffer.
 
-	static void			Update();				// Copies all browser contexts to D3D Image surfaces.
-	static void			Render(int backbufferindex);	//Draws all browsers to the backbuffer.
+  // Creates a browser with the specified name
+  static void CreateBrowser(const char *browsername, const char *url, int x,
+                            int y, int w, int h, int updateticks = 0,
+                            LONG options = BROWSEROPTION_SCROLLBARS |
+                                           BROWSEROPTION_3DBORDER,
+                            LPDISPATCH gamedispatch = 0);
 
-	// Creates a browser with the specified name
-	static void			CreateBrowser(const char* browsername, const char* url, int x, int y, int w, int h, int updateticks = 0, LONG options = BROWSEROPTION_SCROLLBARS | BROWSEROPTION_3DBORDER, LPDISPATCH gamedispatch = 0);
+  // Destroys the browser with the specified name
+  static void DestroyBrowser(const char *browsername);
 
-	// Destroys the browser with the specified name
-	static void			DestroyBrowser(const char* browsername);
+  // Returns true if a browser with the specified name is open.
+  static bool Is_Browser_Open(const char *browsername);
 
-	// Returns true if a browser with the specified name is open.
-	static bool			Is_Browser_Open(const char* browsername);
-
-	// Navigates the specified browser to the specified page.
-	static void			Navigate(const char* browsername, const char* url);
+  // Navigates the specified browser to the specified page.
+  static void Navigate(const char *browsername, const char *url);
 
 private:
-	// The window handle of the application.  This is initialized by Initialize().
-	static				HWND						hWnd;
+  // The window handle of the application.  This is initialized by Initialize().
+  static HWND hWnd;
+};
+
+#else
+
+// Stubbed out when ENABLE_EMBEDDED_BROWSER is 0
+class DX8WebBrowser {
+public:
+  static inline bool Initialize(const char * = 0, const char * = 0,
+                                const char * = 0, const char * = 0) {
+    return false;
+  }
+  static inline void Shutdown() {}
+  static inline void Update() {}
+  static inline void Render(int) {}
+  static inline void CreateBrowser(const char *, const char *, int, int, int,
+                                   int, int = 0, LONG = 0, LPDISPATCH = 0) {}
+  static inline void DestroyBrowser(const char *) {}
+  static inline bool Is_Browser_Open(const char *) { return false; }
+  static inline void Navigate(const char *, const char *) {}
 };
 
 #endif

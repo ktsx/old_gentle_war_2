@@ -39,6 +39,7 @@ class STLSpecialAlloc;
 // different .cpp files, so I bit the bullet and included it here.
 // PLEASE DO NOT ABUSE WINDOWS OR IT WILL BE REMOVED ENTIRELY. :-)
 //--------------------------------------------------------------------------------- System Includes
+#ifndef __EMSCRIPTEN__
 #define WIN32_LEAN_AND_MEAN
 // TheSuperHackers @build JohnsterID 05/01/2026 Add ATL compatibility for MinGW-w64 builds
 #if defined(__GNUC__) && defined(_WIN32)
@@ -46,22 +47,33 @@ class STLSpecialAlloc;
 #endif
 #include <atlbase.h>
 #include <windows.h>
+#endif // !__EMSCRIPTEN__
 
+// Cross-platform system headers
 #include <assert.h>
 #include <ctype.h>
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <memory.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <Utility/fstream_adapter.h>
+
+// Windows-only system headers — not available on Emscripten
+#ifndef __EMSCRIPTEN__
 #include <direct.h>
 #include <excpt.h>
-#include <float.h>
-#include <Utility/fstream_adapter.h>
 #include <imagehlp.h>
 #include <io.h>
-#include <limits.h>
 #include <lmcons.h>
 #if defined(_MSC_VER) && _MSC_VER < 1300
 #include <mapicode.h>
 #endif
-#include <math.h>
-#include <memory.h>
 #include <mmsystem.h>
 #include <objbase.h>
 #include <ocidl.h>
@@ -70,14 +82,8 @@ class STLSpecialAlloc;
 #include <shlobj.h>
 #include <shlguid.h>
 #include <snmp.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <sys/stat.h>
 #include <sys/timeb.h>
-#include <sys/types.h>
 #include <tchar.h>
-#include <time.h>
 #include <vfw.h>
 #include <winerror.h>
 #include <wininet.h>
@@ -86,8 +92,8 @@ class STLSpecialAlloc;
 #ifndef DIRECTINPUT_VERSION
 #	define DIRECTINPUT_VERSION	0x800
 #endif
-
 #include <dinput.h>
+#endif // !__EMSCRIPTEN__
 
 //------------------------------------------------------------------------------------ STL Includes
 // srj sez: no, include STLTypesdefs below, instead, thanks

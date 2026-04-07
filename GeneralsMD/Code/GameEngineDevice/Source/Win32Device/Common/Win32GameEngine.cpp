@@ -90,6 +90,7 @@ void Win32GameEngine::update()
 	// call the engine normal update
 	GameEngine::update();
 
+#if !defined(__EMSCRIPTEN__)
 	extern HWND ApplicationHWnd;
 	if (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
 		while (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
@@ -119,6 +120,7 @@ void Win32GameEngine::update()
 		TheAudio->setVolume(TheAudio->getVolume( aa ), aa );
 
 	}
+#endif
 
 	// allow windows to perform regular windows maintenance stuff like msgs
 	serviceWindowsOS();
@@ -133,6 +135,7 @@ void Win32GameEngine::update()
 //-------------------------------------------------------------------------------------------------
 void Win32GameEngine::serviceWindowsOS()
 {
+#if !defined(__EMSCRIPTEN__)
 	MSG msg;
   Int returnValue;
 
@@ -165,6 +168,7 @@ void Win32GameEngine::serviceWindowsOS()
 		TheMessageTime = 0;
 
 	}
-
+#endif
 }
+
 

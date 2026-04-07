@@ -18,12 +18,39 @@
 
 #pragma once
 
+// --- Null-mode allocation macros ---
+// In DISABLE_GAMEMEMORY mode, all pool/DMA macros route to standard malloc/free
+// via the trivial DynamicMemoryAllocator below.
+
 #define allocateBytes(ARGCOUNT,ARGLITERAL)          allocateBytesImplementation(ARGCOUNT)
 #define allocateBytesDoNotZero(ARGCOUNT,ARGLITERAL) allocateBytesDoNotZeroImplementation(ARGCOUNT)
 #define newInstanceDesc(ARGCLASS,ARGLITERAL)        new ARGCLASS
 #define newInstance(ARGCLASS)                       new ARGCLASS
 #define MSGNEW(MSG)                                 new
 #define NEW                                         new
+
+// These macros are used in the full GameMemory.h for debug-tagged allocation.
+// In null mode they expand to nothing.
+#define DECLARE_LITERALSTRING_ARG1
+#define PASS_LITERALSTRING_ARG1
+#define DECLARE_LITERALSTRING_ARG2
+#define PASS_LITERALSTRING_ARG2
+
+// Forward declarations
+class MemoryPool;
+class MemoryPoolSingleBlock;
+class MemoryPoolBlob;
+class MemoryPoolFactory;
+class DynamicMemoryAllocator;
+
+// --- PoolInitRec (needed by userMemoryManagerGetDmaParms signature) ---
+struct PoolInitRec
+{
+	const char *poolName;
+	Int allocationSize;
+	Int initialAllocationCount;
+	Int overflowAllocationCount;
+};
 
 
 /**
@@ -75,15 +102,28 @@ public:
 };
 
 
+// --- Null-mode GCMP macros (pool lookup/creation is a no-op) ---
+#define GCMP_FIND(ARGCLASS, ARGPOOLNAME)
+#define GCMP_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW)
+
+// --- Null-mode MEMORY_POOL_GLUE macros ---
+// In the full build, these inject custom operator new/delete that route through
+// MemoryPool.  In null mode, the global operator new/delete (which use malloc)
+// handle everything, so the macros only need to declare the virtual destructor.
+
 #define MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS) \
 protected: \
 	virtual ~ARGCLASS(); \
 public: /* include this line at the end to reset visibility to 'public' */
 
+#define MEMORY_POOL_GLUE(ARGCLASS, ARGPOOLNAME) \
+	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)
+
+#define MEMORY_POOL_GLUE_WITH_EXPLICIT_CREATE(ARGCLASS, ARGPOOLNAME, ARGINITIAL, ARGOVERFLOW) \
+	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)
 
 #define MEMORY_POOL_GLUE_WITH_USERLOOKUP_CREATE(ARGCLASS, ARGPOOLNAME) \
 	MEMORY_POOL_GLUE_WITHOUT_GCMP(ARGCLASS)
-
 
 // this is the version for an Abstract Base Class, which will never be instantiated...
 #define MEMORY_POOL_GLUE_ABC(ARGCLASS) \
@@ -142,6 +182,11 @@ extern void shutdownMemoryManager();
 extern MemoryPoolFactory *TheMemoryPoolFactory;
 extern DynamicMemoryAllocator *TheDynamicMemoryAllocator;
 
+// --- Functions normally provided by GameMemoryInit.cpp ---
+// In null-memory mode, stubs are in GameMemoryNull.cpp.
+extern void userMemoryManagerGetDmaParms(Int *numSubPools, const PoolInitRec **pParms);
+extern void userMemoryManagerInitPools();
+extern void userMemoryAdjustPoolSize(const char *poolName, Int& initialAllocationCount, Int& overflowAllocationCount);
 
 // TheSuperHackers @info
 // The new operator overloads will zero all memory after allocation.
@@ -169,3 +214,11 @@ extern void __cdecl operator delete[](void *p, const char *, int);
 inline void* __cdecl operator new[](size_t s, void* p) { return p; }
 inline void __cdecl operator delete[](void*, void* p) {}
 #endif
+
+// --- STLSpecialAlloc (null-mode: route to global new/delete) ---
+class STLSpecialAlloc
+{
+public:
+	static void* allocate(size_t __n) { return ::operator new(__n); }
+	static void deallocate(void* __p, size_t) { ::operator delete(__p); }
+};

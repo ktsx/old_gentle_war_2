@@ -117,8 +117,18 @@
 #include "assetstatus.h"
 #include "ringobj.h"
 #include "sphereobj.h"
+#include "refcount.h"
 
 #include "shdlib.h"
+
+#if defined(_UNIX) || defined(PLATFORM_WEB)
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif
+#define lstrcat strcat
+#define lstrcpyn strncpy
+#endif
+
 
 /*
 ** Static member variable which keeps track of the single instanced asset manager
@@ -656,9 +666,11 @@ bool WW3DAssetManager::Load_3D_Assets(FileClass & w3dfile)
 
 	ChunkLoadClass cload(&w3dfile);
 
+	int chunk_count = 0;
 	while (cload.Open_Chunk()) {
+		int chunk_id = cload.Cur_Chunk_ID();
 
-		switch (cload.Cur_Chunk_ID()) {
+		switch (chunk_id) {
 
 			case W3D_CHUNK_HIERARCHY:
 				HTreeManager.Load_Tree(cload);

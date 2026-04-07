@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
+#include <cstdio>
 
 
 // USER INCLUDES
@@ -549,21 +550,17 @@ void DebugCrash(const char *format, ...)
 #endif
 	}
 
-	strlcat(theCrashBuffer, "\n\nAbort->exception; Retry->debugger; Ignore->continue", ARRAY_SIZE(theCrashBuffer));
+	fflush(stderr);
 
-	const int result = doCrashBox(theCrashBuffer, useLogging);
+	// TheSuperHackers: Disable doCrashBox because it hangs Emscripten!
+	// const int result = doCrashBox(theCrashBuffer, useLogging);
+	const int result = IDIGNORE;
 
 	if (result == IDIGNORE && TheCurrentIgnoreCrashPtr != nullptr)
 	{
 		int yn;
-		if (!ignoringAsserts())
-		{
-			yn = MessageBoxWrapper("Ignore this crash from now on?", "", MB_YESNO|MB_TASKMODAL);
-		}
-		else
-		{
-			yn = IDYES;
-		}
+		yn = IDYES; // Auto-ignore
+		
 		if (yn == IDYES)
 			*TheCurrentIgnoreCrashPtr = 1;
 		if( TheKeyboard )
@@ -748,6 +745,9 @@ static void TriggerMiniDump()
 
 void ReleaseCrash(const char *reason)
 {
+	fprintf(stderr, "========================================\n");
+	fprintf(stderr, "FATAL C++ CRASH (ReleaseCrash): %s\n", reason ? reason : "Unknown");
+	fprintf(stderr, "========================================\n");
 	/// do additional reporting on the crash, if possible
 
 	if (!DX8Wrapper_IsWindowed) {
@@ -764,6 +764,7 @@ void ReleaseCrash(const char *reason)
 	if (TheGlobalData==nullptr) {
 		return; // We are shutting down, and TheGlobalData has been freed.  jba. [4/15/2003]
 	}
+
 
 	strlcpy(prevbuf, TheGlobalData->getPath_UserData().str(), ARRAY_SIZE(prevbuf));
 	strlcat(prevbuf, RELEASECRASH_FILE_NAME_PREV, ARRAY_SIZE(prevbuf));
@@ -829,6 +830,9 @@ void ReleaseCrash(const char *reason)
 void ReleaseCrashLocalized(const AsciiString& p, const AsciiString& m)
 {
 	if (!TheGameText) {
+		fprintf(stderr, "========================================\n");
+		fprintf(stderr, "FATAL C++ CRASH (ReleaseCrashLocalized base): %s\n", m.str() ? m.str() : "Unknown");
+		fprintf(stderr, "========================================\n");
 		ReleaseCrash(m.str());
 		// This won't ever return
 		return;
@@ -838,6 +842,10 @@ void ReleaseCrashLocalized(const AsciiString& p, const AsciiString& m)
 
 	UnicodeString prompt = TheGameText->fetch(p);
 	UnicodeString mesg = TheGameText->fetch(m);
+
+	fprintf(stderr, "========================================\n");
+	fprintf(stderr, "FATAL C++ CRASH (ReleaseCrashLocalized): %ls\n", mesg.str() ? mesg.str() : L"Unknown");
+	fprintf(stderr, "========================================\n");
 
 
 	/// do additional reporting on the crash, if possible

@@ -45,7 +45,32 @@
 
 static unsigned Get_FVF_Vertex_Size(unsigned FVF)
 {
+#if defined(_UNIX) || defined(PLATFORM_WEB)
+	// Basic mapping for DX8 FVF sizes if needed
+	unsigned size = 0;
+	if ((FVF & D3DFVF_XYZ) == D3DFVF_XYZ) size += 3 * sizeof(float);
+	if ((FVF & D3DFVF_XYZRHW) == D3DFVF_XYZRHW) size += 4 * sizeof(float);
+	if ((FVF & D3DFVF_XYZB1) == D3DFVF_XYZB1) size += 4 * sizeof(float);
+	if ((FVF & D3DFVF_XYZB2) == D3DFVF_XYZB2) size += 5 * sizeof(float);
+	if ((FVF & D3DFVF_XYZB3) == D3DFVF_XYZB3) size += 6 * sizeof(float);
+	if ((FVF & D3DFVF_XYZB4) == D3DFVF_XYZB4) size += 7 * sizeof(float);
+	if ((FVF & D3DFVF_XYZB5) == D3DFVF_XYZB5) size += 8 * sizeof(float);
+	if ((FVF & D3DFVF_NORMAL) == D3DFVF_NORMAL) size += 3 * sizeof(float);
+	if ((FVF & D3DFVF_PSIZE) == D3DFVF_PSIZE) size += sizeof(float);
+	if ((FVF & D3DFVF_DIFFUSE) == D3DFVF_DIFFUSE) size += sizeof(DWORD);
+	if ((FVF & D3DFVF_SPECULAR) == D3DFVF_SPECULAR) size += sizeof(DWORD);
+	unsigned texcount = (FVF & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+	for (unsigned i = 0; i < texcount; i++) {
+		unsigned format = (FVF >> (16 + i * 2)) & 0x3;
+		if (format == D3DFVF_TEXTUREFORMAT1) size += sizeof(float);
+		else if (format == D3DFVF_TEXTUREFORMAT2) size += 2 * sizeof(float);
+		else if (format == D3DFVF_TEXTUREFORMAT3) size += 3 * sizeof(float);
+		else if (format == D3DFVF_TEXTUREFORMAT4) size += 4 * sizeof(float);
+	}
+	return size;
+#else
 	return D3DXGetFVFVertexSize(FVF);
+#endif
 }
 
 FVFInfoClass::FVFInfoClass(unsigned FVF_, unsigned vertex_size)

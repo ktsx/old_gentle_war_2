@@ -4,6 +4,19 @@ by Electronic Arts Inc. under GPL-3.0 (with additional terms), via the
 TheSuperHackers/GeneralsGameCode community project
 (https://github.com/TheSuperHackers/GeneralsGameCode).
 
+The WebAssembly/WebGL 2.0 browser port and all modifications made to adapt the
+engine for the browser are:
+
+    Copyright (C) 2025-2026 Ralph Theodory / TheodoryLabs
+    (https://github.com/TheodoryLabs)
+
+These modifications are licensed under the GNU General Public License, version 3
+(with EA's additional terms), the same terms as the upstream source. Under
+sections 5 and 7 of the GPL-3.0, this copyright notice and the attribution
+above must be preserved in all copies and derivative works. Anyone who copies,
+modifies, or redistributes this software must retain this notice, keep it under
+the GPL-3.0, and state the changes they made.
+
 EA has not endorsed and does not support this product. This project is not
 affiliated with, sponsored by, or approved by Electronic Arts Inc. "Command &
 Conquer" and "Command & Conquer: Generals" are trademarks of Electronic Arts

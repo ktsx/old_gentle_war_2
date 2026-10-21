@@ -75,7 +75,7 @@ jobs:
         # annotations (job logs live on blob storage that some proxies block).
         run: |
           set -o pipefail
-          ninja -C build-web z_generals 2>&1 | tee build-web/build.log
+          ninja -k 0 -C build-web z_generals 2>&1 | tee build-web/build.log
 
       - name: Surface compiler errors as annotations
         if: failure()

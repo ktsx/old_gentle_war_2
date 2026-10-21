@@ -61,7 +61,7 @@ function main() {
   const patchData = join(patchDir, PATCH_DATA);
   if (!existsSync(join(patchData, "INI"))) throw new Error(`no INI corpus at ${patchData}`);
 
-  const stage = join(outDir, ".stage");
+  const stage = join(cacheDir, "stage"); // scratch lives with the cache (outDir may be a synced/mounted folder)
   rmSync(stage, { recursive: true, force: true });
   const iniStage = join(stage, "ini");
   const wndStage = join(stage, "wnd");

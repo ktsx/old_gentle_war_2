@@ -670,33 +670,33 @@ void __stdcall AIL_start_3D_sample(H3DSAMPLE sample) {
     }, s->id, s->loop_count == 0 || s->loop_count > 1);
 }
 
-unsigned int __stdcall AIL_3D_sample_loop_count(H3DSAMPLE sample) {
+U32 __stdcall AIL_3D_sample_loop_count(H3DSAMPLE sample) {
     Sample3DState* s = (Sample3DState*)sample;
     return s->loop_count;
 }
 
-void __stdcall AIL_set_3D_sample_offset(H3DSAMPLE sample, unsigned int offset) {
+void __stdcall AIL_set_3D_sample_offset(H3DSAMPLE sample, U32 offset) {
 }
 
-int __stdcall AIL_3D_sample_length(H3DSAMPLE sample) {
+U32 __stdcall AIL_3D_sample_length(H3DSAMPLE sample) {
     return 0;
 }
 
-unsigned int __stdcall AIL_3D_sample_offset(H3DSAMPLE sample) {
+U32 __stdcall AIL_3D_sample_offset(H3DSAMPLE sample) {
     return 0;
 }
 
-int __stdcall AIL_3D_sample_playback_rate(H3DSAMPLE sample) {
+S32 __stdcall AIL_3D_sample_playback_rate(H3DSAMPLE sample) {
     Sample3DState* s = (Sample3DState*)sample;
     return s->playback_rate;
 }
 
-void __stdcall AIL_set_3D_sample_playback_rate(H3DSAMPLE sample, int playback_rate) {
+void __stdcall AIL_set_3D_sample_playback_rate(H3DSAMPLE sample, S32 playback_rate) {
     Sample3DState* s = (Sample3DState*)sample;
     s->playback_rate = playback_rate;
 }
 
-int __stdcall AIL_set_3D_sample_file(H3DSAMPLE sample, const void* file_image) {
+S32 __stdcall AIL_set_3D_sample_file(H3DSAMPLE sample, const void* file_image) {
     Sample3DState* s = (Sample3DState*)sample;
     GX_TRACE_LOG("[web_audio_bridge] AIL_set_3D_sample_file: sample=%p, id=%d, file_image=%p\n", (void*)sample, s ? s->id : -1, file_image);
     s->file_image = file_image;
@@ -723,11 +723,11 @@ void __stdcall AIL_release_sample_handle(HSAMPLE sample) {
 void __stdcall AIL_close_3D_provider(HPROVIDER lib) {
 }
 
-int __stdcall AIL_set_preference(unsigned int number, int value) {
+S32 __stdcall AIL_set_preference(U32 number, S32 value) {
     return 1;
 }
 
-int __stdcall AIL_waveOutOpen(HDIGDRIVER* driver, LPHWAVEOUT* waveout, int id, LPWAVEFORMAT format) {
+S32 __stdcall AIL_waveOutOpen(HDIGDRIVER* driver, LPHWAVEOUT* waveout, S32 id, LPWAVEFORMAT format) {
     return 0;
 }
 

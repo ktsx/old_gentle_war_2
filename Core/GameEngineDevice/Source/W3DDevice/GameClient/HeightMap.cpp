@@ -2030,12 +2030,13 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 		if (++s_terrainDiag >= 60) {
 			s_terrainDiag = 0;
 			GX_DIAG_LOG("TERRAIN: shader=%d passes=%d tiles=%dx%d hidden=%d notex=%d tex0=%dx%d(%p) cloud=%d "
-						"wire=%d numVertsPerTile=%d map=%dx%d\n",
+						"wire=%d vbTiles=%d map=%dx%d shroud=%p shroudOn=%d\n",
 						(int)st, devicePasses, m_numVBTilesX, m_numVBTilesY, (int)Is_Hidden(), (int)m_disableTextures,
 						m_stageZeroTexture ? m_stageZeroTexture->Get_Width() : -1,
 						m_stageZeroTexture ? m_stageZeroTexture->Get_Height() : -1, (void*)m_stageZeroTexture,
 						(int)doCloud, (int)doMultiPassWireFrame, m_numVertexBufferTiles,
-						m_map ? m_map->getXExtent() : -1, m_map ? m_map->getYExtent() : -1);
+						m_map ? m_map->getXExtent() : -1, m_map ? m_map->getYExtent() : -1,
+						(void*)m_shroud, (int)TheGlobalData->m_shroudOn);
 		}
 	}
 #endif

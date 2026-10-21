@@ -21,6 +21,7 @@
 #if defined(__EMSCRIPTEN__)
 
 #include "gles3_wrapper.h"
+#include <emscripten.h>
 #include <cstring>
 #include <cstdio>
 #include <cmath>
@@ -405,14 +406,32 @@ void GLES3_Set_Render_State(unsigned int state, unsigned int value) {
                 GLES3_Helpers::Blend_To_GL(value));
             break;
 
-        case GLES3_RS_CULLMODE:
-            if (value == 1) { // D3DCULL_NONE
+        case GLES3_RS_CULLMODE: {
+            // Web diag: ?gxcull=none disables face culling, ?gxcull=flip inverts the
+            // D3D->GL winding mapping, so a wrong cull mapping (geometry drawn but
+            // invisible) can be told apart from a transform/lighting problem.
+            static int s_cullOverride = -1; // -1 unread, 0 normal, 1 none, 2 flip
+            if (s_cullOverride < 0) {
+                s_cullOverride = EM_ASM_INT({
+                    try {
+                        var m = /[?&#]gxcull=([a-z]+)/.exec(location.search + location.hash);
+                        if (m && m[1] == 'none') return 1;
+                        if (m && m[1] == 'flip') return 2;
+                    } catch (e) {}
+                    return 0;
+                });
+                if (s_cullOverride) fprintf(stderr, "GLES3: cull override %d\n", s_cullOverride);
+            }
+            if (value == 1 || s_cullOverride == 1) { // D3DCULL_NONE
                 glDisable(GL_CULL_FACE);
             } else {
                 glEnable(GL_CULL_FACE);
-                glCullFace(GLES3_Helpers::CullMode_To_GL(value));
+                GLenum face = GLES3_Helpers::CullMode_To_GL(value);
+                if (s_cullOverride == 2) face = (face == GL_BACK) ? GL_FRONT : GL_BACK;
+                glCullFace(face);
             }
             break;
+        }
 
         case GLES3_RS_ALPHATESTENABLE:
             // OpenGL ES 3.0 removed alpha test — emulated in fragment shader

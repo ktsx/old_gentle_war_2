@@ -80,7 +80,24 @@ export function generateFreeImages(): Record<string, Image32> {
   const btnDis = new Image32(256, 32, [30, 30, 34, 255]);
   btnDis.strokeRect(0, 0, 256, 32, [70, 70, 76, 255]);
 
-  return { "gxlogo.tga": logo, "gxbutton.tga": btn, "gxbutton_hi.tga": btnHi, "gxbutton_dis.tga": btnDis };
+  // Terrain multiply passes (W3DShaderManager TerrainShader2Stage pass 2): the cloud map
+  // TSCloudMed.tga and the "lightmap" noise TSNoiseUrb.tga are blended DESTCOLOR*ZERO over the
+  // terrain, so a missing texture multiplies it to black. Supply bright, soft ones.
+  const cloud = new Image32(256, 256);
+  for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) {
+    const n = smoothNoise(x / 32, y / 32, 3) * 0.6 + smoothNoise(x / 8, y / 8, 5) * 0.4;
+    const v = Math.round(215 + 40 * n);
+    cloud.set(x, y, [v, v, v, 255]);
+  }
+  const lightNoise = new Image32(256, 256);
+  for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) {
+    const v = Math.round(225 + 30 * noise(x, y, 11));
+    lightNoise.set(x, y, [v, v, v, 255]);
+  }
+  return {
+    "gxlogo.tga": logo, "gxbutton.tga": btn, "gxbutton_hi.tga": btnHi, "gxbutton_dis.tga": btnDis,
+    "TSCloudMed.tga": cloud, "TSNoiseUrb.tga": lightNoise,
+  };
 }
 
 /** Deterministic hash noise in [0, 1). */
@@ -89,6 +106,14 @@ function noise(x: number, y: number, seed = 0): number {
   h = (h ^ (h >>> 13)) * 1274126177;
   h ^= h >>> 16;
   return (h >>> 0) / 4294967296;
+}
+
+/** Bilinear value noise in [0, 1) (periodic in 256-unit tiles is not required: the maps wrap on their own). */
+function smoothNoise(x: number, y: number, seed = 0): number {
+  const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+  const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+  const a = noise(x0, y0, seed), b = noise(x0 + 1, y0, seed), c = noise(x0, y0 + 1, seed), d = noise(x0 + 1, y0 + 1, seed);
+  return (a * (1 - sx) + b * sx) * (1 - sy) + (c * (1 - sx) + d * sx) * sy;
 }
 
 /**

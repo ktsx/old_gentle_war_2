@@ -195,16 +195,23 @@ jobs:
           SMOKE_EXPECT="GAMELOGIC: startNewGame:ENTER;inGame=1 isPaused=0" \
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
 
-      - name: Annotate smoke results
+      # Surface the interesting console lines as check-run annotations (readable through the API without
+      # downloading artifacts): failures as errors, load/tick progress as notices. One step per log, since
+      # GitHub keeps at most 10 annotations of each level per step.
+      - name: Annotate menu smoke
         if: always()
         run: |
-          # Surface the interesting console lines as check-run annotations (readable through the API
-          # without downloading artifacts): failures as errors, load/tick progress as notices.
-          for f in smoke.log map-smoke.log; do
-            [ -f "$f" ] || continue
-            grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-            grep -E "LOAD: progress|GAMELOGIC:|TICK-DIAG|WINDOW:|UI STATE" "$f" | cut -c1-900 | tail -10 | sed "s/^/::notice title=$f::/"
-          done
+          f=smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "GBM_SELECTED|Clearing|VERDICT|UI STATE" "$f" | cut -c1-900 | tail -10 | sed "s/^/::notice title=$f::/"
+
+      - name: Annotate map smoke
+        if: always()
+        run: |
+          f=map-smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "LOAD: progress|GAMELOGIC:" "$f" | cut -c1-900 | tail -6 | sed "s/^/::notice title=$f::/"
+          grep -E "TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
 
       - name: Upload screenshot and log
         if: always()

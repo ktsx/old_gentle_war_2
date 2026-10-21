@@ -89,7 +89,7 @@
 #include "GameNetwork/GameSpyOverlay.h"
 #include "GameNetwork/GameSpy/BuddyThread.h"
 
-#include "ww3d.h"
+#include "WW3D2/ww3d.h"
 
 #if defined(RTS_DEBUG)
 /*non-static*/ Real TheSkateDistOverride = 0.0f;
@@ -1445,13 +1445,11 @@ GameMessage::Type CommandTranslator::createEnterMessage( Drawable *enter,
 CommandTranslator::CommandTranslator() :
 	m_objective(0),
 	m_teamExists(false),
-	m_mouseRightDown(0),
-	m_mouseRightUp(0)
+	m_rightMouseDownTimeMs(0),
+	m_rightMouseUpTimeMs(0)
 {
-	m_mouseRightDragAnchor.x = 0;
-	m_mouseRightDragAnchor.y = 0;
-	m_mouseRightDragLift.x = 0;
-	m_mouseRightDragLift.y = 0;
+	m_rightMouseDownAnchor.zero();
+	m_rightMouseUpAnchor.zero();
 }
 
 //====================================================================================
@@ -2590,9 +2588,8 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 						// create a new group.
 						GameMessage *teamMsg = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP );
 
-						//New group or add to group? Passed in value is true if we are creating a new group.
+						//New group so pass in value true
 						teamMsg->appendBooleanArgument( TRUE );
-
 						teamMsg->appendObjectIDArgument( newDrawable->getObject()->getID() );
 
 						// select the unit
@@ -2702,16 +2699,15 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 					{
 						//deselect other units
 						TheInGameUI->deselectAllDrawables();
-						// select the unit
 
 						// create a new group.
 						GameMessage *teamMsg = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP );
 
-						//New group or add to group? Passed in value is true if we are creating a new group.
+						//New group so pass in value true
 						teamMsg->appendBooleanArgument( TRUE );
-
 						teamMsg->appendObjectIDArgument( newDrawable->getObject()->getID() );
 
+						// select the unit
 						TheInGameUI->selectDrawable( newDrawable );
 
 						// center on the unit
@@ -2816,13 +2812,14 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 						//deselect other units
 						TheInGameUI->deselectAllDrawables();
 
-						// select the unit
 						// create a new group.
 						GameMessage *teamMsg = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP );
 
 						//New group so pass in value true
 						teamMsg->appendBooleanArgument( TRUE );
 						teamMsg->appendObjectIDArgument( newDrawable->getObject()->getID() );
+
+						// select the unit
 						TheInGameUI->selectDrawable( newDrawable );
 
 						// center on the unit
@@ -2930,16 +2927,15 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 					{
 						//deselect other units
 						TheInGameUI->deselectAllDrawables();
-						// select the unit
 
 						// create a new group.
 						GameMessage *teamMsg = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP );
 
-						//New group so passed in value true
+						//New group so pass in value true
 						teamMsg->appendBooleanArgument( TRUE );
-
 						teamMsg->appendObjectIDArgument( newDrawable->getObject()->getID() );
 
+						// select the unit
 						TheInGameUI->selectDrawable( newDrawable );
 
 						// center on the unit
@@ -2982,6 +2978,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			if ( heroDraw == nullptr )
 				break;
 
+			//deselect other units
 			TheInGameUI->deselectAllDrawables();
 
 			// create a new group.
@@ -2990,6 +2987,8 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			//New group so pass in value true
 			teamMsg->appendBooleanArgument( TRUE );
 			teamMsg->appendObjectIDArgument( hero->getID() );
+
+			// select the unit
 			TheInGameUI->selectDrawable( heroDraw );
 
 			// center on the unit
@@ -3738,7 +3737,15 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		case GameMessage::MSG_META_TAKE_SCREENSHOT:
 		{
 			if (TheDisplay)
-				TheDisplay->takeScreenShot();
+				TheDisplay->takeScreenShot(SCREENSHOT_JPEG, TheGlobalData->m_jpegQuality);
+			disp = DESTROY_MESSAGE;
+			break;
+		}
+
+		case GameMessage::MSG_META_TAKE_SCREENSHOT_PNG:
+		{
+			if (TheDisplay)
+				TheDisplay->takeScreenShot(SCREENSHOT_PNG);
 			disp = DESTROY_MESSAGE;
 			break;
 		}
@@ -3867,8 +3874,8 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			// There are two ways in which we can ignore this as a deselect:
 			// 1) 2-D position on screen
 			// 2) Time has exceeded the time which we allow for this to be a click.
-			m_mouseRightDragAnchor = msg->getArgument( 0 )->pixel;
-			m_mouseRightDown = (UnsignedInt) msg->getArgument( 2 )->integer;
+			m_rightMouseDownAnchor = msg->getArgument( 0 )->pixel;
+			m_rightMouseDownTimeMs = (UnsignedInt) msg->getArgument( 2 )->integer;
 
 			break;
 		}
@@ -3877,14 +3884,16 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		case GameMessage::MSG_RAW_MOUSE_RIGHT_BUTTON_UP:
 		{
 			// register this event for determining if the click was fast or short enough not to be a drag
-			m_mouseRightDragLift = msg->getArgument( 0 )->pixel;
-			m_mouseRightUp = (UnsignedInt) msg->getArgument( 2 )->integer;
+			m_rightMouseUpAnchor = msg->getArgument( 0 )->pixel;
+			m_rightMouseUpTimeMs = (UnsignedInt) msg->getArgument( 2 )->integer;
 
 			//Kris: July 7, 2003. Added this code to deselect build placement mode when right clicked. This fixes
 			//a bug where you couldn't cancel the sneak attack mode via right click. This only happened when you
 			//didn't have anything selected which is possible via the shortcut bar. Normally, it would get deselected
 			//via the deselect drawable code.
-			if( TheMouse->isClick(&m_mouseRightDragAnchor, &m_mouseRightDragLift, m_mouseRightDown, m_mouseRightUp) )
+			if( TheMouse->isClick(
+				m_rightMouseDownTimeMs, m_rightMouseUpTimeMs,
+				m_rightMouseDownAnchor, m_rightMouseUpAnchor) )
 			{
 				TheInGameUI->placeBuildAvailable( nullptr, nullptr );
 			}
@@ -3898,9 +3907,11 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			if( TheGlobalData->m_useAlternateMouse && TheGlobalData->m_doubleClickAttackMove )
 			{
 				// create the message and append arguments for a guard location
-				GameMessage *newMsg = TheMessageStream->appendMessage( GameMessage::MSG_DO_GUARD_POSITION );
 				Coord3D pos;
-				TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos );
+				if( !TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos ) )
+					break;
+
+				GameMessage *newMsg = TheMessageStream->appendMessage( GameMessage::MSG_DO_GUARD_POSITION );
 				newMsg->appendLocationArgument(pos);
 				newMsg->appendIntegerArgument(GUARDMODE_NORMAL);
 
@@ -3916,10 +3927,10 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		{
 			// right click is only actioned here if we're in alternate mouse mode
 			if (TheGlobalData->m_useAlternateMouse
-				&& TheMouse->isClick(&m_mouseRightDragAnchor, &m_mouseRightDragLift, m_mouseRightDown, m_mouseRightUp))
+				&& TheMouse->isClick(
+					m_rightMouseDownTimeMs, m_rightMouseUpTimeMs,
+					m_rightMouseDownAnchor, m_rightMouseUpAnchor))
 			{
-				Bool isPoint = (msg->getArgument(0)->pixelRegion.height() == 0 && msg->getArgument(0)->pixelRegion.width() == 0);
-
 				// NOTE: RIGHT_CLICK is not transmitted if AREA_SELECTION or DRAWABLE_PICKED occurs.
 				// If we see this msg, no object was clicked on, therefore clicked on ground.
 				// Issue move command to all currently selected objects.
@@ -3930,9 +3941,11 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 
 				// translate from screen coordinates to terrain coords
 				Coord3D pos;
-				TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos );
+				if( !TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos ) )
+					break;
 
 				const CommandButton *command = TheInGameUI->getGUICommand();
+				Bool isPoint = (msg->getArgument(0)->pixelRegion.height() == 0 && msg->getArgument(0)->pixelRegion.width() == 0);
 				Bool controllable = TheInGameUI->areSelectedObjectsControllable()
 														|| (command && command->getCommandType() == GUI_COMMAND_SPECIAL_POWER_FROM_SHORTCUT);
 				if (isPoint && controllable)
@@ -3969,9 +3982,11 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			if( !TheGlobalData->m_useAlternateMouse && TheGlobalData->m_doubleClickAttackMove )
 			{
 				// create the message and append arguments for a guard location
-				GameMessage *newMsg = TheMessageStream->appendMessage( GameMessage::MSG_DO_GUARD_POSITION );
 				Coord3D pos;
-				TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos );
+				if( !TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos ) )
+					break;
+
+				GameMessage *newMsg = TheMessageStream->appendMessage( GameMessage::MSG_DO_GUARD_POSITION );
 				newMsg->appendLocationArgument(pos);
 				newMsg->appendIntegerArgument(GUARDMODE_NORMAL);
 
@@ -3985,8 +4000,6 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		}
 		case GameMessage::MSG_MOUSE_LEFT_CLICK:
 		{
-			Bool isPoint = (msg->getArgument(0)->pixelRegion.height() == 0 && msg->getArgument(0)->pixelRegion.width() == 0);
-
 			// NOTE: LEFT_CLICK is not transmitted if AREA_SELECTION or DRAWABLE_PICKED occurs.
 			// If we see this msg, no object was clicked on, therefore clicked on ground.
 			// Issue move command to all currently selected objects.
@@ -3997,7 +4010,8 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 
 			// translate from screen coordinates to terrain coords
 			Coord3D pos;
-			TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos );
+			if( !TheTacticalView->screenToTerrain( &msg->getArgument( 0 )->pixel, &pos ) )
+				break;
 
 			const CommandButton *command = TheInGameUI->getGUICommand();
 			// maintain this as the list of GUI button initiated commands that fire with left click in alt mouse mode
@@ -4012,6 +4026,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			if ((TheGlobalData->m_useAlternateMouse) && (! isFiringGUICommand))
 				break;
 
+			Bool isPoint = (msg->getArgument(0)->pixelRegion.height() == 0 && msg->getArgument(0)->pixelRegion.width() == 0);
 			Bool controllable = TheInGameUI->areSelectedObjectsControllable()
 													|| (command && command->getCommandType() == GUI_COMMAND_SPECIAL_POWER_FROM_SHORTCUT);
 			if (isPoint && controllable)

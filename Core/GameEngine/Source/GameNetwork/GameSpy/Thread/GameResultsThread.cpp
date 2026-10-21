@@ -33,8 +33,8 @@
 #endif
 
 #include "GameNetwork/GameSpy/GameResultsThread.h"
-#include "mutex.h"
-#include "thread.h"
+#include "WWLib/mutex.h"
+#include "WWLib/thread.h"
 
 #include "Common/SubsystemInterface.h"
 

@@ -86,6 +86,7 @@ static void drawFramerateBar();
 #include "W3DDevice/GameClient/W3DShaderManager.h"
 #include "W3DDevice/GameClient/W3DDebugDisplay.h"
 #include "W3DDevice/GameClient/W3DProjectedShadow.h"
+#include "W3DDevice/GameClient/W3DScreenshot.h"
 #include "W3DDevice/GameClient/W3DShroud.h"
 #include "WWMath/wwmath.h"
 #include "WWLib/registry.h"
@@ -105,7 +106,7 @@ static void drawFramerateBar();
 #include "WW3D2/meshmatdesc.h"
 #include "WW3D2/meshmdl.h"
 #include "WW3D2/rddesc.h"
-#include "TARGA.h"
+#include "WWLib/TARGA.h"
 
 #include "GameLogic/ScriptEngine.h"		// For TheScriptEngine - jkmcd
 #include "GameLogic/GameLogic.h"
@@ -1408,9 +1409,16 @@ void W3DDisplay::gatherDebugStats()
 		//display the x and y mouse coordinates
 		const MouseIO *mouseIO = TheMouse->getMouseStatus();
 		Coord3D worldPos;
-		TheTacticalView->screenToTerrain(&mouseIO->pos, &worldPos);
-		unibuffer.format( L"Mouse position: screen: (%d, %d), world: (%g, %g, %g)", mouseIO->pos.x, mouseIO->pos.y,
-			worldPos.x, worldPos.y, worldPos.z);
+		if( TheTacticalView->screenToTerrain(&mouseIO->pos, &worldPos) )
+		{
+			unibuffer.format( L"Mouse position: screen: (%d, %d), world: (%g, %g, %g)",
+				mouseIO->pos.x, mouseIO->pos.y, worldPos.x, worldPos.y, worldPos.z);
+		}
+		else
+		{
+			unibuffer.format( L"Mouse position: screen: (%d, %d), world: none",
+				mouseIO->pos.x, mouseIO->pos.y);
+		}
 		m_displayStrings[MousePosition]->setText( unibuffer );
 
 		//display the number of particles in the world and being displayed on screen
@@ -1642,8 +1650,7 @@ void W3DDisplay::calculateTerrainLOD()
 			default: curLOD = TERRAIN_LOD_DISABLE; break;
 			case TERRAIN_LOD_AUTOMATIC: curLOD = TERRAIN_LOD_MAX; break;
 			case TERRAIN_LOD_MAX: curLOD = TERRAIN_LOD_NO_WATER; break;
-			case TERRAIN_LOD_HALF_CLOUDS: curLOD = TERRAIN_LOD_DISABLE; break;
-			case TERRAIN_LOD_NO_WATER: curLOD = TERRAIN_LOD_HALF_CLOUDS; break;
+			case TERRAIN_LOD_NO_WATER: curLOD = TERRAIN_LOD_DISABLE; break;
 		}
 		if (curLOD == TERRAIN_LOD_DISABLE) {
 			break;
@@ -1732,6 +1739,9 @@ void W3DDisplay::draw()
 
 	if (TheGlobalData->m_headless)
 		return;
+
+	// TheSuperHackers @feature bobtista 10/07/2026 Show messages for screenshots finished by the screenshot thread.
+	W3D_UpdateScreenshotMessages();
 
 	updateAverageFPS();
 	if (TheGlobalData->m_enableDynamicLOD && TheGameLogic->getShowDynamicLOD())
@@ -1907,7 +1917,7 @@ AGAIN:
 				// draw the user interface
 				TheInGameUI->DRAW();
 
-				// end of video example code
+				TheGameClient->DRAW();
 
 				// draw the mouse
 				if( TheMouse )
@@ -1918,14 +1928,7 @@ AGAIN:
 					// TheSuperHackers @bugfix Mauller 20/07/2025 scale videos based on screen size so they are shown in their original aspect
 					drawScaledVideoBuffer( m_videoBuffer, m_videoStream );
 				}
-				if( m_copyrightDisplayString )
-				{
-					Int x, y, dX, dY;
-					m_copyrightDisplayString->getSize(&dX, &dY);
-					x = (getWidth() / 2) - (dX /2);
-					y = getHeight()  - dY - 20 ;
-					m_copyrightDisplayString->draw(x, y, GameMakeColor(0,0,0,255), GameMakeColor(0,0,0,0),0,0);
-				}
+
 				// render letter box before debug display so debug info isn't hidden
 				renderLetterBox(now);
 
@@ -2940,7 +2943,6 @@ void W3DDisplay::setShroudLevel( Int x, Int y, CellShroudStatus setting )
 	}
 }
 
-//=============================================================================
 ///Utility function to dump data into a .BMP file
 #ifdef _WIN32
 static void CreateBMPFile(LPTSTR pszFile, char *image, Int width, Int height)
@@ -3162,10 +3164,16 @@ void W3DDisplay::takeScreenShot()
 	TheInGameUI->message(TheGameText->fetch("GUI:ScreenCapture"), ufileName.str());
 }
 
+=======
 /** Start/Stop capturing an AVI movie*/
 void W3DDisplay::toggleMovieCapture()
 {
 	WW3D::Toggle_Movie_Capture("Movie",30);
+}
+
+void W3DDisplay::takeScreenShot(ScreenshotFormat format, Int jpegQuality)
+{
+	W3D_TakeCompressedScreenshot(format, jpegQuality);
 }
 
 

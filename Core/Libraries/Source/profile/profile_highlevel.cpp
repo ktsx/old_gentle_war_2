@@ -31,7 +31,7 @@
 #include "profile.h"
 #include "internal.h"
 #include <new>
-#include <WWCommon.h>
+#include <WWLib/WWCommon.h>
 
 // our own fast critical section
 static ProfileFastCS cs;

@@ -50,7 +50,7 @@
 #include <Utility/stdio_adapter.h>
 #include <assert.h>
 #include <signal.h>
-#include "Except.h"
+#include "WWLib/Except.h"
 
 #ifdef _WIN32
 #include <windows.h>

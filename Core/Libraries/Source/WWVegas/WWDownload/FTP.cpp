@@ -42,7 +42,7 @@
 #endif
 #include "assert.h"
 #include "ftp.h"
-#include <WWCommon.h>
+#include <WWLib/WWCommon.h>
 #ifdef _WIN32
 #include <direct.h>
 #else

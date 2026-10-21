@@ -75,6 +75,7 @@ set(WWLIB_SRC
     #md5.h
     mempool.h
     mmsys.h
+    mpsc_intrusive_queue.h
     multilist.cpp
     multilist.h
     mutex.cpp
@@ -178,21 +179,21 @@ target_include_directories(core_wwlib PUBLIC
 # GeneralsX @feature WebPort 09/03/2026 — windows.h not available on Emscripten
 if(EMSCRIPTEN)
     target_precompile_headers(core_wwlib PRIVATE
-        [["Utility/CppMacros.h"]]
-        always.h
-        STLUtils.h
-        win.h
-        WWCommon.h
-        wwstring.h
-    )
+        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["WWLib/always.h"]]
+        [["WWLib/STLUtils.h"]]
+        [["WWLib/win.h"]]
+        [["WWLib/WWCommon.h"]]
+        [["WWLib/wwstring.h"]]
+        )
 else()
     target_precompile_headers(core_wwlib PRIVATE
-        [["Utility/CppMacros.h"]]
-        always.h
-        STLUtils.h
-        win.h
-        WWCommon.h
-        wwstring.h
+        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["WWLib/always.h"]]
+        [["WWLib/STLUtils.h"]]
+        [["WWLib/win.h"]]
+        [["WWLib/WWCommon.h"]]
+        [["WWLib/wwstring.h"]]
         <windows.h>
     )
 endif()

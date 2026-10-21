@@ -34,7 +34,10 @@
 #include "WW3D2/surfaceclass.h"
 #include "WW3D2/texture.h"
 #include "WW3D2/textureloader.h"
-#include "vector2i.h"
+#include "WW3D2/surfaceclass.h"
+#include "GameClient/Image.h"
+#include "GameClient/GameWindow.h"
+#include "WWMath/vector2i.h"
 #include <d3dx8.h>
 
 W3DWebBrowser::W3DWebBrowser() : WebBrowser() {}

@@ -38,7 +38,7 @@
 
 #pragma once
 
-#include "always.h"
+#include "WWLib/always.h"
 
 #if defined(_MSC_VER)
 #pragma warning(push, 3) // (gth) system headers complain at warning level 4...

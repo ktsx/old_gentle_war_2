@@ -62,7 +62,7 @@
 #include "vector3.h"
 #include "WWDebug/wwdebug.h"
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 

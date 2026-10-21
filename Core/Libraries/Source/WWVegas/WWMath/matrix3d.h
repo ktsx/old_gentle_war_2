@@ -81,7 +81,7 @@
 #pragma once
 
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 #include "WWLib/always.h"
@@ -90,7 +90,7 @@
 #include "vector3.h"
 #include "vector4.h"
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 

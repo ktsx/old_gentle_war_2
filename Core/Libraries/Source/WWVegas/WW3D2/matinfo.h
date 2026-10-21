@@ -43,7 +43,7 @@
 #include "texture.h"
 #include "WW3D2/shader.h"
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 class MeshModelClass;

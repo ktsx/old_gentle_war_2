@@ -15,9 +15,10 @@ to a live, clickable main menu **without them**, so that
 | `overlay/Data/English/Language.ini` | ours | Language/font block. The web port rasterises fonts with HTML5 Canvas, so the family name is all that matters. |
 | `overlay/Data/English/HeaderTemplate.ini` | ours | Text styles (`Title`, `Subtitle`, `Button`, `Label`, `Small`) referenced by our `.wnd` layouts. |
 | `overlay/Data/English/CommandMap.ini` | ours | Empty per-language hotkey override (optional, silences an INI ERROR). |
-| `overlay/Data/INI/Default/*.ini` | ours | Empty stubs for the `Default\<X>.ini` files the engine insists on opening (`loadFileDirectory` throws when neither file nor directory exists); the retail defaults live in the main `<X>.ini`. |
 | `overlay/Data/INI/MappedImages/HandCreated/FreeAssets.ini` + `tools/asset-pipeline/tga.ts` | ours | Placeholder button plates and a "logo" that is really a colour-order probe (red / green / blue stripes): `check-menu-shot.py` reads the stripes back from the screenshot, so a channel-order bug in the texture path (as the WebGL2 no-swizzle one was) fails CI. |
 | `maps/gxtest.map.json` + `tools/asset-pipeline/map.ts` | ours | A 64×64 flat map (USA human player vs. a China rival, start waypoints, afternoon lighting) written straight into the engine's DataChunk `.map` format — no WorldBuilder involved. `?args=-file+Maps/gxtest.map` launches it at boot. |
+| `overlay/Data/INI/Default/GameData.ini` | ours | `ShroudOn = No` (plus the corpus `MapName` line): the free map carries no vision-giving objects yet, so with the shroud on the whole tactical view is unexplored, i.e. black. Goes away once the map has units. |
+| `Art/Textures/TSCloudMed.tga`, `TSNoiseUrb.tga` | ours | The terrain's cloud and "lightmap" noise maps. `TerrainShader2Stage` multiplies the frame by them (`DESTCOLOR * ZERO`), so when they are missing the terrain goes black; the free set generates bright, soft versions. |
 | `overlay/Data/INI/Default/Terrain.ini` + `Art/Terrain/gxgrass.tga` | ours | The map's one terrain type. `Default\Terrain.ini` is loaded before the corpus `Terrain.ini`, so it is where the free set adds types without replacing the corpus file; the texture is a procedural 2×2-tile sheet. |
 | `windows/ShellGameLoadScreen.wnd.json`, `windows/BlankWindow.wnd.json` | ours | Load screen (`ProgressLoad`, `StaticTextLegal`) and the black backdrop `prepareNewGame` puts behind a loading game. |
 | `windows/MainMenu.wnd.json` | ours | Main menu layout, expanded to `.wnd` by `tools/asset-pipeline/wnd.ts`. Mirrors the window hierarchy `MainMenu.cpp` and `WindowTransitions.ini` expect (`MapBorder2` = main panel, `MapBorder` = single-player, `MapBorder1` = multiplayer, `MapBorder3` = replays, `MapBorder4` = difficulty, faction windows, `Logo`, `MainMenuRuler`, ...). All 57 window names the code looks up exist, most as hidden placeholders. |
@@ -38,8 +39,9 @@ reports `Ready`, and after the first click/key shows the main menu.
 
 Headless check (what CI runs): Begin, Space, SOLO PLAY → BACK → EXIT GAME, then the
 screenshot (lit menu, colour probe) and the `?diag=1` traces are checked. A second run
-launches the map with `?args=-file+Maps/gxtest.map` and expects `GAMELOGIC: startNewGame`
-followed by `TICK-DIAG ... inGame=1`.
+launches the map with `?args=-file+Maps/gxtest.map`, expects `GAMELOGIC: startNewGame`
+followed by `TICK-DIAG ... inGame=1`, and `check-map-shot.py` requires the centre of the
+tactical view to be grass-green (the first 3D content the WebGL2 shim renders).
 
 ```bash
 npx playwright install chromium

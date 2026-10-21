@@ -195,6 +195,12 @@ jobs:
           SMOKE_EXPECT="GAMELOGIC: startNewGame:ENTER;inGame=1 isPaused=0" \
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
 
+      - name: Check the terrain is visible
+        if: always()
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 tools/asset-pipeline/check-map-shot.py map.png
+
       # Surface the interesting console lines as check-run annotations (readable through the API without
       # downloading artifacts): failures as errors, load/tick progress as notices. One step per log, since
       # GitHub keeps at most 10 annotations of each level per step.

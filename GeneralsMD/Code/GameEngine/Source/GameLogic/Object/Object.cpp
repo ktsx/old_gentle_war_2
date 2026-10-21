@@ -1969,7 +1969,8 @@ void Object::attemptDamage( DamageInfo *damageInfo )
 			getControllingPlayer() &&
 			!BitIsSet(damageInfo->in.m_sourcePlayerMask, getControllingPlayer()->getPlayerMask()) &&
 			m_radarData != nullptr &&
-			isLocallyControlled() )
+			isLocallyControlled() &&
+			!isKindOf( KINDOF_NO_ATTACK_WARNING ) )
 		TheRadar->tryUnderAttackEvent( this );
 
 }
@@ -3122,7 +3123,9 @@ Bool Object::isSelectable() const
 	if ( m_isSelectable )
     if ( !testStatus(OBJECT_STATUS_UNSELECTABLE) )
 		  if ( !isEffectivelyDead() )
-				//if ( !getTemplate()->isKindOf(KINDOF_DRONE) )//Most drones are unselectable from being slaved, but the SpyDrone needs help
+#if !RETAIL_COMPATIBLE_CRC
+				if ( !getTemplate()->isKindOf(KINDOF_NO_SELECT) )
+#endif
 					return TRUE;
 
   return FALSE;
@@ -6455,7 +6458,7 @@ void Object::enterGroup( AIGroup *group )
 #if RETAIL_COMPATIBLE_AIGROUP
 	m_group = group;
 #else
-	m_group = AIGroupPtr::Create_AddRef(group);
+	m_group.Assign_Add_Ref(group);
 #endif
 }
 

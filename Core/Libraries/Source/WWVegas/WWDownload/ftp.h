@@ -35,7 +35,7 @@ typedef const char *LPCSTR;
 #endif
 #include <Utility/stdio_adapter.h>
 
-#include "WWDownload/ftpdefs.h"
+#include "ftpdefs.h"
 
 // FTP server return codes.  See RFC 959
 

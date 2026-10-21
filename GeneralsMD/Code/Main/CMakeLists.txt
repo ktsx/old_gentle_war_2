@@ -23,7 +23,6 @@ if(WIN32)
     target_link_libraries(z_generals PRIVATE
         binkstub
         comctl32
-        core_debug
         d3d8
         dinput8
         dxguid
@@ -36,7 +35,6 @@ endif()
 
 # Cross-platform core libraries
 target_link_libraries(z_generals PRIVATE
-    core_profile_legacy
     d3dx8
     z_gameengine
     z_gameenginedevice

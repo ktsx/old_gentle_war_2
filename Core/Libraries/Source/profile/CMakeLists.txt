@@ -41,6 +41,7 @@ else()
 endif()
 
 target_link_libraries(core_profile_legacy PRIVATE
+    core_debug
     core_wwcommon
     corei_always
 )

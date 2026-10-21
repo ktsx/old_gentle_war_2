@@ -22,11 +22,11 @@
 
 #ifndef __EMSCRIPTEN__
 
-#include <WWLib/win.h>
+#include "win.h"
 #include <imagehlp.h> // Must be included after Windows.h
 #include <set>
 #ifdef RTS_ENABLE_CRASHDUMP
-#include <WWLib/DbgHelpLoader_minidump.h>
+#include "DbgHelpLoader_minidump.h"
 #endif
 
 #include "mutex.h"

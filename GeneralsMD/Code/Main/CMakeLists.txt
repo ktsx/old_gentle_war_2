@@ -94,6 +94,11 @@ if(EMSCRIPTEN)
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         set(GX_PROFILE_FLAGS
             "-O3"
+            # Objects are compiled with -g (cmake/web.cmake); strip DWARF at
+            # link and keep assertions off — without -g0 the Release wasm is
+            # ~67 MB instead of ~7.6 MB and emcc skips JS/HTML minification.
+            "-g0"
+            "-sASSERTIONS=0"
             "--closure=1"
             "SHELL:--closure-args=--externs=${CMAKE_CURRENT_SOURCE_DIR}/closure-externs-gx.js"
             "-sMALLOC=emmalloc"

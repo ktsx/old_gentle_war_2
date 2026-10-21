@@ -65,6 +65,7 @@
 #include "GameLogic/TerrainLogic.h"
 
 #include "Common/file.h"
+#include <Utility/gx_trace.h>
 
 
 enum { INFINITE_LOOP_COUNT = 1000000 };
@@ -1428,9 +1429,9 @@ AsciiString MilesAudioManager::getMusicTrackName() const
 //-------------------------------------------------------------------------------------------------
 void MilesAudioManager::openDevice()
 {
-	printf("[MilesAudio] openDevice called\n");
+	GX_TRACE_LOG("[MilesAudio] openDevice called\n");
 	if (!TheGlobalData->m_audioOn) {
-		printf("[MilesAudio] openDevice: audio is globally off, returning\n");
+		GX_TRACE_LOG("[MilesAudio] openDevice: audio is globally off, returning\n");
 		return;
 	}
 
@@ -1443,33 +1444,33 @@ void MilesAudioManager::openDevice()
 	m_selectedSpeakerType = TheAudio->translateSpeakerTypeToUnsignedInt(m_prefSpeaker);
 
 	retval = AIL_quick_startup(audioSettings->m_useDigital, audioSettings->m_useMidi, audioSettings->m_outputRate, audioSettings->m_outputBits, audioSettings->m_outputChannels);
-	printf("[MilesAudio] AIL_quick_startup returned: %d\n", retval);
+	GX_TRACE_LOG("[MilesAudio] AIL_quick_startup returned: %d\n", retval);
 
 	// Quick handles tells us where to store the various devices. For now, we're only interested in the digital handle.
 	AIL_quick_handles(&m_digitalHandle, nullptr, nullptr);
 
 	if (retval) {
 		buildProviderList();
-		printf("[MilesAudio] buildProviderList finished. m_providerCount: %u\n", m_providerCount);
+		GX_TRACE_LOG("[MilesAudio] buildProviderList finished. m_providerCount: %u\n", m_providerCount);
 	} else {
 		// if we couldn't initialize any devices, turn sound off (fail silently)
 		setOn( false, AudioAffect_All );
 	}
 
 	UnsignedInt prefProviderNdx = TheAudio->getProviderIndex(m_pref3DProvider);
-	printf("[MilesAudio] m_pref3DProvider index: %u\n", prefProviderNdx);
+	GX_TRACE_LOG("[MilesAudio] m_pref3DProvider index: %u\n", prefProviderNdx);
 	selectProvider(prefProviderNdx);
 
 	// Now that we're all done, update the cached variables so that everything is in sync.
 	TheAudio->refreshCachedVariables();
 
 	if (!isValidProvider()) {
-		printf("[MilesAudio] openDevice: isValidProvider is FALSE, returning early\n");
+		GX_TRACE_LOG("[MilesAudio] openDevice: isValidProvider is FALSE, returning early\n");
 		return;
 	}
 
 	initDelayFilter();
-	printf("[MilesAudio] openDevice finished successfully\n");
+	GX_TRACE_LOG("[MilesAudio] openDevice finished successfully\n");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1653,23 +1654,23 @@ UnsignedInt MilesAudioManager::getProviderIndex( AsciiString providerName ) cons
 //-------------------------------------------------------------------------------------------------
 void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 {
-	printf("[MilesAudio] selectProvider called with providerNdx: %u, m_providerCount: %u\n", providerNdx, m_providerCount);
+	GX_TRACE_LOG("[MilesAudio] selectProvider called with providerNdx: %u, m_providerCount: %u\n", providerNdx, m_providerCount);
 
 	if (!isOn(AudioAffect_Sound3D))
 	{
-		printf("[MilesAudio] selectProvider: Sound3D is off, returning early\n");
+		GX_TRACE_LOG("[MilesAudio] selectProvider: Sound3D is off, returning early\n");
 		return;
 	}
 
 	if (providerNdx == m_selectedProvider && providerNdx != PROVIDER_ERROR)
 	{
-		printf("[MilesAudio] selectProvider: providerNdx matches selected and is not PROVIDER_ERROR, returning early\n");
+		GX_TRACE_LOG("[MilesAudio] selectProvider: providerNdx matches selected and is not PROVIDER_ERROR, returning early\n");
 		return;
 	}
 
 	if (isValidProvider())
 	{
-		printf("[MilesAudio] selectProvider: freeing current provider\n");
+		GX_TRACE_LOG("[MilesAudio] selectProvider: freeing current provider\n");
 		freeAllMilesHandles();
 		unselectProvider();
 	}
@@ -1681,7 +1682,7 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 	{
 		DWORD speakerConfig;
 		lpDirectSoundInfo->GetSpeakerConfig( &speakerConfig );
-		printf("[MilesAudio] selectProvider: lpDirectSoundInfo speakerConfig: %u\n", (unsigned int)speakerConfig);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: lpDirectSoundInfo speakerConfig: %u\n", (unsigned int)speakerConfig);
 		switch( DSSPEAKER_CONFIG( speakerConfig ) )
 		{
 			case DSSPEAKER_DIRECTOUT:
@@ -1717,29 +1718,29 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 	}
 	else
 	{
-		printf("[MilesAudio] selectProvider: lpDirectSoundInfo is null\n");
+		GX_TRACE_LOG("[MilesAudio] selectProvider: lpDirectSoundInfo is null\n");
 	}
 
 	Bool success = FALSE;
 	if( useDolby )
 	{
 		providerNdx = getProviderIndex( "Dolby Surround" );
-		printf("[MilesAudio] selectProvider: useDolby is TRUE, selected provider index: %u\n", providerNdx);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: useDolby is TRUE, selected provider index: %u\n", providerNdx);
 	}
 	else
 	{
 		providerNdx = getProviderIndex( "Miles Fast 2D Positional Audio" );
-		printf("[MilesAudio] selectProvider: useDolby is FALSE, selected provider index: %u\n", providerNdx);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: useDolby is FALSE, selected provider index: %u\n", providerNdx);
 	}
 
 	if (providerNdx != PROVIDER_ERROR && providerNdx < m_providerCount)
 	{
 		success = AIL_open_3D_provider( m_provider3D[providerNdx].id ) == 0;
-		printf("[MilesAudio] selectProvider: open 3D provider returned success: %d\n", success);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: open 3D provider returned success: %d\n", success);
 	}
 	else
 	{
-		printf("[MilesAudio] selectProvider: providerNdx is invalid (%u)\n", providerNdx);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: providerNdx is invalid (%u)\n", providerNdx);
 	}
 
 	if( !success )
@@ -1747,18 +1748,18 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 		m_selectedProvider = PROVIDER_ERROR;
 		// try to select a failsafe
 		providerNdx = getProviderIndex( "Miles Fast 2D Positional Audio" );
-		printf("[MilesAudio] selectProvider: fallback selection provider index: %u\n", providerNdx);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: fallback selection provider index: %u\n", providerNdx);
 		if (providerNdx != PROVIDER_ERROR && providerNdx < m_providerCount)
 		{
 			success = AIL_open_3D_provider( m_provider3D[providerNdx].id ) == 0;
-			printf("[MilesAudio] selectProvider: fallback open returned success: %d\n", success);
+			GX_TRACE_LOG("[MilesAudio] selectProvider: fallback open returned success: %d\n", success);
 		}
 	}
 
 	if ( success )
 	{
 		m_selectedProvider = providerNdx;
-		printf("[MilesAudio] selectProvider: success! Selected provider set to: %u\n", m_selectedProvider);
+		GX_TRACE_LOG("[MilesAudio] selectProvider: success! Selected provider set to: %u\n", m_selectedProvider);
 
 		initSamplePools();
 
@@ -1771,7 +1772,7 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 	}
 	else
 	{
-		printf("[MilesAudio] selectProvider: failed to select provider\n");
+		fprintf(stderr, "[MilesAudio] selectProvider: failed to select provider\n");
 	}
 }
 
@@ -2922,7 +2923,7 @@ void MilesAudioManager::initDelayFilter()
 Bool MilesAudioManager::isValidProvider()
 {
 	Bool valid = (m_selectedProvider < m_providerCount);
-	printf("[MilesAudio] isValidProvider: m_selectedProvider=%u, m_providerCount=%u -> valid=%d\n", m_selectedProvider, m_providerCount, (int)valid);
+	GX_TRACE_LOG("[MilesAudio] isValidProvider: m_selectedProvider=%u, m_providerCount=%u -> valid=%d\n", m_selectedProvider, m_providerCount, (int)valid);
 	return valid;
 }
 

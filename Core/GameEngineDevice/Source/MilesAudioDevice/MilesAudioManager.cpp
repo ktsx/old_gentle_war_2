@@ -653,8 +653,12 @@ void MilesAudioManager::pauseAmbient( Bool shouldPause )
 }
 
 //-------------------------------------------------------------------------------------------------
-void MilesAudioManager::playAudioEvent( AudioEventRTS *event )
+void MilesAudioManager::playAudioEvent( AudioRequest* req )
 {
+	DEBUG_ASSERTCRASH(req->m_usePendingEvent && req->m_pendingEvent, ("audio request was expected to contain a valid audio event"));
+
+	AudioEventRTS* event = req->m_pendingEvent;
+
 #ifdef INTENSIVE_AUDIO_DEBUG
 	DEBUG_LOG(("MILES (%d) - Processing play request: %d (%s)", TheGameLogic->getFrame(), event->getPlayingHandle(), event->getEventName().str()));
 #endif
@@ -710,7 +714,7 @@ void MilesAudioManager::playAudioEvent( AudioEventRTS *event )
 			}
 
 			// Put this on here, so that the audio event RTS will be cleaned up regardless.
-			audio->m_audioEventRTS = event;
+			audio->m_audioEventRTS = event = req->releasePendingEvent();
 			audio->m_stream = stream;
 			audio->m_type = PAT_Stream;
 
@@ -779,7 +783,7 @@ void MilesAudioManager::playAudioEvent( AudioEventRTS *event )
 					sample3D = nullptr;
 				}
 				// Push it onto the list of playing things
-				audio->m_audioEventRTS = event;
+				audio->m_audioEventRTS = event = req->releasePendingEvent();
 				audio->m_3DSample = sample3D;
 				audio->m_file = nullptr;
 				audio->m_type = PAT_3DSample;
@@ -850,7 +854,7 @@ void MilesAudioManager::playAudioEvent( AudioEventRTS *event )
 				}
 
 				// Push it onto the list of playing things
-				audio->m_audioEventRTS = event;
+				audio->m_audioEventRTS = event = req->releasePendingEvent();
 				audio->m_sample = sample;
 				audio->m_file = nullptr;
 				audio->m_type = PAT_Sample;
@@ -2965,7 +2969,7 @@ void MilesAudioManager::processRequest( AudioRequest *req )
 	{
 		case AR_Play:
 		{
-			playAudioEvent(req->m_pendingEvent);
+			playAudioEvent(req);
 			break;
 		}
 		case AR_Pause:

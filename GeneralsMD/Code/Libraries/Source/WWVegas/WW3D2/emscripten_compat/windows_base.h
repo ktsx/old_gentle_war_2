@@ -271,6 +271,21 @@ inline void InitializeCriticalSection(CRITICAL_SECTION *x) {}
 inline void DeleteCriticalSection(CRITICAL_SECTION *x) {}
 inline void EnterCriticalSection(CRITICAL_SECTION *x) {}
 inline void LeaveCriticalSection(CRITICAL_SECTION *x){}
+
+// GeneralsX @merge 2026-10-21 — Interlocked* used by upstream's threaded audio
+// release path (MilesAudioManager). The web build is single-threaded, so plain
+// read-modify-write is equivalent; keep the Win32 semantics (returns the
+// previous value).
+inline long InterlockedCompareExchange(volatile long *dest, long exchange, long comparand) {
+  long prev = *dest;
+  if (prev == comparand) *dest = exchange;
+  return prev;
+}
+inline long InterlockedExchange(volatile long *dest, long value) {
+  long prev = *dest; *dest = value; return prev;
+}
+inline long InterlockedIncrement(volatile long *dest) { return ++(*dest); }
+inline long InterlockedDecrement(volatile long *dest) { return --(*dest); }
 #define S_OK ((HRESULT)0)
 #define E_FAIL ((HRESULT)0x80004005)
 #define SEVERITY_ERROR 1

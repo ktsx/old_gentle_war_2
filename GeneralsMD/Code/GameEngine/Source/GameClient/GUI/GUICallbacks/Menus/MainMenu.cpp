@@ -896,12 +896,12 @@ void MainMenuUpdate( WindowLayout *layout, void *userData )
 	static int mainSpamCounter = 0;
 	if (dontAllowTransitions && (mainSpamCounter++ % 30 == 0))
 	{
-		GX_TRACE_LOG( "GX-TRACE: MainMenuUpdate: dontAllowTransitions=%d, transitionsFinished=%d, activeGroup='%s'\n",
+		GX_DIAG_LOG( "GX-TRACE: MainMenuUpdate: dontAllowTransitions=%d, transitionsFinished=%d, activeGroup='%s'\n",
 			(int)dontAllowTransitions, (int)TheTransitionHandler->isFinished(), TheTransitionHandler->getCurrentGroupName().str());
 	}
 	if(dontAllowTransitions && TheTransitionHandler->isFinished())
 	{
-		GX_TRACE_LOG( "GX-TRACE: MainMenuUpdate: Clearing dontAllowTransitions!\n");
+		GX_DIAG_LOG( "GX-TRACE: MainMenuUpdate: Clearing dontAllowTransitions!\n");
 		dontAllowTransitions = FALSE;
 	}
 

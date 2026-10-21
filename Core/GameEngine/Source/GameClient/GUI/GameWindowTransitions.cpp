@@ -320,7 +320,7 @@ Bool TransitionGroup::isFinished()
 			allFinished = FALSE;
 			if (m_currentFrame > 60 && (spamCounter++ % 30 == 0))
 			{
-				GX_TRACE_LOG( "GX-TRACE: TransitionGroup '%s' frame=%d NOT finished because window '%s' (style=%d) is not finished.\n",
+				GX_DIAG_LOG( "GX-TRACE: TransitionGroup '%s' frame=%d NOT finished because window '%s' (style=%d) is not finished.\n",
 					m_name.str(), m_currentFrame, tWin->m_winName.str(), tWin->m_style);
 			}
 		}

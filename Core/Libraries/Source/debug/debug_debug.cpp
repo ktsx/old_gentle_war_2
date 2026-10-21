@@ -1,7 +1,4 @@
 #ifndef __EMSCRIPTEN__
-#include <stdio.h>
-#define wsprintf sprintf
-#endif
 /*
 **	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
@@ -66,7 +63,7 @@ void __attribute__((constructor(65434))) GccPostStaticInit() { Debug::PostStatic
 void *Debug::PreStatic = nullptr;
 void *Debug::PostStatic = nullptr;
 #else
-// removed error
+#error "Unsupported compiler or platform. This code requires MSVC or GCC/MinGW-w64 targeting Windows."
 #endif
 
 Debug::LogDescription::LogDescription(const char *fileOrGroup, const char *description)
@@ -297,7 +294,7 @@ void Debug::InstallExceptionHandler()
   // MinGW-w64 doesn't support _set_se_translator, use Vectored Exception Handler
   AddVectoredExceptionHandler(1, LocalVectoredExceptionHandler);
 #else
-  // removed exception error
+  #error "Unsupported compiler for exception handling"
 #endif
 }
 
@@ -326,7 +323,7 @@ bool Debug::SkipNext()
     : "memory"
   );
 #else
-  // removed asm error
+  #error "Unsupported compiler or architecture for inline assembly"
 #endif
   curStackFrame=help;
 
@@ -879,7 +876,7 @@ Debug& Debug::operator<<(unsigned short val)
   return (*this) << _itoa(val,help,m_radix);
 }
 
-Debug& Debug::operator<<(long long val)
+Debug& Debug::operator<<(__int64 val)
 {
   // usually having a fixed size buffer and a function
   // that doesn't check for buffer overflow isn't a good idea
@@ -889,7 +886,7 @@ Debug& Debug::operator<<(long long val)
   return (*this) << _i64toa(val,help,m_radix);
 }
 
-Debug& Debug::operator<<(unsigned long long val)
+Debug& Debug::operator<<(unsigned __int64 val)
 {
   // usually having a fixed size buffer and a function
   // that doesn't check for buffer overflow isn't a good idea
@@ -1688,3 +1685,5 @@ void __cdecl _heap_abort()
 {
   DCRASH_RELEASE("Fatal heap error.");
 }
+
+#endif // __EMSCRIPTEN__

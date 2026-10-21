@@ -23,16 +23,7 @@
 #include "Utility/stringex.h"
 #include <mmsystem.h>
 #include <assert.h>
-#ifdef _WIN32
 #include <direct.h>
-#else
-#include <unistd.h>
-#define _mkdir(path) mkdir(path, 0777)
-#define _stat stat
-#define _strnicmp strncasecmp
-#define MulDiv(nNumber, nNumerator, nDenominator) (int)(((long long)(nNumber) * (nNumerator) + ((nDenominator) / 2)) / (nDenominator))
-#include "../WW3D2/emscripten_compat/windows.h"
-#endif
 #include <stdlib.h>
 #include <sys/stat.h>
 
@@ -436,4 +427,4 @@ HRESULT CDownload::PumpMessages()
 	return DOWNLOAD_SUCCEEDED;
 }
 
-#endif
+#endif // __EMSCRIPTEN__

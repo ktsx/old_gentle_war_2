@@ -104,7 +104,7 @@ ProfileHighLevel::Block::Block(const char *name)
 
 ProfileHighLevel::Block::~Block()
 {
-  long long end;
+  _int64 end;
   ProfileGetTime(end);
   end-=m_start;
 
@@ -343,4 +343,4 @@ ProfileHighLevel::ProfileHighLevel()
 
 ProfileHighLevel ProfileHighLevel::Instance;
 
-#endif
+#endif // __EMSCRIPTEN__

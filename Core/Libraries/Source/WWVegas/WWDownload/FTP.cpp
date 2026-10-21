@@ -27,33 +27,16 @@
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include <stdlib.h>
-#ifndef __EMSCRIPTEN__
-#ifdef _WIN32
 #include <process.h>
-#else
-#include "../WW3D2/emscripten_compat/windows.h"	// For Emscripten compat
-#endif
-#endif
 #include <sys/stat.h>
-#ifndef __EMSCRIPTEN__
 #include <io.h>
-#else
-#include <unistd.h>
-#endif
+#include <time.h>
 #include "assert.h"
 #include "ftp.h"
-#include <WWLib/WWCommon.h>
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <netdb.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#define closesocket close
-#define gethostbynameA gethostbyname
-#endif
 #include <time.h>
+#include <direct.h>
 #include <errno.h>
+#include <WWLib/WWCommon.h>
 //#include "wlib/wstring.h"
 
 #include "DownloadDebug.h"
@@ -1030,7 +1013,7 @@ unsigned long MyIPAddress( int sockfd )
 		i = sizeof( sin );
 		getsockname( sockfd, (struct sockaddr *)&sin, &i );
 
-		ip = sin.sin_addr.s_addr;
+		ip = sin.sin_addr.S_un.S_addr;
 	}
 	else
 	{
@@ -1857,4 +1840,8 @@ bool Prepare_Directories(const char *rootdir, const char *filename)
 	return(true);
 }
 
-#endif
+
+
+
+
+#endif // __EMSCRIPTEN__

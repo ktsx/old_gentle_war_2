@@ -31,8 +31,7 @@
 #include "debug/debug_cmd.h"
 #include "internal.h"
 #include <windows.h>
-//#include <process.h>
-#define _beginthreadex(a,b,c,d,e,f) 0
+#include <process.h>
 
 bool DebugCmdInterfaceDebug::Execute(class Debug& dbg, const char *cmd,
                                      CommandMode cmdmode, unsigned argn,
@@ -411,4 +410,4 @@ bool DebugCmdInterfaceDebug::Execute(class Debug& dbg, const char *cmd,
   return false;
 }
 
-#endif
+#endif // __EMSCRIPTEN__

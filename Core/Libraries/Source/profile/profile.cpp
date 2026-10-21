@@ -88,7 +88,7 @@ void ProfileFreeMemory(void *ptr)
 
 //////////////////////////////////////////////////////////////////////////////
 
-static long long GetClockCyclesFast()
+static _int64 GetClockCyclesFast()
 {
   // this is where we're adding our internal result functions
   Profile::AddResultFunction(ProfileResultFileCSV::Create,
@@ -102,7 +102,7 @@ static long long GetClockCyclesFast()
 
   // measure clock cycles 3 times for 20 msec each
   // then take the 2 counts that are closest, average
-  long long n[3];
+  _int64 n[3];
   for (int k=0;k<3;k++)
   {
     // wait for end of current tick
@@ -110,7 +110,7 @@ static long long GetClockCyclesFast()
     while (timeGetTime()<timeEnd);
 
     // get cycles
-    long long start,startQPC,endQPC;
+    _int64 start,startQPC,endQPC;
     QueryPerformanceCounter((LARGE_INTEGER *)&startQPC);
     ProfileGetTime(start);
     timeEnd+=20;
@@ -121,7 +121,7 @@ static long long GetClockCyclesFast()
     // convert to 1 second
     if (QueryPerformanceCounter((LARGE_INTEGER *)&endQPC))
     {
-      long long freq;
+      _int64 freq;
       QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
       n[k]=(n[k]*freq)/(endQPC-startQPC);
     }
@@ -132,11 +132,11 @@ static long long GetClockCyclesFast()
   }
 
   // find two closest values
-  long long d01=n[1]-n[0],d02=n[2]-n[0],d12=n[2]-n[1];
+  _int64 d01=n[1]-n[0],d02=n[2]-n[0],d12=n[2]-n[1];
   if (d01<0) d01=-d01;
   if (d02<0) d02=-d02;
   if (d12<0) d12=-d12;
-  long long avg;
+  _int64 avg;
   if (d01<d02)
   {
     avg=d01<d12?n[0]+n[1]:n[1]+n[2];
@@ -155,7 +155,7 @@ unsigned Profile::m_rec;
 char **Profile::m_recNames;
 unsigned Profile::m_names;
 Profile::FrameName *Profile::m_frameNames;
-long long Profile::m_clockCycles=GetClockCyclesFast();
+_int64 Profile::m_clockCycles=GetClockCyclesFast();
 Profile::PatternListEntry *Profile::firstPatternEntry;
 Profile::PatternListEntry *Profile::lastPatternEntry;
 
@@ -336,7 +336,7 @@ void Profile::ClearTotals()
   ProfileId::ClearTotals();
 }
 
-long long Profile::GetClockCyclesPerSecond()
+_int64 Profile::GetClockCyclesPerSecond()
 {
   return m_clockCycles;
 }
@@ -385,4 +385,4 @@ static void ProfileShutdown()
 
 int profileTracerInit=atexit(ProfileShutdown);
 
-#endif
+#endif // __EMSCRIPTEN__

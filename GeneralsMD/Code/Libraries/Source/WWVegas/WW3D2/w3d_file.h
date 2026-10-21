@@ -1130,7 +1130,7 @@ typedef enum
 	SURFACE_TYPE_MAX			// NOTE: if you add a surface type, add it to the SurfaceEffects.INI file!
 } W3D_SURFACE_TYPES;
 
-const char * const SURFACE_TYPE_STRINGS[SURFACE_TYPE_MAX] =
+const char * const SURFACE_TYPE_STRINGS[] =
 {
 	"Light Metal",
 	"Heavy Metal",
@@ -1165,6 +1165,7 @@ const char * const SURFACE_TYPE_STRINGS[SURFACE_TYPE_MAX] =
 	"Underwater Dirt",
 	"Underwater Tiberium Dirt",
 };
+static_assert(ARRAY_SIZE(SURFACE_TYPE_STRINGS) == SURFACE_TYPE_MAX, "Incorrect array size");
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Flags for the Mesh Attributes member
@@ -1796,7 +1797,7 @@ enum
 // The definition of this string array can be found in
 // Part_Ldr.cpp.  Please update this array accordingly.
 //
-extern const char *EMITTER_TYPE_NAMES[EMITTER_TYPEID_COUNT];
+extern const char *EMITTER_TYPE_NAMES[];
 
 struct W3dEmitterHeaderStruct
 {

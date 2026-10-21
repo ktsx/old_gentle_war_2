@@ -37,3 +37,7 @@ Result = the exact file list a replacement asset set must provide for that
 object. Tested against the community patch INI corpus
 (TheSuperHackers/GeneralsGamePatch): Ranger → 7 w3d, 8 images, 2 weapons,
 29 audio events, 14 particle systems.
+
+## Build (ktsx fork)
+
+Web build: push to `main` runs `.github/workflows/web-build.yml` (Emscripten 6.0.2), artifacts `GeneralsZH-web`.

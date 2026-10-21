@@ -48,6 +48,7 @@
 #include <stdlib.h>
 
 #include "W3DDevice/GameClient/TerrainTex.h"
+#include <Utility/gx_trace.h>
 #include "W3DDevice/GameClient/WorldHeightMap.h"
 #include "W3DDevice/GameClient/TileData.h"
 #include "Common/GlobalData.h"
@@ -193,6 +194,20 @@ int TerrainTextureClass::update(WorldHeightMap *htMap)
 		}
 
 	}
+#ifdef __EMSCRIPTEN__
+	// Web diag: what went into the terrain texture (format, first tile position, a few texels).
+	if (locked_rect.pBits && htMap->m_numBitmapTiles > 0) {
+		TileData *t0 = htMap->getSourceTile(0);
+		ICoord2D p0 = t0 ? t0->m_tileLocationInTexture : ICoord2D{-1, -1};
+		const UnsignedShort *px = (const UnsignedShort *)locked_rect.pBits;
+		Int sx = p0.x > 0 ? p0.x + 8 : 8, sy = p0.y > 0 ? p0.y + 8 : 8;
+		GX_DIAG_LOG("TERRAINTEX: %ux%u fmt=%d pitch=%d tiles=%d classes=%d tile0=(%d,%d) texel(%d,%d)=%04x texel(%d,%d)=%04x texel(8,8)=%04x\n",
+					(unsigned)surface_desc.Width, (unsigned)surface_desc.Height, (int)surface_desc.Format, locked_rect.Pitch,
+					htMap->m_numBitmapTiles, htMap->m_numTextureClasses, p0.x, p0.y,
+					sx, sy, px[sy * surface_desc.Width + sx], sx + 20, sy + 20, px[(sy + 20) * surface_desc.Width + sx + 20],
+					px[8 * surface_desc.Width + 8]);
+	}
+#endif
 	surface_level->UnlockRect();
 	surface_level->Release();
 	DX8_ErrorCode(D3DXFilterTexture(Peek_D3D_Texture(), nullptr, 0, D3DX_FILTER_BOX));

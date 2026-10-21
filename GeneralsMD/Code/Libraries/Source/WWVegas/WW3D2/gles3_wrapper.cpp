@@ -753,8 +753,14 @@ void GLES3_Diag_Dump_Draw(const char* kind, unsigned int fvf, unsigned int strid
                 const float* pos = (const float*)(vb + off);
                 float v[4] = {pos[0], pos[1], pos[2], 1.0f}, a[4], b[4], c[4];
                 Mul_Row_Vec(g_State.world_matrix, v, a); Mul_Row_Vec(g_State.view_matrix, a, b); Mul_Row_Vec(g_State.projection_matrix, b, c);
-                n += snprintf(line + n, sizeof(line) - n, " (%.1f,%.1f,%.1f)->ndc(%.2f,%.2f,%.2f w=%.1f)",
-                              pos[0], pos[1], pos[2], c[3] != 0 ? c[0] / c[3] : 0, c[3] != 0 ? c[1] / c[3] : 0, c[3] != 0 ? c[2] / c[3] : 0, c[3]);
+                // diffuse (D3DCOLOR, bytes B G R A) sits after the position (+normal when D3DFVF_NORMAL 0x10)
+                unsigned int col = 0;
+                if (fvf & 0x40) {
+                    size_t coff = off + 12 + ((fvf & 0x10) ? 12 : 0) + (((fvf & 0xE) == 0x4) ? 4 : 0);
+                    if (coff + 4 <= vb_bytes) memcpy(&col, vb + coff, 4);
+                }
+                n += snprintf(line + n, sizeof(line) - n, " (%.1f,%.1f,%.1f)->ndc(%.2f,%.2f,%.2f w=%.1f) argb=%08x",
+                              pos[0], pos[1], pos[2], c[3] != 0 ? c[0] / c[3] : 0, c[3] != 0 ? c[1] / c[3] : 0, c[3] != 0 ? c[2] / c[3] : 0, c[3], col);
             }
             fprintf(stderr, "%s\n", line);
         }

@@ -1002,111 +1002,13 @@
         };
 
         let runtimeDepsTotal = 0;
-        // ------------------------------------------------------------------
-        // IDBFS mount + initial sync as a runtime dependency.
-        //
-        // The engine reads/writes save games and options.ini under what it
-        // thinks is the user-data directory; on Emscripten we point that at
-        // /userdata, mounted with IDBFS so the contents persist in the
-        // browser's IndexedDB across page reloads. This preRun hook:
-        //   1. Creates /userdata in MEMFS
-        //   2. Mounts IDBFS over it
-        //   3. Calls FS.syncfs(true, ...) to load any previously saved data
-        //      from IndexedDB into MEMFS, BEFORE main() runs (via
-        //      addRunDependency / removeRunDependency, the canonical pattern)
-        //
-        // After main() takes over, the C++ side is responsible for periodic
-        // FS.syncfs(false, ...) flushes — see GX_FlushIdbfs in
-        // EmscriptenMain.cpp.
-        // ------------------------------------------------------------------
-        const idbfsPreRun = function () {
-          const fs = window['Module']['FS'] || (typeof FS !== 'undefined' ? FS : null);
-          if (!fs) {
-            console.warn('[GeneralsX] FS is not defined on Module or globally!');
-            return;
-          }
-          if (fs) {
-            if (!fs['mkdir'] || !fs['mount'] || !fs['syncfs']) {
-              console.log('[GeneralsX] FS.mkdir, FS.mount or FS.syncfs is missing, scanning for minified aliases...');
-              for (const key in fs) {
-                if (typeof fs[key] === 'function') {
-                  const str = fs[key].toString();
-                  if (!fs['syncfs'] && (str.includes('FS.syncfs') || str.includes('operations in flight') || str.includes('extra work'))) {
-                    fs['syncfs'] = fs[key];
-                    console.log(`[GeneralsX] Found minified FS.syncfs as fs['${key}']`);
-                  }
-                  if (!fs['mkdir'] && str.includes('16384')) {
-                    fs['mkdir'] = fs[key];
-                    console.log(`[GeneralsX] Found minified FS.mkdir as fs['${key}']`);
-                  }
-                  if (!fs['mount'] && fs[key].length === 3 && (str.includes('===') && (str.includes('c') || str.includes('mountpoint')) && (str.includes('/') || str.includes('ErrnoError') || str.includes('gj(')))) {
-                    fs['mount'] = fs[key];
-                    console.log(`[GeneralsX] Found minified FS.mount as fs['${key}']`);
-                  }
-                }
-              }
-            }
-          }
-          let idbfs = window['IDBFS'] || (fs['filesystems'] && fs['filesystems']['IDBFS']);
-          if (!idbfs) {
-            // In release mode, Closure Compiler minifies FS.filesystems (e.g. to FS.Np).
-            // Scan FS properties dynamically for an object containing 'MEMFS' and 'IDBFS'.
-            for (const key in fs) {
-              if (fs.hasOwnProperty(key) && fs[key] && typeof fs[key] === 'object' && fs[key]['MEMFS'] && fs[key]['IDBFS']) {
-                idbfs = fs[key]['IDBFS'];
-                console.log(`[GeneralsX] Found IDBFS via minified filesystems property: ${key}`);
-                break;
-              }
-            }
-          }
-          if (idbfs) {
-            const keys = [];
-            for (const key in idbfs) {
-              keys.push(key + ' (len=' + (typeof idbfs[key] === 'function' ? idbfs[key].length : 'N/A') + ')');
-              if (typeof idbfs[key] === 'function') {
-                if (typeof idbfs['mount'] !== 'function' && idbfs[key].length === 1 && key !== 'mount') {
-                  idbfs['mount'] = idbfs[key];
-                  console.log(`[GeneralsX] Aliased IDBFS.${key} to IDBFS.mount`);
-                } else if (typeof idbfs['syncfs'] !== 'function' && idbfs[key].length === 3 && key !== 'syncfs') {
-                  idbfs['syncfs'] = idbfs[key];
-                  console.log(`[GeneralsX] Aliased IDBFS.${key} to IDBFS.syncfs`);
-                }
-              }
-            }
-            console.log('[GeneralsX] IDBFS keys and properties scanned:', keys.join(', '));
-          }
-          if (!idbfs) {
-            console.warn('[GeneralsX] IDBFS is not defined!');
-            return;
-          }
-          try {
-            fs['mkdir']('/userdata');
-          } catch (e) {
-            // Already exists — fine.
-          }
-          try {
-            fs['mount'](idbfs, {}, '/userdata');
-          } catch (e) {
-            console.warn('[GeneralsX] IDBFS mount failed:', e);
-            return;
-          }
-          window['Module']['addRunDependency']('idbfs-load');
-          stageEl.textContent = 'Loading saved data';
-          fs['syncfs'](true, function (err) {
-            if (err) {
-              console.warn('[GeneralsX] IDBFS load failed:', err);
-            } else {
-              console.log('[GeneralsX] IDBFS load complete');
-            }
-            window['Module']['removeRunDependency']('idbfs-load');
-          });
-        };
-
+        // IDBFS mount + initial sync (/userdata) lives in web_pre.js, linked
+        // with --pre-js so it is compiled with the runtime and survives
+        // Closure minification. GeneralsX @build WebPort 2026-10-21
         window.Module = {
           canvas: document.getElementById('canvas'),
           print: printToOutput,
           printErr: printErrToOutput,
-          preRun: [idbfsPreRun],
           onRuntimeInitialized: function () {
             if (virtualNetEnabled) {
               console.log(`[GeneralsX] Enabling virtual networking with IP: ${virtualIP.join('.')}`);

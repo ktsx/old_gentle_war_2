@@ -33,9 +33,14 @@
 #else
 typedef struct WAVEOUT* HWAVEOUT;
 typedef struct WAVEHDR* LPWAVEHDR;
-typedef struct WAVEFORMAT *LPWAVEFORMAT;
 #include <stdint.h>
 
+// GeneralsX @merge 2026-10-21 — on Emscripten the Win32 compatibility layer
+// (WW3D2/emscripten_compat/windows_base.h) already defines WAVEFORMAT with the
+// same layout; share its guard instead of redefining.
+#ifndef _WAVEFORMAT_DEFINED
+#define _WAVEFORMAT_DEFINED
+typedef struct WAVEFORMAT *LPWAVEFORMAT;
 typedef struct WAVEFORMAT
 {
     uint16_t wFormatTag;
@@ -46,6 +51,7 @@ typedef struct WAVEFORMAT
     uint16_t wBitsPerSample;
     uint16_t cbSize;
 } WAVEFORMAT;
+#endif // _WAVEFORMAT_DEFINED
 
 typedef struct PCMWAVEFORMAT
 {

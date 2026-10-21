@@ -1459,7 +1459,7 @@ FontCharsClass::Store_GDI_Char (WCHAR ch)
 
 	Update_Current_Buffer(char_w);
 
-	uint16 *dst = BufferList[BufferList.Count() - 1]->Buffer + CurrPixelOffset;
+	uint16 *dst = BufferList[BufferList.Count() - 1].Buffer + CurrPixelOffset;
 	for (int i = 0; i < char_w * char_h; ++i) {
 		dst[i] = stage_buf[i];
 	}

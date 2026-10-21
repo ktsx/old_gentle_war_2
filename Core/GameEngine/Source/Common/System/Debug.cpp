@@ -209,6 +209,13 @@ static void TriggerMiniDump()
 
 void ReleaseCrash(const char *reason)
 {
+#ifdef __EMSCRIPTEN__
+	// Web: no dialog can carry the reason, so put it in the browser console first.
+	fprintf(stderr, "========================================\n");
+	fprintf(stderr, "FATAL C++ CRASH (ReleaseCrash): %s\n", reason ? reason : "Unknown");
+	fprintf(stderr, "========================================\n");
+	fflush(stderr);
+#endif
 	const DebugCrashHandler crashHandler = DebugGetCrashHandler();
 	if (crashHandler != nullptr)
 	{

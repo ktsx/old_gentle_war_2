@@ -39,7 +39,7 @@
 #include "WWDebug/wwdebug.h"
 
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h" // GeneralsX @merge 2026-10-21 — WWVegas-rooted include paths
 #endif
 
 ////////////////////////////////////////////////////////////////////////////

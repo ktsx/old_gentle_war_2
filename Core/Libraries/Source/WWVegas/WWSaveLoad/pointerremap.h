@@ -37,7 +37,7 @@
 #pragma once
 
 #ifdef _UNIX
-#include "osdep/osdep.h"
+#include "WWLib/osdep/osdep.h" // GeneralsX @merge 2026-10-21 — WWVegas-rooted include paths
 #endif
 
 #include "WWLib/always.h"

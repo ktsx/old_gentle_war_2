@@ -28,7 +28,7 @@
 #include "GameNetwork/GameInfo.h"
 
 #if defined(__EMSCRIPTEN__)
-#include "emscripten_compat/windows.h"
+#include "WW3D2/emscripten_compat/windows.h" // GeneralsX @merge 2026-10-21 — WWVegas-rooted include paths
 #endif
 
 class File;

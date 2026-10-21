@@ -573,6 +573,10 @@ AsciiString GameState::findNextSaveFilename( UnicodeString desc )
 /** Save the current state of the engine in a save file
 	* NOTE: filename is a *filename only* */
 // ------------------------------------------------------------------------------------------------
+#ifdef PLATFORM_WEB
+extern "C" void GX_FlushIdbfs_Tab(const char *reason);
+#endif
+
 SaveResult GameState::saveGame( AsciiString filename, UnicodeString desc,
 													SaveFileType saveType, SnapshotType which )
 {
@@ -639,6 +643,11 @@ SaveResult GameState::saveGame( AsciiString filename, UnicodeString desc,
 
 	// close the file
 	xferSave.close();
+
+#ifdef PLATFORM_WEB
+	// Persist /userdata to IndexedDB right away; a closed tab must not lose the save.
+	GX_FlushIdbfs_Tab("save");
+#endif
 
 	return SaveResult( SC_OK, filename );
 

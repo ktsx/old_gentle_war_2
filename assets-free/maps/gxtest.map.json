@@ -1,0 +1,14 @@
+{
+  "name": "gxtest",
+  "playable": [64, 64],
+  "border": 8,
+  "height": 20,
+  "heightNoise": 1,
+  "terrain": { "name": "GxGrass", "tiles": 2 },
+  "timeOfDay": "afternoon",
+  "players": [
+    { "name": "GxPlayer", "faction": "FactionAmerica", "human": true, "displayName": "Player", "color": [0, 80, 255], "start": [20, 20] },
+    { "name": "GxRival", "faction": "FactionChina", "human": false, "displayName": "Rival", "color": [220, 40, 40], "start": [44, 44] }
+  ],
+  "camera": [20, 20]
+}

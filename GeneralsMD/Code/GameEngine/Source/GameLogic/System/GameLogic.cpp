@@ -1082,6 +1082,8 @@ static void populateRandomStartPosition( GameInfo *game )
 // ------------------------------------------------------------------------------------------------
 void GameLogic::updateLoadProgress( Int progress )
 {
+	// Web diag (?diag=1): where a map load is, so a hang or crash in the load path can be placed.
+	GX_DIAG_LOG("LOAD: progress=%d loadScreen=%d\n", progress, m_loadScreen ? 1 : 0);
 
 	if( m_loadScreen )
 		m_loadScreen->update( progress );
@@ -1152,10 +1154,14 @@ void GameLogic::tryStartNewGame( Bool loadingSaveGame )
 	if (_t) { fprintf(_t, "GX-TRACE: startNewGame:%s mode=%d save=%d\n", \
 		tag, (int)m_gameMode, (int)loadingSaveGame); fclose(_t); } \
 } while (0)
-	GX_TRACE("ENTER");
+#elif defined(__EMSCRIPTEN__)
+	// Release web build: the same tags on stderr when ?diag=1 is set.
+#define GX_TRACE(tag) GX_DIAG_LOG("GAMELOGIC: startNewGame:%s mode=%d save=%d map='%s'\n", \
+		tag, (int)m_gameMode, (int)loadingSaveGame, TheGlobalData->m_mapName.str())
 #else
 #define GX_TRACE(tag) ((void)0)
 #endif
+	GX_TRACE("ENTER");
 
 	#ifdef DUMP_PERF_STATS
 	__int64 startTime64;

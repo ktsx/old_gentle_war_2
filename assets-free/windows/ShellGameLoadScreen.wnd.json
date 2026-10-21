@@ -1,0 +1,43 @@
+{
+  "file": "ShellGameLoadScreen.wnd",
+  "version": 2,
+  "creationResolution": [800, 600],
+  "defaults": { "font": ["Arial", 12, 1], "headerTemplate": "Label" },
+  "windows": [
+    {
+      "name": "ShellGameLoadScreenParent",
+      "type": "USER",
+      "rect": [0, 0, 800, 600],
+      "status": ["ENABLED", "IMAGE"],
+      "colors": { "enabled": [12, 14, 20, 255], "enabledBorder": [12, 14, 20, 255] },
+      "children": [
+        {
+          "name": "StaticTextTitle",
+          "type": "STATICTEXT",
+          "rect": [200, 230, 400, 40],
+          "status": ["ENABLED"],
+          "headerTemplate": "Title",
+          "text": "GUI:LoadingMap"
+        },
+        {
+          "name": "ProgressLoad",
+          "type": "PROGRESSBAR",
+          "rect": [200, 300, 400, 20],
+          "status": ["ENABLED"],
+          "colors": {
+            "enabled": [30, 34, 44, 255], "enabledBorder": [120, 130, 150, 255],
+            "hilite": [80, 140, 230, 255], "hiliteBorder": [80, 140, 230, 255]
+          }
+        },
+        {
+          "name": "StaticTextLegal",
+          "type": "STATICTEXT",
+          "rect": [100, 540, 600, 20],
+          "status": ["ENABLED", "HIDDEN"],
+          "headerTemplate": "Small",
+          "text": "GUI:Legal"
+        }
+      ]
+    }
+  ]
+}

@@ -1005,8 +1005,15 @@
         // IDBFS mount + initial sync (/userdata) lives in web_pre.js, linked
         // with --pre-js so it is compiled with the runtime and survives
         // Closure minification. GeneralsX @build WebPort 2026-10-21
+        // Engine command line from the URL: ?args=-file+Maps/gxtest.map (space- or
+        // plus-separated; URLSearchParams decodes '+' to a space). The engine
+        // parses it like a desktop command line (CommandLine.cpp); `-file` is
+        // what boot-smoke uses to launch a map without clicking through menus.
+        const engineArgs = (new URLSearchParams(location.search).get('args') || '')
+          .split(/\s+/).filter(Boolean);
         window.Module = {
           canvas: document.getElementById('canvas'),
+          arguments: engineArgs,
           print: printToOutput,
           printErr: printErrToOutput,
           onRuntimeInitialized: function () {

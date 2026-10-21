@@ -83,14 +83,44 @@ export function generateFreeImages(): Record<string, Image32> {
   return { "gxlogo.tga": logo, "gxbutton.tga": btn, "gxbutton_hi.tga": btnHi, "gxbutton_dis.tga": btnDis };
 }
 
-export function writeFreeImages(outDir: string): string[] {
-  const dir = join(outDir, "Art", "Textures");
-  mkdirSync(dir, { recursive: true });
-  const names: string[] = [];
-  for (const [name, img] of Object.entries(generateFreeImages())) {
-    writeFileSync(join(dir, name), encodeTga(img));
-    names.push(name);
+/** Deterministic hash noise in [0, 1). */
+function noise(x: number, y: number, seed = 0): number {
+  let h = (x * 374761393 + y * 668265263 + seed * 1442695041) ^ 0x5bd1e995;
+  h = (h ^ (h >>> 13)) * 1274126177;
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+
+/**
+ * Terrain tile sheets live in Art/Terrain and are cut into 64x64 tiles by
+ * WorldHeightMap::readTiles (a 128x128 sheet = 2x2 tiles). gxgrass.tga is a
+ * procedural green with a faint 1-px darker cell edge so the height-map grid
+ * stays visible while there is nothing else on the terrain.
+ */
+export function generateTerrainImages(): Record<string, Image32> {
+  const size = 128;
+  const grass = new Image32(size, size);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const n = noise(x >> 1, y >> 1) * 0.6 + noise(x >> 3, y >> 3, 7) * 0.4;
+    const edge = x % 64 === 0 || y % 64 === 0;
+    const k = edge ? 0.75 : 1;
+    grass.set(x, y, [Math.round((70 + 40 * n) * k), Math.round((120 + 50 * n) * k), Math.round((45 + 30 * n) * k), 255]);
   }
+  return { "gxgrass.tga": grass };
+}
+
+export function writeFreeImages(outDir: string): string[] {
+  const names: string[] = [];
+  const write = (sub: string, images: Record<string, Image32>) => {
+    const dir = join(outDir, "Art", sub);
+    mkdirSync(dir, { recursive: true });
+    for (const [name, img] of Object.entries(images)) {
+      writeFileSync(join(dir, name), encodeTga(img));
+      names.push(`${sub}/${name}`);
+    }
+  };
+  write("Textures", generateFreeImages());
+  write("Terrain", generateTerrainImages());
   return names;
 }
 

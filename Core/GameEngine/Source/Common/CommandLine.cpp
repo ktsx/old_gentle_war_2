@@ -701,6 +701,14 @@ Int parseDisplayDebug(char *args[], int)
 	return 1;
 }
 
+#endif // defined(RTS_DEBUG)
+
+// GeneralsX @feature WebPort 2026-10-21 — `-file Maps/<name>.map` starts a map
+// straight from the command line (GameEngine::init posts MSG_NEW_GAME). On the
+// web the arguments come from the page URL (`?args=-file+Maps/gxtest.map`, see
+// web_shell.html), and boot-smoke uses it to drive a real match on the free asset
+// set, so the option is also available in release builds there.
+#if defined(RTS_DEBUG) || defined(__EMSCRIPTEN__)
 Int parseFile(char *args[], int num)
 {
 	if (num > 1)
@@ -710,7 +718,9 @@ Int parseFile(char *args[], int num)
 	}
 	return 2;
 }
+#endif // defined(RTS_DEBUG) || defined(__EMSCRIPTEN__)
 
+#if defined(RTS_DEBUG)
 
 Int parsePreloadEverything( char *args[], int num )
 {
@@ -1368,6 +1378,9 @@ static CommandLineParam paramsForEngineInit[] =
 	{ "-preload", parsePreload },
 #endif
 
+#if defined(__EMSCRIPTEN__) && !defined(RTS_DEBUG)
+	{ "-file", parseFile },
+#endif
 
 };
 

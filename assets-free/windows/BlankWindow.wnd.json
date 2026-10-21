@@ -1,0 +1,14 @@
+{
+  "file": "BlankWindow.wnd",
+  "version": 2,
+  "creationResolution": [800, 600],
+  "windows": [
+    {
+      "name": "BlankWindowParent",
+      "type": "USER",
+      "rect": [0, 0, 800, 600],
+      "status": ["ENABLED", "IMAGE"],
+      "colors": { "enabled": [0, 0, 0, 255], "enabledBorder": [0, 0, 0, 255] }
+    }
+  ]
+}

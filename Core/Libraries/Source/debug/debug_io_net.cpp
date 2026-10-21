@@ -28,7 +28,7 @@
 // Debug I/O class net (Network destination via named pipe)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "debug.h"
+#include "debug/debug.h"
 #include "internal.h"
 #include "internal_io.h"
 #include <windows.h>

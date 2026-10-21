@@ -69,8 +69,6 @@ set(GAMEENGINEDEVICE_SRC
     Include/W3DDevice/GameLogic/W3DGameLogic.h
     Include/W3DDevice/GameLogic/W3DGhostObject.h
     Include/W3DDevice/GameLogic/W3DTerrainLogic.h
-#    Include/Win32Device/Common/Win32BIGFile.h
-#    Include/Win32Device/Common/Win32BIGFileSystem.h
 #    Include/Win32Device/Common/Win32GameEngine.h
 #    Include/Win32Device/Common/Win32LocalFile.h
 #    Include/Win32Device/Common/Win32LocalFileSystem.h
@@ -166,8 +164,6 @@ set(GAMEENGINEDEVICE_SRC
     Source/W3DDevice/GameLogic/W3DGameLogic.cpp
     Source/W3DDevice/GameLogic/W3DGhostObject.cpp
     Source/W3DDevice/GameLogic/W3DTerrainLogic.cpp
-#    Source/Win32Device/Common/Win32BIGFile.cpp
-#    Source/Win32Device/Common/Win32BIGFileSystem.cpp
 #    Source/Win32Device/Common/Win32GameEngine.cpp
 #    Source/Win32Device/Common/Win32LocalFile.cpp
 #    Source/Win32Device/Common/Win32LocalFileSystem.cpp
@@ -186,7 +182,7 @@ target_include_directories(g_gameenginedevice PUBLIC
 )
 
 target_precompile_headers(g_gameenginedevice PRIVATE
-    [["Precompiled/precompiled.h"]] # Must be first
+    [["Precompiled/BasePrecomp.h"]] # Must be first
     [["Common/STLTypedefs.h"]]
     [["Common/SubsystemInterface.h"]]
     [["WWLib/INI.h"]]
@@ -198,7 +194,6 @@ target_link_libraries(g_gameenginedevice PRIVATE
     corei_gameenginedevice_private
     gi_always
     gi_main
-    stb
 )
 
 target_link_libraries(g_gameenginedevice PUBLIC

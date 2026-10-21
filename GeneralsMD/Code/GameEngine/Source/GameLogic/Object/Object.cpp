@@ -44,6 +44,9 @@
 #include "Common/Team.h"
 #include "Common/ThingFactory.h"
 #include "Common/ThingTemplate.h"
+#if RTS_GENERALS && RETAIL_COMPATIBLE_CRC
+#include "Common/TunnelTracker.h"
+#endif
 #include "Common/Upgrade.h"
 #include "Common/WellKnownKeys.h"
 #include "Common/Xfer.h"
@@ -349,9 +352,9 @@ Object::Object( const ThingTemplate *tt, const ObjectStatusMaskType &objectStatu
 		*curB++ = m_subdualDamageHelper;
 	}
 
-	if (TheAI != nullptr
-			&& TheAI->getAiData()->m_enableRepulsors
-			&& isKindOf(KINDOF_CAN_BE_REPULSED))
+	if (TheAI != nullptr &&
+			TheAI->getAiData()->m_enableRepulsors &&
+			isKindOf(KINDOF_CAN_BE_REPULSED))
 	{
 		// if we can ever be a temporary-repulsor, make a repulsor helper. (srj)
 		static const NameKeyType repulsorHelperModuleDataTagNameKey = NAMEKEY( "ModuleTag_RepulsorHelper" );
@@ -711,6 +714,23 @@ void Object::onRemovedFrom( Object *removedFrom )
 
 }
 
+#if RTS_GENERALS && RETAIL_COMPATIBLE_CRC
+//-------------------------------------------------------------------------------------------------
+void Object::removeFromTunnelContain()
+{
+	for (Int i = 0; i < ThePlayerList->getPlayerCount(); ++i)
+	{
+		TunnelTracker* tracker = ThePlayerList->getNthPlayer(i)->getTunnelSystem();
+		if (tracker && tracker->removeFromContain(this))
+		{
+			break;
+		}
+	}
+
+	onRemovedFrom(nullptr);
+}
+#endif
+
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 Int Object::getTransportSlotCount() const
@@ -770,7 +790,21 @@ void Object::onDestroy()
 	// This is the old cleanUpContain safeguard.  Say goodbye so they don't try to look us up.
 	if( m_containedBy && m_containedBy->getContain() )
 	{
-		m_containedBy->getContain()->removeFromContain( this );
+#if RTS_GENERALS && RETAIL_COMPATIBLE_CRC
+		// TheSuperHackers @bugfix bobtista / Caball009 17/09/2026 Remove stranded tunnel occupants during destruction.
+		// Surrendering can transfer a tunnel without updating its tunnel tracker. If that tunnel is destroyed,
+		// m_containedBy still points to the freed tunnel, and its ID is read here through that stale pointer.
+		// An unregistered ID means the tunnel is gone, so this object is removed from the tunnel trackers directly.
+		// This is a limited workaround that keeps retail compatibility. It cannot detect reuse of the freed memory.
+		if (!TheGameLogic->findObjectByID(m_containedBy->getID()))
+		{
+			removeFromTunnelContain();
+		}
+		else
+#endif
+		{
+			m_containedBy->getContain()->removeFromContain(this);
+		}
 	}
 
 	//
@@ -1845,7 +1879,7 @@ void Object::reactToTransformChange(const Matrix3D* oldMtx, const Coord3D* oldPo
 
 		Region3D mapExtent;
 		TheTerrainLogic->getExtent(&mapExtent);
-		if (mapExtent.isInRegionNoZ(*getPosition()))
+		if (mapExtent.containsWithin(getPosition()->asCoord2D()))
 			m_privateStatus &= ~OFF_MAP;
 		else
 			m_privateStatus |= OFF_MAP;
@@ -1960,7 +1994,8 @@ ObjectID Object::getSoleHealingBenefactor() const
 }
 
 Bool Object::attemptHealingFromSoleBenefactor ( Real amount, const Object* source, UnsignedInt duration )
-{///< for the non-stacking healers like ambulance and propaganda
+{
+	///< for the non-stacking healers like ambulance and propaganda
 
 	if( ! source ) // sanity
 		return FALSE;
@@ -2875,7 +2910,7 @@ void Object::friend_notifyOfNewMapBoundary()
 
 	Region3D mapExtent;
 	TheTerrainLogic->getExtent(&mapExtent);
-	if (mapExtent.isInRegionNoZ(*getPosition()))
+	if (mapExtent.containsWithin(getPosition()->asCoord2D()))
 		m_privateStatus &= ~OFF_MAP;
 	else
 		m_privateStatus |= OFF_MAP;
@@ -3185,10 +3220,10 @@ void Object::onVeterancyLevelChanged( VeterancyLevel oldLevel, VeterancyLevel ne
 			break;
 	}
 
-	Bool doAnimation = provideFeedback
-		&& newLevel > oldLevel
-		&& !isKindOf(KINDOF_IGNORED_IN_GUI)
-		&& isLogicallyVisible();
+	Bool doAnimation = provideFeedback &&
+		newLevel > oldLevel &&
+		!isKindOf(KINDOF_IGNORED_IN_GUI) &&
+		isLogicallyVisible();
 
 	if (doAnimation)
 		createVeterancyLevelFX(oldLevel, newLevel);
@@ -4070,7 +4105,17 @@ void Object::xfer( Xfer *xfer )
 {
 
 	// version
+#if RTS_GENERALS
+
+#if RETAIL_COMPATIBLE_XFER_SAVE
+	const XferVersion currentVersion = 7;
+#else
+	const XferVersion currentVersion = 8;
+#endif
+
+#else
 	const XferVersion currentVersion = 9;
+#endif
 	XferVersion version = currentVersion;
 	xfer->xferVersion( &version, currentVersion );
 
@@ -4133,20 +4178,30 @@ void Object::xfer( Xfer *xfer )
 	}
 	else
 	{
-		//We are loading an old version, so we must convert it from a 32-bit int to a bitflag
-		UnsignedInt oldStatus;
-		xfer->xferUnsignedInt( &oldStatus );
+#if RTS_GENERALS
+		// TheSuperHackers @info Originally OBJECT_STATUS_IS_CARBOMB (28) + 1 would equal OBJECT_STATUS_COUNT,
+		// but the enum has been expanded with Zero Hour specific entries.
+		constexpr const UnsignedInt count = OBJECT_STATUS_IS_CARBOMB + 1;
+		constexpr const UnsignedInt mask = (1 << count) - 1;
+		static_assert(count == 29, "This code needs to be updated when inserting new entries into ObjectStatusTypes");
 
-		//Clear our status
+		// shift by one bit: OBJECT_STATUS_NONE (0) has a dedicated bit in the bitset but not in the integer
+		UnsignedInt status = (m_status.toUnsignedInt() & mask) >> 1;
+#else
+		// Zero Hour uses this branch only for XFER_LOAD
+		UnsignedInt status;
+#endif
+		xfer->xferUnsignedInt(&status);
+
 		m_status.clear();
 
 		for( int i = 0; i < 32; i++ )
 		{
-			UnsignedInt bit = 1<<i;
-			if( oldStatus & bit )
+			UnsignedInt bit = 1u<<i;
+			if( status & bit )
 			{
-				ObjectStatusTypes status = (ObjectStatusTypes)(i+1);
-				m_status.set( MAKE_OBJECT_STATUS_MASK( status ) );
+				ObjectStatusTypes type = (ObjectStatusTypes)(i + 1);
+				m_status.set( MAKE_OBJECT_STATUS_MASK( type ) );
 			}
 		}
 	}
@@ -4206,7 +4261,44 @@ void Object::xfer( Xfer *xfer )
 	}
 
 	// disabled till frame
-	xfer->xferUser( m_disabledTillFrame, sizeof( UnsignedInt ) * DISABLED_COUNT );
+	{
+		static_assert(DISABLED_DEFAULT             == 0,  "Unexpected enum value");
+		static_assert(DISABLED_HACKED              == 1,  "Unexpected enum value");
+		static_assert(DISABLED_EMP                 == 2,  "Unexpected enum value");
+		static_assert(DISABLED_HELD                == 3,  "Unexpected enum value");
+		static_assert(DISABLED_PARALYZED           == 4,  "Unexpected enum value");
+		static_assert(DISABLED_UNMANNED            == 5,  "Unexpected enum value");
+		static_assert(DISABLED_UNDERPOWERED        == 6,  "Unexpected enum value");
+		static_assert(DISABLED_FREEFALL            == 7,  "Unexpected enum value");
+		static_assert(DISABLED_AWESTRUCK           == 8,  "Unexpected enum value");
+		static_assert(DISABLED_BRAINWASHED         == 9,  "Unexpected enum value");
+		static_assert(DISABLED_SUBDUED             == 10, "Unexpected enum value");
+		static_assert(DISABLED_SCRIPT_DISABLED     == 11, "Unexpected enum value");
+		static_assert(DISABLED_SCRIPT_UNDERPOWERED == 12, "Unexpected enum value");
+		static_assert(DISABLED_COUNT               == 13, "Unexpected enum value");
+
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_DEFAULT]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_HACKED]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_EMP]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_HELD]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_PARALYZED]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_UNMANNED]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_UNDERPOWERED]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_FREEFALL]);
+
+#if RTS_GENERALS
+		if (version >= 8)
+#endif
+		{
+			// TheSuperHackers @info These 3 types are Zero Hour specific, but inserted in the middle of the enum.
+			xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_AWESTRUCK]);
+			xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_BRAINWASHED]);
+			xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_SUBDUED]);
+		}
+
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_SCRIPT_DISABLED]);
+		xfer->xferUnsignedInt(&m_disabledTillFrame[DISABLED_SCRIPT_UNDERPOWERED]);
+	}
 
 	// OK, now that we have xferred our status bits and disabled data, it's safe to set the team...
 	// TheSuperHackers @todo Refactor so that this code can be moved to loadPostProcess.
@@ -4667,6 +4759,29 @@ void Object::onDie( DamageInfo *damageInfo )
 	handlePartitionCellMaintenance();
 	if(m_team)
 		m_team->notifyTeamOfObjectDeath();
+#if RTS_GENERALS && RETAIL_COMPATIBLE_DATA
+	// Play death sound here.
+
+	AudioEventRTS deathSound = *getTemplate()->getSoundDie();
+	// If we were killed by fire, or by poison, we should play those die sounds instead of the usual
+	// sound
+	if (damageInfo->in.m_deathType == DEATH_BURNED)
+		deathSound = *getTemplate()->getSoundDieFire();
+	else if (damageInfo->in.m_deathType == DEATH_POISONED || damageInfo->in.m_deathType == DEATH_POISONED_BETA)
+		deathSound = *getTemplate()->getSoundDieToxin();
+
+	// If we didn't actually have a specialized die sound (for the case of fire or poison, we
+	// should use the generic death sound)
+	if (!TheAudio->isValidAudioEvent(&deathSound))
+		deathSound = *getTemplate()->getSoundDie();
+
+	// Use the position. Next frame, when this unit is gone, this sound will be clipped because we
+	// can no longer automatically find its position. - jkmcd
+	deathSound.setPosition(getPosition());
+	PlayerIndex index = getControllingPlayer() ? getControllingPlayer()->getPlayerIndex() : 0;
+	deathSound.setPlayerIndex( index );
+	TheAudio->addAudioEvent(&deathSound);
+#endif
 
 	if (isLocallyViewed() && !selfInflicted) // wasLocallyViewed? :-)
 	{

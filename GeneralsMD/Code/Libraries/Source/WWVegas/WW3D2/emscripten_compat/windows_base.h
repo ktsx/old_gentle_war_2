@@ -762,20 +762,27 @@ inline void DebugBreak() {}
 #define ERROR_ALREADY_EXISTS 183L
 #define AddFontResource(a) 1
 #define RemoveFontResource(a) 1
-#define MB_ABORTRETRYIGNORE 0
+#define MB_ABORTRETRYIGNORE 0x2
 #define IDABORT 3
 typedef void *HKL;
 #define GetKeyboardLayout(a) nullptr
 
 #define CreateFile(...) ((HANDLE) - 1)
-inline int MessageBoxA(HWND, const char *, const char *, unsigned int) {
-  return 0;
-}
-#define MessageBox MessageBoxA
 #define IDIGNORE 5
 #define IDRETRY 4
 #define IDYES 6
-#define MB_YESNO 4
+#define MB_YESNO 0x4
+// Web: there is no modal dialog. Log the message and pick the answer that
+// lets the game keep running: Ignore for assert boxes, Yes for
+// "ignore this crash from now on?", OK otherwise.
+inline int MessageBoxA(HWND, const char *text, const char *caption, unsigned int type) {
+  fprintf(stderr, "[MessageBox] %s: %s\n", caption ? caption : "", text ? text : "");
+  fflush(stderr);
+  if ((type & 0xF) == MB_ABORTRETRYIGNORE) return IDIGNORE;
+  if ((type & 0xF) == MB_YESNO) return IDYES;
+  return 1; // IDOK
+}
+#define MessageBox MessageBoxA
 #define MB_ICONQUESTION 0x20
 
 #ifndef IN
@@ -835,8 +842,12 @@ typedef struct {
 #define MB_TASKMODAL 0x2000
 #define SW_HIDE 0
 
-inline int MessageBoxW(HWND, const wchar_t *, const wchar_t *, unsigned int) {
-  return 0;
+inline int MessageBoxW(HWND, const wchar_t *text, const wchar_t *caption, unsigned int type) {
+  fprintf(stderr, "[MessageBox] %ls: %ls\n", caption ? caption : L"", text ? text : L"");
+  fflush(stderr);
+  if ((type & 0xF) == MB_ABORTRETRYIGNORE) return IDIGNORE;
+  if ((type & 0xF) == MB_YESNO) return IDYES;
+  return 1; // IDOK
 }
 #define HWND_NOTOPMOST ((HWND) - 2)
 

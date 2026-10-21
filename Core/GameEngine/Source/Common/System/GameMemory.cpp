@@ -49,6 +49,8 @@
 #include <emscripten.h>
 #endif
 
+#ifndef DISABLE_GAMEMEMORY
+
 // SYSTEM INCLUDES
 
 // USER INCLUDES
@@ -1044,13 +1046,13 @@ void MemoryPoolSingleBlock::debugVerifyBlock()
 	DEBUG_ASSERTCRASH(m_debugLiteralTagString != nullptr, ("bad tagstring"));
 	/// @todo Put this check back in after the AI memory usage is under control (MSB)
 	//DEBUG_ASSERTCRASH(m_logicalSize>0 && m_logicalSize < 0x00ffffff, ("unlikely value for m_logicalSize"));
-	DEBUG_ASSERTCRASH(m_nextBlock == nullptr
-		|| memcmp(&m_nextBlock->m_owningBlob, &s_initFillerValue, sizeof(s_initFillerValue)) == 0
-		|| m_nextBlock->m_owningBlob == m_owningBlob, ("owning blob mismatch..."));
+	DEBUG_ASSERTCRASH(m_nextBlock == nullptr ||
+		memcmp(&m_nextBlock->m_owningBlob, &s_initFillerValue, sizeof(s_initFillerValue)) == 0 ||
+		m_nextBlock->m_owningBlob == m_owningBlob, ("owning blob mismatch..."));
 #ifdef MPSB_DLINK
-	DEBUG_ASSERTCRASH(m_prevBlock == nullptr
-		|| memcmp(&m_prevBlock->m_owningBlob, &s_initFillerValue, sizeof(s_initFillerValue)) == 0
-		|| m_prevBlock->m_owningBlob == m_owningBlob, ("owning blob mismatch..."));
+	DEBUG_ASSERTCRASH(m_prevBlock == nullptr ||
+		memcmp(&m_prevBlock->m_owningBlob, &s_initFillerValue, sizeof(s_initFillerValue)) == 0 ||
+		m_prevBlock->m_owningBlob == m_owningBlob, ("owning blob mismatch..."));
 #endif
 	debugCheckUnderrun();
 	debugCheckOverrun();
@@ -3567,7 +3569,7 @@ void initMemoryManager()
 		userMemoryManagerInitPools();
 		thePreMainInitFlag = false;
 
-		DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
+		GAME_DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
 		DEBUG_LOG(("*** Initialized the Memory Manager"));
 	}
 	else
@@ -3617,7 +3619,7 @@ static NOINLINE void preMainInitMemoryManagerImpl()
 		userMemoryManagerInitPools();
 		thePreMainInitFlag = true;
 
-		DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
+		GAME_DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
 		DEBUG_LOG(("*** Initialized the Memory Manager prior to main!"));
 	}
 }
@@ -3702,3 +3704,5 @@ void freeFromW3DMemPool(void* pool, void* p)
 	DEBUG_ASSERTCRASH(pool, ("pool is null"));
 	((MemoryPool*)pool)->freeBlock(p);
 }
+
+#endif // DISABLE_GAMEMEMORY

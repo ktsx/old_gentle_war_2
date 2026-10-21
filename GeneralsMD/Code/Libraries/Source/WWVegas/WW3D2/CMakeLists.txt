@@ -248,8 +248,8 @@ target_compile_definitions(z_ww3d2 PRIVATE
 
 if(EMSCRIPTEN)
     target_precompile_headers(z_ww3d2 PRIVATE
-        [["Precompiled/precompiled.h"]] # Must be first
-            [["WWLib/always.h"]]
+        [["Precompiled/BasePrecomp.h"]] # Must be first
+        [["WWLib/always.h"]]
         [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
         [["WWLib/WWCommon.h"]]
@@ -257,7 +257,7 @@ if(EMSCRIPTEN)
         )
 else()
     target_precompile_headers(z_ww3d2 PRIVATE
-        [["Precompiled/precompiled.h"]] # Must be first
+        [["Precompiled/BasePrecomp.h"]] # Must be first
         [["dx8wrapper.h"]]
         [["WWLib/always.h"]]
         [["Utility/STLUtils.h"]]

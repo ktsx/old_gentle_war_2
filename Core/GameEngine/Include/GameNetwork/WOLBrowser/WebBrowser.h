@@ -44,14 +44,13 @@
 
 #include "Common/SubsystemInterface.h"
 #ifndef __EMSCRIPTEN__
-#include "EABrowserDispatch/BrowserDispatch.h"
-#include "FEBDispatch.h"
-#endif
-#include <Common/GameMemory.h>
-#include <Lib/BaseType.h>
-#ifndef __EMSCRIPTEN__
 #include <atlbase.h>
 #include <windows.h>
+#endif
+#include <Common/GameMemory.h>
+#ifndef __EMSCRIPTEN__
+#include "EABrowserDispatch/BrowserDispatch.h"
+#include "FEBDispatch.h"
 #endif
 
 class GameWindow;

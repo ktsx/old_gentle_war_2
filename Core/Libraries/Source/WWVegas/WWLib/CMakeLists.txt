@@ -173,7 +173,7 @@ target_include_directories(core_wwlib PUBLIC
 # GeneralsX @feature WebPort 09/03/2026 — windows.h not available on Emscripten
 if(EMSCRIPTEN)
     target_precompile_headers(core_wwlib PRIVATE
-        [["Precompiled/precompiled.h"]] # Must be first
+        [["Precompiled/BasePrecomp.h"]] # Must be first
         [["WWLib/always.h"]]
         [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
@@ -182,7 +182,7 @@ if(EMSCRIPTEN)
     )
 else()
     target_precompile_headers(core_wwlib PRIVATE
-        [["Precompiled/precompiled.h"]] # Must be first
+        [["Precompiled/BasePrecomp.h"]] # Must be first
         [["WWLib/always.h"]]
         [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]

@@ -75,7 +75,6 @@ extern bool g_isDma32TracingEnabledNow;
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
 
-#include "Lib/BaseType.h"
 #include "Common/Debug.h"
 #include "Common/Errors.h"
 
@@ -188,7 +187,9 @@ extern Bool g_enableDmaPool32Tracing;
 // Useful for address sanitizer checks and other investigations.
 // Is included below the macros so that memory pool debug code can still be used.
 #ifdef DISABLE_GAMEMEMORY
-#include "GameMemoryNull.h"
+	#define INCLUDE_GAMEMEMORYNULL_INL 1
+	#include "GameMemoryNull.inl"
+	#undef INCLUDE_GAMEMEMORYNULL_INL
 #else
 
 #ifdef MEMORYPOOL_DEBUG

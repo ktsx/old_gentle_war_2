@@ -80,7 +80,7 @@
 #include <io.h>
 #include "Win32Device/GameClient/Win32Mouse.h"
 #include "Win32Device/Common/Win32LocalFileSystem.h"
-#include "Win32Device/Common/Win32BIGFileSystem.h"
+#include "Common/BIGFileSystem.h"
 
 
 static SubsystemInterfaceList TheSubsystemListRecord;
@@ -334,7 +334,7 @@ BOOL CWorldBuilderApp::InitInstance()
 	TheFileSystem = new FileSystem;
 
 	initSubsystem(TheLocalFileSystem, (LocalFileSystem*)new Win32LocalFileSystem);
-	initSubsystem(TheArchiveFileSystem, (ArchiveFileSystem*)new Win32BIGFileSystem);
+	initSubsystem(TheArchiveFileSystem, (ArchiveFileSystem*)new BIGFileSystem);
 
 	// Just for kicks, get the HINSTANCE that WOL would need
 	// if we were going to use it, which we aren't.
@@ -552,7 +552,8 @@ void CWorldBuilderApp::updateCurTool(Bool forceHand)
 {
 	Tool *curTool = m_curTool;
 	DEBUG_ASSERTCRASH((m_lockCurTool>=0),("oops"));
-	if (!m_lockCurTool) {	 // don't change tools that are doing something.
+	if (!m_lockCurTool) {
+		// don't change tools that are doing something.
 		if (forceHand || (0x8000 & ::GetAsyncKeyState(VK_SPACE))) {
 			// Space bar gives scroll hand.
 			m_curTool = &m_handScrollTool;

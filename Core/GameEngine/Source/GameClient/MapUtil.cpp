@@ -1140,59 +1140,38 @@ const MapMetaData *MapCache::findMap(AsciiString mapName)
 // ------------------------------------------------------------------------------------------------
 /** Embed the pristine map into the xfer stream */
 // ------------------------------------------------------------------------------------------------
-__attribute__((noinline)) Bool copyFromBigToDir( const AsciiString& infile, const AsciiString& outfile )
+static Bool copyFromBigToDir( const AsciiString& infile, const AsciiString& outfile )
 {
-	// open the map file
-
 	File *file = TheFileSystem->openFile( infile.str(), File::READ | File::BINARY );
 	if( file == nullptr )
 	{
-		DEBUG_LOG(( "copyFromBigToDir - Error opening source file '%s'", infile.str() ));
-		return false;
+		DEBUG_CRASH(( "copyFromBigToDir - Error opening source file '%s'", infile.str() ));
+		return FALSE;
 	}
 
-	// how big is the map file
-	Int fileSize = file->seek( 0, File::END );
-
-
-	// rewind to beginning of file
+	const Int fileSize = file->seek( 0, File::END );
 	file->seek( 0, File::START );
 
-	// allocate buffer big enough to hold the entire map file
 	char *buffer = NEW char[ fileSize ];
-	if( buffer == nullptr )
-	{
-		DEBUG_LOG(( "copyFromBigToDir - Unable to allocate buffer for file '%s'", infile.str() ));
-		file->close();
-		return false;
-	}
-
-	// copy the file to the buffer
-	if( file->read( buffer, fileSize ) < fileSize )
-	{
-		DEBUG_LOG(( "copyFromBigToDir - Error reading from file '%s'", infile.str() ));
-		file->close();
-		delete [] buffer;
-		return false;
-	}
-	// close the BIG file
+	const Bool readOk = file->read( buffer, fileSize ) == fileSize;
 	file->close();
+	DEBUG_ASSERTCRASH( readOk, ( "copyFromBigToDir - Error reading from file '%s'", infile.str() ) );
 
-	File *filenew = TheFileSystem->openFile( outfile.str(), File::WRITE | File::CREATE | File::BINARY );
-
-	if( !filenew || filenew->write(buffer, fileSize) < fileSize)
+	Bool writeOk = FALSE;
+	if( readOk )
 	{
-		DEBUG_LOG(( "copyFromBigToDir - Error writing to file '%s'", outfile.str() ));
-		if (filenew) filenew->close();
-		delete [] buffer;
-		return false;
+		File *filenew = TheFileSystem->openFile( outfile.str(), File::WRITE | File::CREATE | File::BINARY );
+		if( filenew != nullptr )
+		{
+			writeOk = filenew->write( buffer, fileSize ) == fileSize;
+			filenew->close();
+		}
+		DEBUG_ASSERTCRASH( writeOk, ( "copyFromBigToDir - Error writing to file '%s'", outfile.str() ) );
 	}
 
-	filenew->close();
-
-	// delete the buffer
 	delete [] buffer;
-	return true;
+
+	return writeOk;
 }
 
 Image *getMapPreviewImage( AsciiString mapName )
@@ -1237,7 +1216,7 @@ Image *getMapPreviewImage( AsciiString mapName )
 
 		mapPreviewDir.concat(name);
 
-		Bool success = copyFromBigToDir(tgaName, mapPreviewDir);
+		const Bool success = copyFromBigToDir(tgaName, mapPreviewDir);
 
 		if (success)
 		{
@@ -1299,7 +1278,8 @@ Image *getMapPreviewImage( AsciiString mapName )
 		ChunkInputStream *pStrm = &theInputStream;
 		pStrm->absoluteSeek(0);
 		DataChunkInput file( pStrm );
-		if (file.isValidFileType()) {	// Backwards compatible files aren't valid data chunk files.
+		if (file.isValidFileType()) {
+			// Backwards compatible files aren't valid data chunk files.
 			// Read the waypoints.
 			file.registerParser( "MapPreview", AsciiString::TheEmptyString, parseMapPreviewChunk );
 			if (!file.parse(nullptr)) {

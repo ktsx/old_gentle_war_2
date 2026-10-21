@@ -33,6 +33,7 @@
 #include "Common/FileSystem.h"
 #include "Common/FramePacer.h"
 #include "Common/GameState.h"
+#include "Common/GameUtility.h"
 #include "Common/LatchRestore.h"
 #include "Common/MessageStream.h"
 #include "Common/PerfTimer.h"
@@ -383,6 +384,7 @@ m_fade(FADE_NONE),
 m_freezeByScript(FALSE),
 m_frameObjectCountChanged(0),
 m_closeWindowTimer(0),
+m_letterBoxActive(FALSE),
 m_curFadeFrame(0),
 m_curFadeValue(0.0f),
 m_endGameTimer(0),
@@ -4561,6 +4563,7 @@ void ScriptEngine::reset()
 	m_numFlags = 1;
 	m_endGameTimer = -1;
 	m_closeWindowTimer = -1;
+	m_letterBoxActive = FALSE;
 
 	m_callingTeam = nullptr;
 	m_callingObject = nullptr;
@@ -6903,7 +6906,8 @@ Bool ScriptEngine::evaluateConditions( Script *pScript, Team *thisTeam, Player *
 			}
 			pCondition = pCondition->getNext();
 		}
-		if (andTerm) { // The outer list is OR'ed - so any true inner means we are true.
+		if (andTerm) {
+			// The outer list is OR'ed - so any true inner means we are true.
 			testValue = true;
 			break;
 		}
@@ -7338,7 +7342,8 @@ void ScriptEngine::evaluateAndProgressAllSequentialScripts()
 						itAdvanced = true;
 					}
 
-					if (itAdvanced) {	// check to make sure they aren't dead.
+					if (itAdvanced) {
+						// check to make sure they aren't dead.
 						if (obj && obj->isEffectivelyDead()) {
 							it = cleanupSequentialScript(it, true);
 							continue;
@@ -7733,6 +7738,22 @@ void ScriptEngine::doFreezeTime()
 void ScriptEngine::doUnfreezeTime()
 {
 	m_freezeByScript = FALSE;
+}
+
+//-------------------------------------------------------------------------------------------------
+/** Report the scripted letterbox opening or closing. */
+//-------------------------------------------------------------------------------------------------
+void ScriptEngine::friend_notifyLetterBoxActive(Bool active)
+{
+	m_letterBoxActive = active;
+}
+
+//-------------------------------------------------------------------------------------------------
+/** Is the letterbox active right now? */
+//-------------------------------------------------------------------------------------------------
+Bool ScriptEngine::isLetterBoxActive() const
+{
+	return m_letterBoxActive;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8143,6 +8164,7 @@ void ScriptEngine::setGlobalDifficulty( GameDifficulty difficulty )
 	* 3: Added m_objectsShouldReceiveDifficultyBonus (JKMCD)
 	* 4: current music track info
 	* 5: add ChooseVictimAlwaysUsesNormal
+	* 6: TheSuperHackers @tweak Serialize m_letterBoxActive
 	*/
 // ------------------------------------------------------------------------------------------------
 void ScriptEngine::xfer( Xfer *xfer )
@@ -8150,7 +8172,11 @@ void ScriptEngine::xfer( Xfer *xfer )
 	Int i;
 
 	// version
+#if RETAIL_COMPATIBLE_XFER_SAVE
 	const XferVersion currentVersion = 5;
+#else
+	const XferVersion currentVersion = 6;
+#endif
 	XferVersion version = currentVersion;
 	xfer->xferVersion( &version, currentVersion );
 
@@ -8609,6 +8635,18 @@ void ScriptEngine::xfer( Xfer *xfer )
 		m_ChooseVictimAlwaysUsesNormal = false;
 	}
 
+	if (version >= 6)
+	{
+		xfer->xferBool(&m_letterBoxActive);
+	}
+	else
+	{
+		if (xfer->getXferMode() == XFER_LOAD)
+		{
+			m_letterBoxActive = FALSE;
+		}
+	}
+
 	if( xfer->getXferMode() == XFER_LOAD ) {
 		// We are doing a load.  If there is no fade active, do a black fade in to start.
 		if (m_fade == FADE_NONE) {
@@ -8640,6 +8678,8 @@ void ScriptEngine::loadPostProcess()
 		event.setPlayerIndex(ThePlayerList->getLocalPlayer()->getPlayerIndex());
 		TheAudio->addAudioEvent(&event);
 	}
+
+	rts::enableLetterBox(isLetterBoxActive());
 
 }
 
@@ -9500,7 +9540,8 @@ static void _reloadParticleSystemFromINI( AsciiString particleSystemName )
 			iniFile->nextLine(linebuff, INI_MAX_CHARS_PER_LINE);
 		}
 
-		{	// copy it to a temp file
+		{
+			// copy it to a temp file
 			if (iniFile->eof()) {
 				throw 0;
 			}

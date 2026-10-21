@@ -805,7 +805,8 @@ RenderObjClass * WW3DAssetManager::Create_Render_Obj(const char * name)
 	// Try to find a prototype
 	PrototypeClass * proto = Find_Prototype(name);
 
-	if (WW3D_Load_On_Demand && proto == nullptr) {	// If we didn't find one, try to load on demand
+	if (WW3D_Load_On_Demand && proto == nullptr) {
+		// If we didn't find one, try to load on demand
 		AssetStatusClass::Peek_Instance()->Report_Load_On_Demand_RObj(name);
 
 		char filename [MAX_PATH];
@@ -983,9 +984,11 @@ HAnimClass *	WW3DAssetManager::Get_HAnim(const char * name)
 	// Try to find the hanim
 	HAnimClass * anim = HAnimManager.Get_Anim(name);
 
-	if (WW3D_Load_On_Demand && anim == nullptr) {	// If we didn't find it, try to load on demand
+	if (WW3D_Load_On_Demand && anim == nullptr) {
+		// If we didn't find it, try to load on demand
 
-		if ( !HAnimManager.Is_Missing( name ) ) {	// if this is NOT a known missing anim
+		if ( !HAnimManager.Is_Missing( name ) ) {
+			// if this is NOT a known missing anim
 
 			AssetStatusClass::Peek_Instance()->Report_Load_On_Demand_HAnim(name);
 
@@ -1037,7 +1040,8 @@ HTreeClass *	WW3DAssetManager::Get_HTree(const char * name)
 	// Try to find the htree
 	HTreeClass * htree = HTreeManager.Get_Tree(name);
 
-	if (WW3D_Load_On_Demand && htree == nullptr) {	// If we didn't find it, try to load on demand
+	if (WW3D_Load_On_Demand && htree == nullptr) {
+		// If we didn't find it, try to load on demand
 
 		AssetStatusClass::Peek_Instance()->Report_Load_On_Demand_HTree(name);
 
@@ -1259,14 +1263,13 @@ void WW3DAssetManager::Log_All_Textures()
 		if (!t->Is_Lightmap()) continue;
 
 		StringClass tmp(true);
-		unsigned bytes=t->Get_Texture_Memory_Usage();
 		if (!t->Is_Initialized()) {
 			tmp+="*";
 		}
 		else {
 			tmp+=" ";
 		}
-		WWDEBUG_SAY(("%4.4dkb %s%s",bytes/1024,tmp.str(),t->Get_Texture_Name().str()));
+		WWDEBUG_SAY(("%4.4dkb %s%s",t->Get_Texture_Memory_Usage()/1024,tmp.str(),t->Get_Texture_Name().str()));
 	}
 
 	// Log procedural textures -------------------------------
@@ -1283,14 +1286,13 @@ void WW3DAssetManager::Log_All_Textures()
 		if (!t->Is_Procedural()) continue;
 
 		StringClass tmp(true);
-		unsigned bytes=t->Get_Texture_Memory_Usage();
 		if (!t->Is_Initialized()) {
 			tmp+="*";
 		}
 		else {
 			tmp+=" ";
 		}
-		WWDEBUG_SAY(("%4.4dkb %s%s",bytes/1024,tmp.str(),t->Get_Texture_Name().str()));
+		WWDEBUG_SAY(("%4.4dkb %s%s",t->Get_Texture_Memory_Usage()/1024,tmp.str(),t->Get_Texture_Name().str()));
 	}
 
 	// Log "ordinary" textures -------------------------------
@@ -1308,14 +1310,13 @@ void WW3DAssetManager::Log_All_Textures()
 		if (t->Is_Lightmap()) continue;
 
 		StringClass tmp(true);
-		unsigned bytes=t->Get_Texture_Memory_Usage();
 		if (!t->Is_Initialized()) {
 			tmp+="*";
 		}
 		else {
 			tmp+=" ";
 		}
-		WWDEBUG_SAY(("%4.4dkb %s%s",bytes/1024,tmp.str(),t->Get_Texture_Name().str()));
+		WWDEBUG_SAY(("%4.4dkb %s%s",t->Get_Texture_Memory_Usage()/1024,tmp.str(),t->Get_Texture_Name().str()));
 	}
 
 }
@@ -1505,6 +1506,17 @@ void	WW3DAssetManager::Release_All_FontChars()
 	while ( FontCharsList.Count() ) {
 		FontCharsList[0]->Release_Ref();
 		FontCharsList.Delete( 0 );
+	}
+}
+
+
+/***********************************************************************************************
+ * WW3DAssetManager::Free_All_FontChars_Glyph_Caches -- Discards all cached glyphs              *
+ *=============================================================================================*/
+void	WW3DAssetManager::Free_All_FontChars_Glyph_Caches()
+{
+	for ( int i = 0; i < FontCharsList.Count(); i++ ) {
+		FontCharsList[i]->Free_Glyph_Cache();
 	}
 }
 

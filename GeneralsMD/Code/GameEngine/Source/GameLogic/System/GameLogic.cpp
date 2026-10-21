@@ -112,7 +112,7 @@
 #include "GameNetwork/NetworkInterface.h"
 #include "GameNetwork/GameSpy/PersistentStorageThread.h"
 
-#include <rts/profile.h>
+#include "Lib/Profile.h"
 
 struct QuitGameException {};
 
@@ -216,30 +216,6 @@ void setFPMode()
 	_controlfp(newVal, _MCW_PC | _MCW_RC);
 }
 
-//-------------------------------------------------------------------------------------------------
-const char* toString(GameMode mode)
-{
-	switch (mode)
-	{
-		case GAME_SINGLE_PLAYER:
-			return "GAME_SINGLE_PLAYER";
-		case GAME_LAN:
-			return "GAME_LAN";
-		case GAME_SKIRMISH:
-			return "GAME_SKIRMISH";
-		case GAME_REPLAY:
-			return "GAME_REPLAY";
-		case GAME_SHELL:
-			return "GAME_SHELL";
-		case GAME_INTERNET:
-			return "GAME_INTERNET";
-		case GAME_NONE:
-			return "GAME_NONE";
-		default:
-			return "GAME_UNKNOWN";
-	}
-}
-
 // ------------------------------------------------------------------------------------------------
 /** GameLogic class constructor */
 // ------------------------------------------------------------------------------------------------
@@ -290,16 +266,24 @@ GameLogic::GameLogic()
 	m_loadingSave = FALSE;
 	m_clearingGameData = FALSE;
 	m_quitToDesktopAfterMatch = FALSE;
+
+#if RTS_GENERALS && defined(_MSC_VER) && _MSC_VER < 1300
+	m_onUnitProducedZeroInit = false;
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-Bool GameLogic::isInSinglePlayerGame()
+Bool GameLogic::isInSinglePlayerGame() const
 {
-	return (m_gameMode == GAME_SINGLE_PLAYER ||
-		(TheRecorder && TheRecorder->isPlaybackMode() && TheRecorder->getGameMode() == GAME_SINGLE_PLAYER));
-}
+	if (rts::isSinglePlayerGame(m_gameMode))
+		return true;
 
+	if (TheRecorder && TheRecorder->isPlaybackMode() && rts::isSinglePlayerGame(TheRecorder->getGameMode()))
+		return true;
+
+	return false;
+}
 
 //-------------------------------------------------------------------------------------------------
 /** Destroy all objects immediately */
@@ -327,6 +311,8 @@ void GameLogic::destroyAllObjectsImmediate()
 	// process the destroy list immediately
 	processDestroyList();
 	DEBUG_ASSERTCRASH( m_objList == nullptr, ("destroyAllObjectsImmediate: Object list not cleared") );
+
+	m_objHash.clear();
 
 }
 
@@ -421,12 +407,6 @@ void GameLogic::reset()
 	m_thingTemplateBuildableOverrides.clear();
 	m_controlBarOverrides.clear();
 
-	// set the hash to be rather large. We need to optimize this value later.
-//	m_objHash.clear();
-//	m_objHash.resize(OBJ_HASH_SIZE);
-	m_objVector.clear();
-	m_objVector.resize(OBJ_HASH_SIZE, nullptr);
-
 	m_pauseFrame = 0;
 	m_pauseSound = FALSE;
 	m_pauseMusic = FALSE;
@@ -440,6 +420,13 @@ void GameLogic::reset()
 
 	// destroy all objects
 	destroyAllObjectsImmediate();
+
+	// set the hash to be rather large. We need to optimize this value later.
+#if USING_STLPORT
+	m_objHash.resize(OBJ_HASH_SIZE);
+#else
+	m_objHash.reserve(OBJ_HASH_SIZE);
+#endif
 
 	m_nextObjID = (ObjectID)1;
 
@@ -971,9 +958,11 @@ static void populateRandomStartPosition( GameInfo *game )
 		//choose a starting position
 		Int team = slot->getTeamNumber();
 		if( !hasStartSpotBeenPicked )
-		{	// We're the first real spot.  Pick randomly.
+		{
+			// We're the first real spot.  Pick randomly.
 			while (posIdx == -1)
-			{	// This while loop shouldn't be neccessary, since we're first.  Why not, though?
+			{
+				// This while loop shouldn't be neccessary, since we're first.  Why not, though?
 				posIdx = GameLogicRandomValue(0, numPlayers-1);
 				if (game->isStartPositionTaken(posIdx))
 					posIdx = -1;
@@ -985,9 +974,11 @@ static void populateRandomStartPosition( GameInfo *game )
 			if( team > -1 )
 				teamPosIdx[team] = posIdx;  //remember where this team is
 		} else
-		{	//pick teams far apart, team members close together
+		{
+			//pick teams far apart, team members close together
 			if( team < 0  ||  teamPosIdx[ team ] == -1 )  //if team None or team not yet placed
-			{	//pick position furthest from all other teams
+			{
+				//pick position furthest from all other teams
 				Real farthestDistance = 0.0f;
 				Int farthestIndex = -1;
 				for (posIdx = 0; posIdx < numPlayers; ++posIdx)
@@ -996,7 +987,8 @@ static void populateRandomStartPosition( GameInfo *game )
 						continue;  //skip occupied positions
 
 					if (farthestIndex < 0)
-					{	//take this one as best if none else
+					{
+						//take this one as best if none else
 						farthestIndex = posIdx;
 						for (Int n=0; n<numPlayers; ++n)
 						{
@@ -1005,7 +997,8 @@ static void populateRandomStartPosition( GameInfo *game )
 						}
 					}
 					else
-					{	//find empty position furthest from all taken positions
+					{
+						//find empty position furthest from all taken positions
 						Real dist = 0.0f;
 						for (Int n=0; n<numPlayers; ++n)
 						{
@@ -1027,14 +1020,16 @@ static void populateRandomStartPosition( GameInfo *game )
 					teamPosIdx[team] = farthestIndex;  //remember where this team is
 			}
 			else  //team already has a starting position
-			{	//pick position closest to team
+			{
+				//pick position closest to team
 				Real closestDist = FLT_MAX;
 				Int  closestIdx = 0;
 				for( Int n=0;  n < numPlayers;  ++n )
 				{
 					Real dist = startSpotDistance[ teamPosIdx[team] ][n];
 					if( !taken[n]  &&  dist < closestDist )
-					{	//found a better match
+					{
+						//found a better match
 						closestDist = dist;
 						closestIdx = n;
 					}
@@ -2208,8 +2203,8 @@ void GameLogic::tryStartNewGame( Bool loadingSaveGame )
 				{
 					rel = ALLIES;
 				}
-				else if (thatPlayer != ThePlayerList->getNeutralPlayer()
-					&& thatPlayer != ThePlayerList->findPlayerWithNameKey(NAMEKEY("PlyrCivilian")))
+				else if (thatPlayer != ThePlayerList->getNeutralPlayer() &&
+					thatPlayer != ThePlayerList->findPlayerWithNameKey(NAMEKEY("PlyrCivilian")))
 				{
 					rel = ENEMIES;
 				}
@@ -3453,8 +3448,8 @@ static void unitTimings()
 			}
 			return;
 		}
-		while (g_UT_curThing->friend_getNextTemplate()
-			&& g_UT_curThing->friend_getNextTemplate()->getName()!=SINGLE_UNIT)
+		while (g_UT_curThing->friend_getNextTemplate() &&
+			g_UT_curThing->friend_getNextTemplate()->getName()!=SINGLE_UNIT)
 			g_UT_curThing = g_UT_curThing->friend_getNextTemplate();
 
 	}
@@ -4005,13 +4000,8 @@ void GameLogic::addObjectToLookupTable( Object *obj )
 	if( obj == nullptr )
 		return;
 
-	// add to lookup
-//	m_objHash[ obj->getID() ] = obj;
-	ObjectID newID = obj->getID();
-	while( newID >= m_objVector.size() ) // Fail case is hella rare, so faster to double up on size() call
-		m_objVector.resize(m_objVector.size() * 2, nullptr);
-
-	m_objVector[ newID ] = obj;
+	// add to lookup table
+	m_objHash[ obj->getID() ] = obj;
 
 }
 
@@ -4022,13 +4012,11 @@ void GameLogic::removeObjectFromLookupTable( Object *obj )
 {
 
 	// sanity
-	// TheSuperHackers @fix Mauller/Xezon 24/04/2025 Prevent out of range access to vector lookup table
-	if( obj == nullptr || static_cast<size_t>(obj->getID()) >= m_objVector.size() )
+	if( obj == nullptr )
 		return;
 
 	// remove from lookup table
-//	m_objHash.erase( obj->getID() );
-	m_objVector[ obj->getID() ] = nullptr;
+	m_objHash.erase( obj->getID() );
 
 }
 

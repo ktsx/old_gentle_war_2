@@ -33,10 +33,6 @@ endif()
 
 # Cross-platform core libraries
 target_link_libraries(z_generals PRIVATE
-    binkloader
-    milesloader
-    d3dx8
-    z_gameengine
     z_gameenginedevice
     zi_always
 )

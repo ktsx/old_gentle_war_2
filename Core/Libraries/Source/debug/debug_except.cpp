@@ -27,7 +27,7 @@
 //
 // Unhandled exception handler
 //////////////////////////////////////////////////////////////////////////////
-#include "debug.h"
+#include "debug/debug.h"
 #include "internal_except.h"
 #include <windows.h>
 #include <commctrl.h>

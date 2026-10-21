@@ -449,3 +449,14 @@ bool FileSystem::removeExtension(UnicodeString& path)
 
 	return false;
 }
+
+//============================================================================
+// FileSystem::appendPathSeparator
+//============================================================================
+void FileSystem::appendPathSeparator(AsciiString& path)
+{
+	if (path.isNotEmpty() && !isPathSeparator(path.back()))
+	{
+		path.concat(getNativePathSeparator());
+	}
+}

@@ -86,6 +86,7 @@ static void drawFramerateBar();
 #include "WWMath/wwmath.h"
 #include "WWLib/registry.h"
 #include "WW3D2/ww3d.h"
+#include "WW3D2/Renderer.h"
 #include "WW3D2/predlod.h"
 #include "WW3D2/part_emt.h"
 #include "WW3D2/part_ldr.h"
@@ -532,7 +533,8 @@ void W3DDisplay::getDisplayModeDescription(Int modeIndex, Int *xres, Int *yres, 
 		if (isResolutionSupported(resolutions[res]))
 		{
 			if (numResolutions == modeIndex)
-			{	//found the mode
+			{
+				//found the mode
 				*xres=resolutions[res].Width;
 				*yres=resolutions[res].Height;
 				*bitDepth=resolutions[res].BitDepth;
@@ -548,7 +550,7 @@ void W3DDisplay::setGamma(Real gamma, Real bright, Real contrast, Bool calibrate
 	if (m_windowed)
 		return;	//we don't allow gamma to change in window because it would affect desktop.
 
-	DX8Wrapper::Set_Gamma(gamma,bright,contrast,calibrate, false);
+	Renderer::Set_Gamma(gamma,bright,contrast,calibrate, false);
 }
 
 /** Set resolution of display */
@@ -564,6 +566,12 @@ Bool W3DDisplay::setDisplayMode( UnsignedInt xres, UnsignedInt yres, UnsignedInt
 	{
 		Render2DClass::Set_Screen_Resolution(RectClass(0, 0, xres, yres));
 		Display::setDisplayMode(xres, yres, bitdepth, windowed);
+
+		// TheSuperHackers @tweak Font point sizes are scaled from the resolution, so every glyph
+		// cached for the old resolution is now dead weight. Discard the current glyphs and start
+		// with a clean slate.
+		WW3DAssetManager::Get_Instance()->Free_All_FontChars_Glyph_Caches();
+
 		return TRUE;
 	}
 
@@ -992,6 +1000,10 @@ void W3DDisplay::reset()
 {
 
 	Display::reset();
+
+	// TheSuperHackers @tweak Discard the current glyphs and start with a clean slate.
+	// This can reduce the memory overhead from glyphs that are no longer needed from here on.
+	WW3DAssetManager::Get_Instance()->Free_All_FontChars_Glyph_Caches();
 
 	// Remove all render objects.
 
@@ -1483,6 +1495,12 @@ void W3DDisplay::gatherDebugStats()
 		unibuffer.format( L"Particles: %d in world, %d being displayed", totalParticles, onScreenParticleCount );
 		m_displayStrings[Particles]->setText( unibuffer );
 
+		//display the terrain-conforming particle load
+		unibuffer.format( L"Terrain Particles: %d tris, %d draws",
+			Debug_Statistics::Get_Terrain_Particle_Triangles(),
+			Debug_Statistics::Get_Terrain_Particle_Batches() );
+		m_displayStrings[TerrainParticles]->setText( unibuffer );
+
 		//display the number of objects in the world
 		UnsignedInt objCount = TheGameLogic->getObjectCount();
 		UnsignedInt objScreenCount = TheGameClient->getRenderedObjectCount();
@@ -1749,7 +1767,8 @@ void W3DDisplay::calculateTerrainLOD()
 			// start render block
 			updateViews();
 			if (WW3D::Begin_Render( true, true, Vector3( 0.0f, 0.0f, 0.0f ) ) == WW3D_ERROR_OK)
-			{	// draw all views of the world
+			{
+				// draw all views of the world
 				drawViews();
 				// render is all done!
 				WW3D::End_Render();
@@ -1881,7 +1900,8 @@ void W3DDisplay::draw()
 		TheGameLODManager->setDynamicLODLevel(lod);
 	}
 	else
-	{	//if dynamic LOD is turned off, force highest LOD
+	{
+		//if dynamic LOD is turned off, force highest LOD
 		TheGameLODManager->setDynamicLODLevel(DYNAMIC_GAME_LOD_VERY_HIGH);
 	}
 
@@ -2183,7 +2203,8 @@ void W3DDisplay::renderLetterBox(UnsignedInt currentTime)
 #endif
 		}
 		else
-		{	//letter box is disabled, but may still be fading out
+		{
+			//letter box is disabled, but may still be fading out
 			if (m_letterBoxFadeLevel != 0.0f)
 			{
 				m_letterBoxFadeLevel = 1.0f - (currentTime - m_letterBoxFadeStartTime)/LETTER_BOX_FADE_TIME;
@@ -2201,7 +2222,8 @@ void W3DDisplay::renderLetterBox(UnsignedInt currentTime)
 #endif
 			}
 			else
-			{	//box has finished fading out
+			{
+				//box has finished fading out
 #ifdef SLIDE_LETTERBOX
 				TheTacticalView->setOrigin(0, 0);
 #else
@@ -2274,7 +2296,8 @@ void W3DDisplay::enableLetterBox(Bool enable)
 	if (enable)
 	{
 		if (!m_letterBoxEnabled)
-		{	//letterbox mode not previously enabled
+		{
+			//letterbox mode not previously enabled
 			m_letterBoxEnabled = TRUE;
 			m_letterBoxFadeStartTime = timeGetTime();
 
@@ -2288,7 +2311,8 @@ void W3DDisplay::enableLetterBox(Bool enable)
 	else
 	{
 		if (m_letterBoxEnabled)
-		{	//letterbox mode no previously disabled
+		{
+			//letterbox mode no previously disabled
 			m_letterBoxEnabled = FALSE;
 			m_letterBoxFadeStartTime = timeGetTime();
 
@@ -2823,7 +2847,8 @@ void W3DDisplay::drawImage( const Image *image, Int startX, Int startY,
 	RectClass uv_rect(uv->lo.x,uv->lo.y,uv->hi.x,uv->hi.y);
 
 	if (m_isClippedEnabled)
-	{	//need to clip this quad to clip rectangle
+	{
+		//need to clip this quad to clip rectangle
 		if (screen_rect.Left < m_clipRegion.lo.x || screen_rect.Right > m_clipRegion.hi.x || screen_rect.Top < m_clipRegion.lo.y || screen_rect.Bottom > m_clipRegion.hi.y)
 		{
 			RectClass clipped_rect;

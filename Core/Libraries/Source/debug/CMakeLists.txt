@@ -32,7 +32,7 @@ target_include_directories(core_debug INTERFACE
 if(EMSCRIPTEN)
     target_precompile_headers(core_debug PRIVATE
         [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
-        [["osdep.h"]]
+        [["WWLib/osdep.h"]]
         "debug.h"
         "internal.h"
         "internal_except.h"

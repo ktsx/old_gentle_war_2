@@ -69,7 +69,7 @@
 #include "wwmath.h"
 #include <assert.h>
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 

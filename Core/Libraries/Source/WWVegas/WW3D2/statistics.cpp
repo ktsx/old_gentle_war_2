@@ -27,7 +27,7 @@
 
 #include <memory.h>
 #ifdef _UNIX
-#include "osdep.h"
+#include "WWLib/osdep.h"
 #endif
 
 // ----------------------------------------------------------------------------

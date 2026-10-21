@@ -59,6 +59,15 @@
 #include "GameLogic/ScriptEngine.h"
 #include "GameLogic/Weapon.h"
 
+// Web: DEBUG_CRASH is compiled out of the shipped builds, so an INIError would
+// otherwise reach the top-level handler with nothing but its numeric code. Say
+// what failed on the way out.
+#ifdef __EMSCRIPTEN__
+#define INI_FAIL_LOG(...) do { fprintf(stderr, "INI ERROR: " __VA_ARGS__); fputc('\n', stderr); } while (0)
+#else
+#define INI_FAIL_LOG(...) ((void)0)
+#endif
+
 #if __cplusplus >= 201611L
 #define USE_STD_FROM_CHARS_PARSING 1
 #else
@@ -224,6 +233,7 @@ UnsignedInt INI::loadFileDirectory( AsciiString fileDirName, INILoadType loadTyp
 	const Bool expectFileFound = (loadFlags & LoadFlags_ExpectFileFound) != 0;
 	if (expectFileFound && filesRead == 0)
 	{
+		INI_FAIL_LOG("no INI files found for '%s' (file or directory)", fileDirName.str());
 		throw INI_CANT_OPEN_FILE;
 	}
 
@@ -278,6 +288,7 @@ UnsignedInt INI::loadDirectory( AsciiString dirName, INILoadType loadType, Xfer 
 	const Bool expectFileFound = (loadFlags & LoadFlags_ExpectFileFound) != 0;
 	if (expectFileFound && filesRead == 0)
 	{
+		INI_FAIL_LOG("no INI files found in directory '%s'", dirName.str());
 		throw INI_CANT_OPEN_FILE;
 	}
 
@@ -293,6 +304,7 @@ void INI::prepFile( AsciiString filename, INILoadType loadType )
 	{
 
 		DEBUG_CRASH(( "INI::load, cannot open file '%s', file already open", filename.str() ));
+		INI_FAIL_LOG("cannot open '%s', a file is already open", filename.str());
 		throw INI_FILE_ALREADY_OPEN;
 
 	}
@@ -303,6 +315,7 @@ void INI::prepFile( AsciiString filename, INILoadType loadType )
 	{
 
 		DEBUG_CRASH(( "INI::load, cannot open file '%s'", filename.str() ));
+		INI_FAIL_LOG("cannot open '%s'", filename.str());
 		throw INI_CANT_OPEN_FILE;
 
 	}
@@ -427,6 +440,7 @@ UnsignedInt INI::load( AsciiString filename, INILoadType loadType, Xfer *pXfer )
 				{
 					DEBUG_CRASH( ("[LINE: %d - FILE: '%s'] Unknown block '%s'",
 														 getLineNum(), getFilename().str(), token ) );
+					INI_FAIL_LOG("unknown block '%s' in '%s' line %d", token, getFilename().str(), getLineNum());
 					throw INI_UNKNOWN_TOKEN;
 				}
 

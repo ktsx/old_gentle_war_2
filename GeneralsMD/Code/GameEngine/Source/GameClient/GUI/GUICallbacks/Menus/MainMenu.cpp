@@ -853,9 +853,9 @@ void DownloadMenuUpdate( WindowLayout *layout, void *userData );
 void MainMenuUpdate( WindowLayout *layout, void *userData )
 {
 	static int mainEntrySpam = 0;
-	if (mainEntrySpam++ % 30 == 0)
+	if (mainEntrySpam++ % 300 == 0)
 	{
-		GX_TRACE_LOG( "GX-TRACE: MainMenuUpdate entered! count=%d, isInGame=%d, isInShellGame=%d\n",
+		GX_DIAG_LOG( "GX-TRACE: MainMenuUpdate entered! count=%d, isInGame=%d, isInShellGame=%d\n",
 			mainEntrySpam, (int)TheGameLogic->isInGame(), (int)TheGameLogic->isInShellGame());
 	}
 
@@ -1335,6 +1335,10 @@ WindowMsgHandledType MainMenuSystem( GameWindow *window, UnsignedInt msg,
 
 			GameWindow *control = (GameWindow *)mData1;
 			Int controlID = control->winGetWindowId();
+
+			GX_DIAG_LOG("MAINMENU: GBM_SELECTED '%s' buttonPushed=%d dontAllowTransitions=%d transitionsFinished=%d windowed=%d\n",
+				control->winGetInstanceData()->m_decoratedNameString.str(), (int)buttonPushed, (int)dontAllowTransitions,
+				(int)TheTransitionHandler->isFinished(), (int)(TheGlobalData && TheGlobalData->m_windowed));
 
 			if(buttonPushed)
 				break;

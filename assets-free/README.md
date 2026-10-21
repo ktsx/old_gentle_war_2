@@ -16,6 +16,7 @@ to a live, clickable main menu **without them**, so that
 | `overlay/Data/English/HeaderTemplate.ini` | ours | Text styles (`Title`, `Subtitle`, `Button`, `Label`, `Small`) referenced by our `.wnd` layouts. |
 | `overlay/Data/English/CommandMap.ini` | ours | Empty per-language hotkey override (optional, silences an INI ERROR). |
 | `overlay/Data/INI/Default/*.ini` | ours | Empty stubs for the `Default\<X>.ini` files the engine insists on opening (`loadFileDirectory` throws when neither file nor directory exists); the retail defaults live in the main `<X>.ini`. |
+| `overlay/Data/INI/MappedImages/HandCreated/FreeAssets.ini` + `tools/asset-pipeline/tga.ts` | ours | Placeholder button plates and a "logo" that is really a colour-order probe (red / green / blue stripes): `check-menu-shot.py` reads the stripes back from the screenshot, so a channel-order bug in the texture path (as the WebGL2 no-swizzle one was) fails CI. |
 | `windows/MainMenu.wnd.json` | ours | Main menu layout, expanded to `.wnd` by `tools/asset-pipeline/wnd.ts`. Mirrors the window hierarchy `MainMenu.cpp` and `WindowTransitions.ini` expect (`MapBorder2` = main panel, `MapBorder` = single-player, `MapBorder1` = multiplayer, `MapBorder3` = replays, `MapBorder4` = difficulty, faction windows, `Logo`, `MainMenuRuler`, ...). All 57 window names the code looks up exist, most as hidden placeholders. |
 
 Nothing here is derived from retail `.big` contents; the layouts and INI stubs
@@ -25,7 +26,7 @@ are written from the engine source.
 
 ```bash
 node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts out/
-# -> out/assets/INIZH.big, out/assets/WindowZH.big   (the patch corpus is cloned into out/.cache)
+# -> out/assets/{INIZH,WindowZH,TexturesZH}.big   (the patch corpus is cloned into out/.cache)
 ```
 
 Put `out/assets/` next to `GeneralsZH.html` (the engine fetches `assets/INIZH.big`
@@ -52,5 +53,4 @@ Boot order and what each step needs, as discovered by iterating on the
 ## Next
 
 - `Menus/QuitMessageBox.wnd`, `OptionsMenu.wnd`, `SkirmishGameOptionsMenu.wnd`, ... — each menu the main menu can open.
-- MappedImages + a few TGA/DDS so buttons get art instead of flat colour.
 - One map + a handful of W3D models to reach a running skirmish (see `inventory.ts`).

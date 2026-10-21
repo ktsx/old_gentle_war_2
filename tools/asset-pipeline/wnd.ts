@@ -29,6 +29,7 @@
  *   "system": "MainMenuSystem", "input": "MainMenuInput", "tooltip": "[None]", "draw": "[None]",
  *   "font": ["Arial", 12, 1], "headerTemplate": "Button",
  *   "colors": Colors, "textColor": TextColor,
+ *   "images": { "enabled": "GxButton", "disabled": "GxButtonDis", "hilite": "GxButtonHi" },  // MappedImage names, entry 0; needs "IMAGE" in status
  *   "staticText": { "centered": true },
  *   "children": [ Window, ... ]
  * }
@@ -59,6 +60,8 @@ export interface WindowSpec {
   headerTemplate?: string;
   colors?: Colors;
   textColor?: Colors;
+  /** MappedImage names for draw-data entry 0 of each state (add "IMAGE" to status to use them). */
+  images?: { enabled?: string; disabled?: string; hilite?: string };
   staticText?: { centered?: boolean };
   tooltipDelay?: number;
   children?: WindowSpec[];
@@ -93,11 +96,11 @@ const TYPE_STYLE: Record<string, string> = {
 
 const rgba = (c: RGBA) => c.join(" ");
 
-function drawData(label: string, c: Required<Colors>, state: "enabled" | "disabled" | "hilite"): string {
+function drawData(label: string, c: Required<Colors>, state: "enabled" | "disabled" | "hilite", image?: string): string {
   const color = c[state];
   const border = c[`${state}Border` as keyof Colors] as RGBA;
-  const entry = `IMAGE: NoImage, COLOR: ${rgba(color)}, BORDERCOLOR: ${rgba(border)}`;
-  const entries = Array.from({ length: 9 }, () => entry);
+  const entry = (img: string) => `IMAGE: ${img}, COLOR: ${rgba(color)}, BORDERCOLOR: ${rgba(border)}`;
+  const entries = Array.from({ length: 9 }, (_, i) => entry(i === 0 && image ? image : "NoImage"));
   return `  ${label} = ${entries.join(",\n" + " ".repeat(label.length + 5))};`;
 }
 
@@ -135,9 +138,9 @@ function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: stri
   L(`              DISABLED: ${rgba(text.disabled)}, DISABLEDBORDER: ${rgba(text.disabledBorder)},`);
   L(`              HILITE: ${rgba(text.hilite)}, HILITEBORDER: ${rgba(text.hiliteBorder)};`);
   if (w.type === "STATICTEXT") L(`  STATICTEXTDATA = CENTERED: ${w.staticText?.centered === false ? 0 : 1};`);
-  for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled").split("\n")) L(line);
-  for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled").split("\n")) L(line);
-  for (const line of drawData("HILITEDRAWDATA", colors, "hilite").split("\n")) L(line);
+  for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled", w.images?.enabled).split("\n")) L(line);
+  for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled", w.images?.disabled).split("\n")) L(line);
+  for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite).split("\n")) L(line);
   if (w.children && w.children.length) {
     L("  CHILD");
     for (const c of w.children) emitWindow(c, spec, out, indent + "  ");

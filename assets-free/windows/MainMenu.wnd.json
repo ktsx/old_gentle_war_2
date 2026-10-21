@@ -90,13 +90,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:SinglePlayer",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonMultiplayer",
@@ -108,13 +114,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Multiplayer",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonLoadReplay",
@@ -126,13 +138,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:LoadReplay",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonOptions",
@@ -144,13 +162,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Options",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonCredits",
@@ -162,13 +186,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Credits",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonExit",
@@ -180,13 +210,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Exit",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       }
      ]
     },
@@ -229,13 +265,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:USA",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonChina",
@@ -247,13 +289,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:China",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonGLA",
@@ -265,13 +313,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:GLA",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonSkirmish",
@@ -283,13 +337,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Skirmish",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonChallenge",
@@ -301,13 +361,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Generals_Challenge",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonSingleBack",
@@ -319,13 +385,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Back",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonCampaign",
@@ -520,13 +592,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:GeneralsOnline",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonNetwork",
@@ -538,13 +616,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Network",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonMultiBack",
@@ -556,13 +640,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Back",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       }
      ]
     },
@@ -605,13 +695,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:LoadGame",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonReplay",
@@ -623,13 +719,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:ReplayMenu",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonLoadReplayBack",
@@ -641,13 +743,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Back",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       }
      ]
     },
@@ -721,13 +829,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Easy",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonMedium",
@@ -739,13 +853,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Medium",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonHard",
@@ -757,13 +877,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Hard",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       },
       {
        "name": "ButtonDiffBack",
@@ -775,13 +901,19 @@
         28
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
        "style": [
         "MOUSETRACK"
        ],
        "text": "GUI:Back",
-       "headerTemplate": "Button"
+       "headerTemplate": "Button",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       }
       }
      ]
     },
@@ -825,7 +957,8 @@
      ],
      "status": [
       "ENABLED",
-      "NOINPUT"
+      "NOINPUT",
+      "IMAGE"
      ],
      "style": [],
      "colors": {
@@ -841,6 +974,9 @@
        40,
        255
       ]
+     },
+     "images": {
+      "enabled": "GxLogo"
      }
     },
     {

@@ -11,6 +11,7 @@
  * Output (<outDir>/assets/):
  *   INIZH.big     Data/INI/**, Data/English/{Language,HeaderTemplate,CommandMap}.ini, Data/English/generals.csf
  *   WindowZH.big  Window/Menus/*.wnd
+ *   TexturesZH.big Art/Textures/*.tga (generated placeholders, see tga.ts)
  *
  * Usage:
  *   node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts <outDir> [--patch <dir>] [--cache <dir>]
@@ -25,6 +26,7 @@ import { execFileSync } from "node:child_process";
 import { parseStr, buildCsf } from "./strings.ts";
 import { buildWnd } from "./wnd.ts";
 import { packDir } from "./big.ts";
+import { writeFreeImages } from "./tga.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
 const PATCH_COMMIT = "6c7f40d6af6a4babb77a33a4502ec7656446c13e"; // 2026-09-18
@@ -65,6 +67,7 @@ function main() {
   rmSync(stage, { recursive: true, force: true });
   const iniStage = join(stage, "ini");
   const wndStage = join(stage, "wnd");
+  const texStage = join(stage, "tex");
   mkdirSync(join(iniStage, "Data", "English"), { recursive: true });
   mkdirSync(join(wndStage, "Window", "Menus"), { recursive: true });
 
@@ -87,13 +90,18 @@ function main() {
     console.log(`${spec.file}: built`);
   }
 
-  // 5. archives
+  // 5. placeholder images
+  console.log(`textures: ${writeFreeImages(texStage).join(", ")}`);
+
+  // 6. archives
   const assets = join(outDir, "assets");
   mkdirSync(assets, { recursive: true });
   const n1 = packDir(iniStage, join(assets, "INIZH.big"));
   const n2 = packDir(wndStage, join(assets, "WindowZH.big"));
+  const n3 = packDir(texStage, join(assets, "TexturesZH.big"));
   console.log(`INIZH.big: ${n1} files (${statSync(join(assets, "INIZH.big")).size} bytes)`);
   console.log(`WindowZH.big: ${n2} files`);
+  console.log(`TexturesZH.big: ${n3} files`);
   rmSync(stage, { recursive: true, force: true });
 }
 

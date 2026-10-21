@@ -23,61 +23,25 @@ message(STATUS "=== Configuring GeneralsX Web Port (Emscripten + WebGL 2.0) ==="
 # 1. Emscripten Compiler Flags
 # ============================================================================
 
-# WebGL 2.0 = OpenGL ES 3.0
+# WebGL 2.0 = OpenGL ES 3.0 (compile-time). The matching -s link flags live
+# with the rest of the z_generals link line (see note below).
 add_compile_options(-sUSE_WEBGL2=1 -sFULL_ES3=1)
-add_link_options(-sUSE_WEBGL2=1 -sFULL_ES3=1)
-add_link_options(-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2)
 
-# OpenAL → WebAudio
-# GeneralsX @build BenderAI 09/03/2026 — In Emscripten 5.x, OpenAL is always
-# built-in (the USE_OPENAL port was removed). No flag needed.
-# add_link_options(-sUSE_OPENAL=1)
-
-# Memory: 256MB initial, grow to 512MB
-add_link_options(
-    -sINITIAL_MEMORY=268435456
-    -sALLOW_MEMORY_GROWTH=1
-    -sMAXIMUM_MEMORY=536870912
-)
-
-# Fetch API (for HTTP Range requests to .big archives)
-add_link_options(-sFETCH=1)
-
-# ASYNCIFY disabled to optimize performance (Fetch_Range_JS uses synchronous XHR and emscripten_sleep yields are commented out)
-add_link_options(-sASYNCIFY=0)
-
-# Enable C++ Exception catching so we can see what is crashing
+# Enable C++ exception catching so init failures surface as messages.
 add_compile_options(-fexceptions -g)
 add_link_options(-fexceptions -sDISABLE_EXCEPTION_CATCHING=0)
 
-# Debugging and Source Maps
-# DEMANGLE_SUPPORT was removed in Emscripten 4.x+ (stacks demangle by default)
-# Debug diagnostics only outside the Release distribution profile —
-# -g keeps full DWARF in the wasm (5x size) and assertions cost frames.
-# GeneralsX @build WebPort 2026-07-07
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_link_options(-g -sSAFE_HEAP=1 -sASSERTIONS=2)
-else()
-    add_link_options(-g0 -sASSERTIONS=0)
-endif()
-
-# Filesystem support
-add_link_options(-sFORCE_FILESYSTEM=1)
-
-# Don't exit runtime (game loop runs via requestAnimationFrame)
-add_link_options(-sEXIT_RUNTIME=0)
-
-# WebAssembly output
-add_link_options(-sWASM=1 -sENVIRONMENT=web)
-
-# SDL3 for Emscripten: must be static, no shared libs
-set(SDL_SHARED OFF CACHE BOOL "No shared libs on Emscripten" FORCE)
-set(SDL_STATIC ON CACHE BOOL "Use static SDL3 on Emscripten" FORCE)
-set(SDL_WAYLAND OFF CACHE BOOL "No Wayland on Emscripten" FORCE)
-set(SDL_X11 OFF CACHE BOOL "No X11 on Emscripten" FORCE)
-set(SDL_VULKAN OFF CACHE BOOL "No Vulkan on Emscripten" FORCE)
-set(SDL_OPENGL OFF CACHE BOOL "No desktop OpenGL on Emscripten" FORCE)
-set(SDL_OPENGLES ON CACHE BOOL "Enable OpenGL ES for Emscripten" FORCE)
+# ----------------------------------------------------------------------------
+# All other link flags — heap size, WebGL, FETCH, ASYNCIFY, filesystem,
+# environment, per-profile -O/-g/assertions, exports, SDL2 — are set ONCE on
+# the z_generals target in GeneralsMD/Code/Main/CMakeLists.txt
+# (EMSCRIPTEN_ASYNC_FLAGS / GX_PROFILE_FLAGS). They used to be duplicated here
+# with different values (256/512 MB heap vs the real 1/2 GB, SAFE_HEAP=1 vs 0);
+# a later -s flag silently wins, so this file only ever *looked* authoritative.
+# The SDL3 cache variables that were here were dead too: the web build uses
+# Emscripten's SDL2 port (-sUSE_SDL=2), SDL3 is never configured.
+# GeneralsX @build WebPort 2026-10-21
+# ----------------------------------------------------------------------------
 
 # ============================================================================
 # 2. Build Defines
@@ -109,11 +73,13 @@ add_definitions(-DDISABLE_MEMORYPOOL_BOUNDINGWALL=1)
 # allocators with standard heap allocations. Slightly slower but eliminates all
 # pool-related corruption (POOL-DOUBLE-FREE, MPSB dlink, bounding wall).
 # Requires a full rebuild: delete build-web/CMakeCache.txt then ninja.
-set(RTS_GAMEMEMORY_ENABLE ON CACHE BOOL "Disable GameMemory pool on web" FORCE)
+set(RTS_GAMEMEMORY_ENABLE ON CACHE BOOL "Use the original GameMemory pool on web (OFF = GameMemoryNull / system malloc)" FORCE)
 
-# Force SAGE_USE_OPENAL so WWAudio uses MilesStub.h instead of mss.h
-# Emscripten provides OpenAL→WebAudio via -sUSE_OPENAL=1
-set(SAGE_USE_OPENAL ON CACHE BOOL "Force OpenAL on Emscripten" FORCE)
+# Audio: the engine's unmodified MilesAudioManager links against the Miles-
+# compatible Web Audio bridge (cmake/miles.cmake -> target `milesstub`,
+# Core/Libraries/Source/WebAudioBridge/web_audio_bridge.cpp). There is no
+# OpenAL path; the former SAGE_USE_OPENAL knob was read by nothing.
+# GeneralsX @build WebPort 2026-10-21
 
 # ============================================================================
 # 3. GLES3 Wrapper Sources
@@ -159,11 +125,9 @@ set(EMSCRIPTEN_MAIN_SOURCE
 if(NOT TARGET d3d8lib)
     add_library(d3d8lib INTERFACE)
     target_include_directories(d3d8lib INTERFACE
-        # Emscripten compat: provides windows_base.h stub (normally from DXVK)
+        # Emscripten compat: d3d8*.h, dinput.h, windows_base.h stubs
+        # (the Win32 type/function stubs too — there is no CompatLib in this tree)
         ${WW3D2_DIR}/emscripten_compat
-        # CompatLib headers: Win32 type/function stubs needed by game code
-        # On Linux, these come via CompatLib STATIC library; on Emscripten we just need headers
-        ${CMAKE_SOURCE_DIR}/GeneralsMD/Code/CompatLib/Include
     )
     target_compile_definitions(d3d8lib INTERFACE
         PLATFORM_WEB=1

@@ -78,14 +78,11 @@ target_include_directories(z_generals PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# GeneralsX @build BenderAI 09/03/2026 - On Emscripten, CompatLib is skipped so its
-# include dir is not propagated transitively. LinuxStubs.cpp needs Windows API type
-# declarations (SYSTEMTIME, Sleep, GetTickCount, etc.) from CompatLib/Include.
+# (A CompatLib/Include directory was listed here for LinuxStubs.cpp; it does
+# not exist in this tree — the Win32 types come from
+# WW3D2/emscripten_compat/windows_base.h — so the include was removed.
+# GeneralsX @build WebPort 2026-10-21)
 if(EMSCRIPTEN)
-    target_include_directories(z_generals PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CompatLib/Include
-    )
-    
     # GeneralsX @build WebPort 2026-07-06 — flags aligned to the last known-good
     # link line (link_mac.sh, 2026-05-24) so a clean CMake build reproduces the
     # .o-surgery era binary: SAFE_HEAP=0 (session 7700f1f), EXIT_RUNTIME=0,

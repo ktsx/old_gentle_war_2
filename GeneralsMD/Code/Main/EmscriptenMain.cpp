@@ -36,9 +36,9 @@
 #include "Lib/BaseType.h"
 
 // Web port includes
-#include "gles3_big_vfs.h"
-#include "gles3_mainloop.h"
-#include "gles3_wrapper.h"
+#include "WW3D2/gles3_big_vfs.h"
+#include "WW3D2/gles3_mainloop.h"
+#include "WW3D2/gles3_wrapper.h"
 
 // SDL input translation
 #include "EmscriptenInput.h"

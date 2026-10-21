@@ -286,6 +286,14 @@ inline long InterlockedExchange(volatile long *dest, long value) {
 }
 inline long InterlockedIncrement(volatile long *dest) { return ++(*dest); }
 inline long InterlockedDecrement(volatile long *dest) { return --(*dest); }
+inline void *InterlockedCompareExchangePointer(void *volatile *dest, void *exchange, void *comparand) {
+  void *prev = *dest;
+  if (prev == comparand) *dest = exchange;
+  return prev;
+}
+inline void *InterlockedExchangePointer(void *volatile *dest, void *value) {
+  void *prev = *dest; *dest = value; return prev;
+}
 #define S_OK ((HRESULT)0)
 #define E_FAIL ((HRESULT)0x80004005)
 #define SEVERITY_ERROR 1

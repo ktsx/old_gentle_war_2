@@ -5,6 +5,9 @@ Launches disposable Chrome-for-Testing, drives the game via CDP, watches for
 renderer crash (Inspector.targetCrashed) vs in-game heartbeat.
 
 Usage: python3 gx_harness.py <url> <outdir> <actions.json> [--headless]
+
+The url must carry ?diag=1 (or #diag) for Release builds: the TICK-DIAG
+console lines this harness waits for are off by default there.
 Exit codes: 0=SUCCESS, 2=CRASH, 3=TIMEOUT/other
 """
 import base64

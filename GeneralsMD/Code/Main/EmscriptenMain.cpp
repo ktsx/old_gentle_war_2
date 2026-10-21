@@ -399,6 +399,27 @@ static void DeferredAudio_Step() {
   }
 }
 
+// Runtime switch for the per-second console diagnostics (see the frame
+// callback). Trace builds always have them on; Release builds opt in with
+// ?diag=1 or #diag in the URL.
+static bool GX_DiagEnabled() {
+  static int s_enabled = -1;
+  if (s_enabled < 0) {
+#if GX_TRACE_LOGGING
+    s_enabled = 1;
+#else
+    s_enabled = EM_ASM_INT(({
+      try {
+        if (location.search && location.search.indexOf('diag=1') >= 0) return 1;
+        if (location.hash && location.hash.indexOf('diag') >= 0) return 1;
+      } catch(e) {}
+      return 0;
+    }));
+#endif
+  }
+  return s_enabled == 1;
+}
+
 static bool GameWebFrameCallback(float /*delta_time_ms*/) {
   EmscriptenInput_PumpEvents();
 
@@ -450,11 +471,12 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
     TheWritableGlobalData->m_loadScreenRender = false;
   }
 
-  // Black-canvas triage: dump DX8Wrapper draw counters once a second so we
-  // can see where the menu's draw calls are getting lost. Remove once the
-  // menu renders. GeneralsX @feature WebPort 2026-05-05.
+  // Once-a-second diagnostics: DX8Wrapper draw counters and the game-logic
+  // tick state. Off by default in Release; enabled by trace builds or at
+  // runtime with ?diag=1 / #diag (scripts/dev/gx_harness.py keys off
+  // "TICK-DIAG ... inGame=1").
   static int s_diagFrameTick = 0;
-  if (++s_diagFrameTick >= 60) {
+  if (GX_DiagEnabled() && ++s_diagFrameTick >= 60) {
     s_diagFrameTick = 0;
     fprintf(stderr,
             "DX8-DIAG: dip:called=%d no_vb=%d empty_vb=%d drew=%d  "
@@ -676,103 +698,6 @@ int main(int argc, char *argv[]) {
       GX_ReportProgress("vfs", archive_total, archive_total,
                         "Mapping virtual filesystem");
       BigVFS::Mount_To_Emscripten_FS();
-
-      // Diagnostic: probe the BigVFS lookup with the exact path the engine
-      // uses for a menu .wnd file. If this prints `size=0` or "not found",
-      // the engine's later fopen on the empty MEMFS placeholder will give
-      // a 0-byte file and the menu won't render.
-      // GeneralsX @feature WebPort 2026-05-05 — black-canvas triage
-      {
-        const char *probes[] = {
-            "Window\\Menus\\MainMenu.wnd",
-            "Window\\Menus\\BlankWindow.wnd",
-            "data\\generals.csf",
-            "Data\\English\\generals.csf",
-            nullptr,
-        };
-        for (int i = 0; probes[i] != nullptr; ++i) {
-          void *data = nullptr;
-          unsigned int size = 0;
-          bool ok = Web_VFS_Read_File_Sync(probes[i], &data, &size);
-          fprintf(stderr,
-                  "VFS-PROBE: '%s' -> ok=%d size=%u\n",
-                  probes[i], (int)ok, size);
-          if (ok && size >= 16) {
-            const unsigned char *p = (const unsigned char *)data;
-            fprintf(stderr, "VFS-PROBE: first 16 bytes: ");
-            for (int j = 0; j < 16; ++j) fprintf(stderr, "%02x ", p[j]);
-            fprintf(stderr, "\n");
-            fprintf(stderr, "VFS-PROBE: as text: '");
-            for (int j = 0; j < 64 && j < (int)size; ++j) {
-              char c = (char)p[j];
-              fputc(c >= 32 && c < 127 ? c : '.', stderr);
-            }
-            fprintf(stderr, "'\n");
-          }
-        }
-
-        // Also try going through the engine's actual file open path to
-        // confirm the LocalFile::open hook returns real data, not the
-        // 0-byte MEMFS placeholder.
-        FILE *f = fopen("/window/menus/mainmenu.wnd", "rb");
-        if (f) {
-          fseek(f, 0, SEEK_END);
-          long sz = ftell(f);
-          fclose(f);
-          fprintf(stderr, "VFS-PROBE: fopen(/window/menus/mainmenu.wnd) -> size=%ld\n", sz);
-        } else {
-          fprintf(stderr, "VFS-PROBE: fopen(/window/menus/mainmenu.wnd) -> FAILED\n");
-        }
-
-        // fmemopen sanity: make sure Emscripten's libc fmemopen wraps a
-        // memory buffer correctly. If this prints fseek/ftell = 64 the
-        // engine's fmemopen path in LocalFile::open is at least functional.
-        {
-          static const char buf[64] = {1,2,3,4,5,6,7,8,9,10};
-          FILE *mf = fmemopen((void *)buf, 64, "rb");
-          if (mf) {
-            fseek(mf, 0, SEEK_END);
-            long sz = ftell(mf);
-            fseek(mf, 0, SEEK_SET);
-            char dst[8] = {0};
-            size_t n = fread(dst, 1, 8, mf);
-            fclose(mf);
-            fprintf(stderr, "VFS-PROBE: fmemopen sanity sz=%ld read=%zu first=[%d %d %d %d]\n",
-                    sz, n, dst[0], dst[1], dst[2], dst[3]);
-          } else {
-            fprintf(stderr, "VFS-PROBE: fmemopen returned NULL\n");
-          }
-        }
-
-        // Mimic exactly what winCreateFromScript -> convertToRAMFile does
-        // on the menu file: fmemopen, then fseek(0,END)+ftell to get size,
-        // then fseek(0,SET)+fread to copy all bytes. If THIS fails, the
-        // engine's identical path in convertToRAMFile is failing too.
-        {
-          void *data = nullptr;
-          unsigned int size = 0;
-          if (Web_VFS_Read_File_Sync("Window\\Menus\\MainMenu.wnd", &data, &size)) {
-            FILE *mf = fmemopen(data, size, "rb");
-            if (mf) {
-              long pos1 = ftell(mf);            // expect 0
-              int seekret = fseek(mf, 0, SEEK_END);
-              long sz = ftell(mf);              // expect 208561
-              fseek(mf, 0, SEEK_SET);
-              static char *bigbuf = (char *)malloc(size + 1);
-              size_t nread = fread(bigbuf, 1, size, mf);
-              fclose(mf);
-              fprintf(stderr,
-                      "VFS-PROBE: fmemopen menu pos1=%ld seekret=%d sz=%ld nread=%zu first10='%c%c%c%c%c%c%c%c%c%c'\n",
-                      pos1, seekret, sz, nread,
-                      bigbuf[0], bigbuf[1], bigbuf[2], bigbuf[3], bigbuf[4],
-                      bigbuf[5], bigbuf[6], bigbuf[7], bigbuf[8], bigbuf[9]);
-              free(bigbuf);
-            } else {
-              fprintf(stderr, "VFS-PROBE: fmemopen on menu FAILED\n");
-            }
-          }
-        }
-      }
     } else {
       fprintf(stderr, "WARN: BigVFS::Init failed\n");
     }

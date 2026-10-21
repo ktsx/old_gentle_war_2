@@ -481,7 +481,9 @@ bool BigVFS::Read_File_Sync(const char *path, void **out_data,
   // Find the file entry
   const BigFileEntry *entry = Find_File(path);
   if (!entry) {
-    fprintf(stderr, "WARN: File not found in .big archives: %s\n", path);
+    // Misses are routine: the engine probes optional files (localized
+    // variants, per-map overrides) on every lookup chain.
+    GX_TRACE_LOG("WARN: File not found in .big archives: %s\n", path);
     return false;
   }
 

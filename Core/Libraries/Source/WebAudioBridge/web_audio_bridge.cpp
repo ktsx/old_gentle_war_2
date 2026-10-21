@@ -624,12 +624,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE void AIL_trigger_sample_eos(int id, int type) {
 
 extern "C" {
 
-float __stdcall AIL_3D_sample_volume(H3DSAMPLE sample) {
+F32 __stdcall AIL_3D_sample_volume(H3DSAMPLE sample) {
     Sample3DState* s = (Sample3DState*)sample;
     return s->volume;
 }
 
-void __stdcall AIL_set_3D_sample_volume(H3DSAMPLE sample, float volume) {
+void __stdcall AIL_set_3D_sample_volume(H3DSAMPLE sample, F32 volume) {
     Sample3DState* s = (Sample3DState*)sample;
     s->volume = volume;
     EM_ASM({
@@ -734,15 +734,15 @@ S32 __stdcall AIL_waveOutOpen(HDIGDRIVER* driver, LPHWAVEOUT* waveout, S32 id, L
 void __stdcall AIL_waveOutClose(HDIGDRIVER driver) {
 }
 
-void __stdcall AIL_set_3D_sample_loop_count(H3DSAMPLE sample, unsigned int count) {
+void __stdcall AIL_set_3D_sample_loop_count(H3DSAMPLE sample, U32 count) {
     Sample3DState* s = (Sample3DState*)sample;
     s->loop_count = count;
 }
 
-void __stdcall AIL_set_stream_playback_rate(HSTREAM stream, int rate) {
+void __stdcall AIL_set_stream_playback_rate(HSTREAM stream, S32 rate) {
 }
 
-int __stdcall AIL_stream_playback_rate(HSTREAM stream) {
+S32 __stdcall AIL_stream_playback_rate(HSTREAM stream) {
     return 22050;
 }
 
@@ -753,7 +753,7 @@ void __stdcall AIL_stream_ms_position(HSTREAM sample, S32* total_milliseconds, S
     }, s->id, total_milliseconds, current_milliseconds);
 }
 
-void __stdcall AIL_set_stream_ms_position(HSTREAM stream, int pos) {
+void __stdcall AIL_set_stream_ms_position(HSTREAM stream, S32 pos) {
     StreamState* s = (StreamState*)stream;
     EM_ASM({
         let s = window.AILBridge.getSample($0 + 1000);
@@ -763,15 +763,15 @@ void __stdcall AIL_set_stream_ms_position(HSTREAM stream, int pos) {
     }, s->id, pos);
 }
 
-int __stdcall AIL_stream_loop_count(HSTREAM stream) {
+S32 __stdcall AIL_stream_loop_count(HSTREAM stream) {
     StreamState* s = (StreamState*)stream;
     return s->loop_count;
 }
 
-void __stdcall AIL_set_stream_loop_block(HSTREAM stream, int loop_start, int loop_end) {
+void __stdcall AIL_set_stream_loop_block(HSTREAM stream, S32 loop_start, S32 loop_end) {
 }
 
-void __stdcall AIL_set_stream_loop_count(HSTREAM stream, int count) {
+void __stdcall AIL_set_stream_loop_count(HSTREAM stream, S32 count) {
     StreamState* s = (StreamState*)stream;
     s->loop_count = count;
 }
@@ -835,7 +835,7 @@ void __stdcall AIL_close_stream(HSTREAM stream) {
     }, s->id);
 }
 
-void __stdcall AIL_pause_stream(HSTREAM stream, int onoff) {
+void __stdcall AIL_pause_stream(HSTREAM stream, S32 onoff) {
     StreamState* s = (StreamState*)stream;
     if (onoff) {
         EM_ASM({
@@ -899,12 +899,12 @@ HSTREAM __stdcall AIL_open_stream_by_sample(HDIGDRIVER driver, HSAMPLE sample, c
     return 0;
 }
 
-void __stdcall AIL_set_sample_playback_rate(HSAMPLE sample, int playback_rate) {
+void __stdcall AIL_set_sample_playback_rate(HSAMPLE sample, S32 playback_rate) {
     SampleState* s = (SampleState*)sample;
     s->playback_rate = playback_rate;
 }
 
-int __stdcall AIL_sample_playback_rate(HSAMPLE sample) {
+S32 __stdcall AIL_sample_playback_rate(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
     return s->playback_rate;
 }
@@ -912,15 +912,15 @@ int __stdcall AIL_sample_playback_rate(HSAMPLE sample) {
 void __stdcall AIL_sample_ms_position(HSAMPLE sample, S32* total_ms, S32* current_ms) {
 }
 
-void __stdcall AIL_set_sample_ms_position(HSAMPLE sample, int pos) {
+void __stdcall AIL_set_sample_ms_position(HSAMPLE sample, S32 pos) {
 }
 
-int __stdcall AIL_sample_loop_count(HSAMPLE sample) {
+S32 __stdcall AIL_sample_loop_count(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
     return s->loop_count;
 }
 
-void __stdcall AIL_set_sample_loop_count(HSAMPLE sample, int count) {
+void __stdcall AIL_set_sample_loop_count(HSAMPLE sample, S32 count) {
     SampleState* s = (SampleState*)sample;
     s->loop_count = count;
 }
@@ -999,15 +999,14 @@ void __stdcall AIL_init_sample(HSAMPLE sample) {
     s->is_playing = false;
 }
 
-int __stdcall AIL_set_named_sample_file(
-    HSAMPLE sample, const char* file_name, const void* file_image, int file_size, int block) {
+S32 __stdcall AIL_set_named_sample_file(HSAMPLE sample, const char* file_name, const void* file_image, S32 file_size, S32 block) {
     return AIL_set_sample_file(sample, file_image, block);
 }
 
-void __stdcall AIL_set_3D_sample_effects_level(H3DSAMPLE sample, float effect_level) {
+void __stdcall AIL_set_3D_sample_effects_level(H3DSAMPLE sample, F32 effect_level) {
 }
 
-void __stdcall AIL_set_3D_sample_distances(H3DSAMPLE sample, float max_dist, float min_dist) {
+void __stdcall AIL_set_3D_sample_distances(H3DSAMPLE sample, F32 max_dist, F32 min_dist) {
     Sample3DState* s = (Sample3DState*)sample;
     s->max_dist = max_dist;
     s->min_dist = min_dist;
@@ -1022,10 +1021,10 @@ void __stdcall AIL_set_3D_sample_distances(H3DSAMPLE sample, float max_dist, flo
     }, s->id, max_dist, min_dist);
 }
 
-void __stdcall AIL_set_3D_velocity_vector(H3DSAMPLE sample, float x, float y, float z) {
+void __stdcall AIL_set_3D_velocity_vector(H3DPOBJECT sample, F32 x, F32 y, F32 z) {
 }
 
-void __stdcall AIL_set_3D_position(H3DPOBJECT obj, float X, float Y, float Z) {
+void __stdcall AIL_set_3D_position(H3DPOBJECT obj, F32 X, F32 Y, F32 Z) {
     // Translate coordinates: X_wa = X, Y_wa = Z, Z_wa = -Y
     float wa_x = X;
     float wa_y = Z;
@@ -1058,8 +1057,7 @@ void __stdcall AIL_set_3D_position(H3DPOBJECT obj, float X, float Y, float Z) {
     }
 }
 
-void __stdcall AIL_set_3D_orientation(
-    H3DPOBJECT obj, float X_face, float Y_face, float Z_face, float X_up, float Y_up, float Z_up) {
+void __stdcall AIL_set_3D_orientation(H3DPOBJECT obj, F32 X_face, F32 Y_face, F32 Z_face, F32 X_up, F32 Y_up, F32 Z_up) {
     if (obj == LISTENER_HANDLE) {
         // Project face vector onto Generals X-Y plane (Z_face = 0)
         float proj_x = X_face;
@@ -1101,7 +1099,7 @@ void __stdcall AIL_set_3D_orientation(
     }
 }
 
-int __stdcall AIL_WAV_info(const void* data, AILSOUNDINFO* info) {
+S32 __stdcall AIL_WAV_info(const void* data, AILSOUNDINFO* info) {
     WavHeaderInfo wav;
     if (!parse_wav(data, wav)) return 0;
     info->format = wav.format;
@@ -1126,15 +1124,14 @@ void __stdcall AIL_stop_timer(HTIMER timer) {
 void __stdcall AIL_release_timer_handle(HTIMER timer) {
 }
 
-void __stdcall AIL_shutdown(void) {
+void __stdcall AIL_shutdown() {
 }
 
-int __stdcall AIL_enumerate_filters(HPROENUM* next, HPROVIDER* dest, char** name) {
+S32 __stdcall AIL_enumerate_filters(HPROENUM* next, HPROVIDER* dest, char** name) {
     return 0;
 }
 
-void __stdcall AIL_set_file_callbacks(AIL_file_open_callback opencb, AIL_file_close_callback closecb,
-    AIL_file_seek_callback seekcb, AIL_file_read_callback readcb) {
+void __stdcall AIL_set_file_callbacks(AIL_file_open_callback opencb, AIL_file_close_callback closecb, AIL_file_seek_callback seekcb, AIL_file_read_callback readcb) {
 }
 
 void __stdcall AIL_release_3D_sample_handle(H3DSAMPLE sample) {
@@ -1162,22 +1159,22 @@ H3DSAMPLE __stdcall AIL_allocate_3D_sample_handle(HPROVIDER lib) {
     return nullptr;
 }
 
-void __stdcall AIL_set_3D_user_data(H3DPOBJECT obj, unsigned int index, void *value) {
+void __stdcall AIL_set_3D_user_data(H3DPOBJECT obj, U32 index, S32 value) {
 }
 
-void __stdcall AIL_unlock(void) {
+void __stdcall AIL_unlock() {
 }
 
-void __stdcall AIL_lock(void) {
+void __stdcall AIL_lock() {
 }
 
-void __stdcall AIL_set_3D_speaker_type(HPROVIDER lib, int speaker_type) {
+void __stdcall AIL_set_3D_speaker_type(HPROVIDER lib, S32 speaker_type) {
 }
 
 void __stdcall AIL_close_3D_listener(H3DPOBJECT listener) {
 }
 
-int __stdcall AIL_enumerate_3D_providers(HPROENUM* next, HPROVIDER* dest, char** name) {
+S32 __stdcall AIL_enumerate_3D_providers(HPROENUM* next, HPROVIDER* dest, char** name) {
     if (next && *next == 0) {
         *dest = (HPROVIDER)1;
         *name = (char*)"Miles Fast 2D Positional Audio";
@@ -1191,7 +1188,7 @@ M3DRESULT __stdcall AIL_open_3D_provider(HPROVIDER lib) {
     return 0;
 }
 
-char* __stdcall AIL_last_error(void) {
+char* __stdcall AIL_last_error() {
     return (char*)"No error";
 }
 
@@ -1199,12 +1196,12 @@ H3DPOBJECT __stdcall AIL_open_3D_listener(HPROVIDER lib) {
     return LISTENER_HANDLE;
 }
 
-void *__stdcall AIL_3D_user_data(H3DSAMPLE sample, unsigned int index) {
-    return nullptr;
+S32 __stdcall AIL_3D_user_data(H3DPOBJECT sample, U32 index) {
+    return 0;
 }
 
-void *__stdcall AIL_sample_user_data(HSAMPLE sample, unsigned int index) {
-    return nullptr;
+S32 __stdcall AIL_sample_user_data(HSAMPLE sample, U32 index) {
+    return 0;
 }
 
 HSAMPLE __stdcall AIL_allocate_sample_handle(HDIGDRIVER dig) {
@@ -1225,10 +1222,10 @@ HSAMPLE __stdcall AIL_allocate_sample_handle(HDIGDRIVER dig) {
     return nullptr;
 }
 
-void __stdcall AIL_set_sample_user_data(HSAMPLE sample, unsigned int index, void *value) {
+void __stdcall AIL_set_sample_user_data(HSAMPLE sample, U32 index, S32 value) {
 }
 
-int __stdcall AIL_decompress_ADPCM(const AILSOUNDINFO *info, void **outdata, unsigned long *outsize) {
+S32 __stdcall AIL_decompress_ADPCM(const AILSOUNDINFO * info, void ** outdata, U32 * outsize) {
     if (!info || !info->data_ptr || info->data_len == 0) return 0;
 
     uint32_t block_align = info->block_size;
@@ -1282,14 +1279,14 @@ int __stdcall AIL_decompress_ADPCM(const AILSOUNDINFO *info, void **outdata, uns
     return 1;
 }
 
-void __stdcall AIL_get_DirectSound_info(HSAMPLE sample, AILLPDIRECTSOUND *lplpDS, AILLPDIRECTSOUNDBUFFER *lplpDSB) {
+void __stdcall AIL_get_DirectSound_info(HSAMPLE sample, AILLPDIRECTSOUND * lplpDS, AILLPDIRECTSOUNDBUFFER * lplpDSB) {
 }
 
-void __stdcall AIL_mem_free_lock(void *ptr) {
+void __stdcall AIL_mem_free_lock(void * ptr) {
     if (ptr) free(ptr);
 }
 
-HSTREAM __stdcall AIL_open_stream(HDIGDRIVER dig, const char *filename, int stream_mem) {
+HSTREAM __stdcall AIL_open_stream(HDIGDRIVER dig, const char * filename, S32 stream_mem) {
     GX_TRACE_LOG("[web_audio_bridge] AIL_open_stream: filename='%s', stream_mem=%d\n", filename, stream_mem);
     for (int i = 0; i < MAX_STREAMS; i++) {
         if (!g_streams[i].allocated) {
@@ -1323,15 +1320,14 @@ HSTREAM __stdcall AIL_open_stream(HDIGDRIVER dig, const char *filename, int stre
 void __stdcall AIL_quick_unload(HAUDIO audio) {
 }
 
-HAUDIO __stdcall AIL_quick_load_and_play(const char *filename, unsigned int loop_count, int wait_request) {
+HAUDIO __stdcall AIL_quick_load_and_play(const char * filename, U32 loop_count, S32 wait_request) {
     return nullptr;
 }
 
-void __stdcall AIL_quick_set_volume(HAUDIO audio, float volume, float extravol) {
+void __stdcall AIL_quick_set_volume(HAUDIO audio, F32 volume, F32 extravol) {
 }
 
-int __stdcall AIL_quick_startup(
-    int use_digital, int use_MIDI, unsigned int output_rate, int output_bits, int output_channels) {
+S32 __stdcall AIL_quick_startup(S32 use_digital, S32 use_MIDI, U32 output_rate, S32 output_bits, S32 output_channels) {
     GX_TRACE_LOG("[web_audio_bridge] AIL_quick_startup: use_digital=%d, use_MIDI=%d, rate=%u, bits=%d, channels=%d\n",
            use_digital, use_MIDI, output_rate, output_bits, output_channels);
 #if GX_TRACE_LOGGING
@@ -1345,26 +1341,26 @@ int __stdcall AIL_quick_startup(
     return 1;
 }
 
-void __stdcall AIL_quick_handles(HDIGDRIVER *pdig, HMDIDRIVER *pmdi, HDLSDEVICE *pdls) {
+void __stdcall AIL_quick_handles(HDIGDRIVER * pdig, HMDIDRIVER * pmdi, HDLSDEVICE * pdls) {
     if (pdig) *pdig = (HDIGDRIVER)1;
     if (pmdi) *pmdi = (HMDIDRIVER)1;
     if (pdls) *pdls = (HDLSDEVICE)1;
 }
 
-void __stdcall AIL_sample_volume_pan(HSAMPLE sample, float *volume, float *pan) {
+void __stdcall AIL_sample_volume_pan(HSAMPLE sample, F32 * volume, F32 * pan) {
     SampleState* s = (SampleState*)sample;
     if (volume) *volume = s->volume;
     if (pan) *pan = s->pan;
 }
 
-void __stdcall AIL_set_3D_sample_occlusion(H3DSAMPLE sample, float occlusion) {
+void __stdcall AIL_set_3D_sample_occlusion(H3DSAMPLE sample, F32 occlusion) {
 }
 
-char *__stdcall AIL_set_redist_directory(const char *dir) {
+char * __stdcall AIL_set_redist_directory(const char * dir) {
     return nullptr;
 }
 
-int __stdcall AIL_set_sample_file(HSAMPLE sample, const void *file_image, int block) {
+S32 __stdcall AIL_set_sample_file(HSAMPLE sample, const void * file_image, S32 block) {
     SampleState* s = (SampleState*)sample;
     GX_TRACE_LOG("[web_audio_bridge] AIL_set_sample_file: sample=%p, id=%d, file_image=%p, block=%d\n",
            (void*)sample, s ? s->id : -1, file_image, block);
@@ -1377,7 +1373,7 @@ int __stdcall AIL_set_sample_file(HSAMPLE sample, const void *file_image, int bl
     return 1;
 }
 
-void __stdcall AIL_set_sample_volume_pan(HSAMPLE sample, float volume, float pan) {
+void __stdcall AIL_set_sample_volume_pan(HSAMPLE sample, F32 volume, F32 pan) {
     SampleState* s = (SampleState*)sample;
     s->volume = volume;
     s->pan = pan;
@@ -1394,7 +1390,7 @@ void __stdcall AIL_set_sample_volume_pan(HSAMPLE sample, float volume, float pan
     }, s->id, volume, pan);
 }
 
-void __stdcall AIL_set_stream_volume_pan(HSTREAM stream, float volume, float pan) {
+void __stdcall AIL_set_stream_volume_pan(HSTREAM stream, F32 volume, F32 pan) {
     StreamState* s = (StreamState*)stream;
     s->volume = volume;
     s->pan = pan;
@@ -1411,13 +1407,13 @@ void __stdcall AIL_set_stream_volume_pan(HSTREAM stream, float volume, float pan
     }, s->id, volume, pan);
 }
 
-void __stdcall AIL_stream_volume_pan(HSTREAM stream, float *volume, float *pan) {
+void __stdcall AIL_stream_volume_pan(HSTREAM stream, F32 * volume, F32 * pan) {
     StreamState* s = (StreamState*)stream;
     if (volume) *volume = s->volume;
     if (pan) *pan = s->pan;
 }
 
-int __stdcall AIL_startup(void) {
+S32 __stdcall AIL_startup() {
     GX_TRACE_LOG("[web_audio_bridge] AIL_startup called\n");
 #if GX_TRACE_LOGGING
     // Debug builds only: let the AILBridge EM_JS console traces through.
@@ -1430,8 +1426,12 @@ int __stdcall AIL_startup(void) {
     return 1;
 }
 
-unsigned long __stdcall AIL_get_timer_highest_delay(void) {
+U32 __stdcall AIL_get_timer_highest_delay() {
     return 0;
 }
 
 } // extern "C"
+
+// GeneralsX @merge 2026-10-21 — declared by upstream's mss.h; the web build is single-threaded.
+void __stdcall AIL_lock_mutex(void) {}
+void __stdcall AIL_unlock_mutex(void) {}

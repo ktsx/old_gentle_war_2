@@ -32,7 +32,7 @@ target_include_directories(core_debug PUBLIC
 if(EMSCRIPTEN)
     target_precompile_headers(core_debug PRIVATE
         [["Precompiled/precompiled.h"]] # Must be first
-        [["WWLib/osdep.h"]] # GeneralsX WebPort — __forceinline & co. for non-MSVC
+        [["Utility/compat.h"]] # web: __forceinline, size_t & co. for non-MSVC
         "Include/debug/debug.h"
         "internal.h"
         "internal_except.h"

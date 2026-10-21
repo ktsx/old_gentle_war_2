@@ -60,3 +60,8 @@ else()
         "$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include Precompiled/BasePrecomp.h>"
     )
 endif()
+
+# Web: <windows.h> resolves to the Emscripten compat header exported by d3d8lib.
+if(EMSCRIPTEN)
+    target_link_libraries(core_libraries PRIVATE d3d8lib)
+endif()

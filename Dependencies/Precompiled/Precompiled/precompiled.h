@@ -33,6 +33,11 @@
 
 #include "stdint_adapter.h"
 
+#ifndef _WIN32
+// size_t for Precompiled/BaseMacros.h (ARRAY_SIZE); windows.h provides it on Windows.
+#include <stddef.h>
+#endif
+
 
 #ifdef _WIN32
 

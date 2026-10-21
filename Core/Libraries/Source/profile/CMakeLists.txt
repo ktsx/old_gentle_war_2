@@ -27,7 +27,7 @@ target_include_directories(core_profile_legacy PUBLIC
 if(EMSCRIPTEN)
     target_precompile_headers(core_profile_legacy PRIVATE
         [["Precompiled/precompiled.h"]] # Must be first
-        [["WWLib/osdep.h"]] # GeneralsX WebPort — __forceinline & co. for non-MSVC
+        [["Utility/compat.h"]] # web: __forceinline, size_t & co. for non-MSVC
         "Include/profile/profile.h"
         "internal.h"
     )

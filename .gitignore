@@ -111,5 +111,7 @@ GeneralsZH.wasm
 *.bik
 Data/
 assets/
+# assets-free/overlay is our own text (INI stubs, Language.ini) — not game data
+!assets-free/overlay/Data/
 game-assets/
 *.sav

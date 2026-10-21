@@ -132,3 +132,60 @@ jobs:
             build-web/GeneralsMD/GeneralsZH.js \
             build-web/GeneralsMD/GeneralsZH.wasm \
             build-web/GeneralsMD/serve.py
+
+  # Boots the Release build in headless Chromium with the EA-free asset set
+  # (assets-free/README.md): engine must reach "Ready", the main menu must be
+  # drawn and lit after the first key press. This is the first test that runs
+  # the engine rather than merely compiling it.
+  boot-smoke:
+    name: Boot to main menu (free assets, Release)
+    needs: build-web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Release build
+        uses: actions/download-artifact@v4
+        with:
+          name: GeneralsZH-web-Release
+          path: site
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build free asset set
+        run: |
+          node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts free-out --cache "$RUNNER_TEMP/free-cache"
+          mkdir -p site/assets && cp free-out/assets/*.big site/assets/
+          ls -l site site/assets
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Serve and boot
+        run: |
+          cp scripts/serve.py site/serve.py
+          (cd site && python3 serve.py 8888 > ../serve.log 2>&1 &)
+          sleep 2
+          SMOKE_KEYS=Space node tools/asset-pipeline/smoke.js http://localhost:8888/GeneralsZH.html 120000 menu.png 8000 --begin | tee smoke.log
+
+      - name: Check the menu is lit
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 tools/asset-pipeline/check-menu-shot.py menu.png
+
+      - name: Upload screenshot and log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-smoke
+          path: |
+            menu.png
+            smoke.log
+            serve.log

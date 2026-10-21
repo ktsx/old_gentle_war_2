@@ -123,6 +123,16 @@ export function buildBig(files: { path: string; data: Buffer }[]): Buffer {
   return Buffer.concat([head, ...tableParts, ...files.map((f) => f.data)]);
 }
 
+/** Pack every file under `dir` into `outFile`; returns the file count. Paths are stored with backslashes. */
+export function packDir(dir: string, outFile: string): number {
+  const files = walk(dir).map((rel) => ({
+    path: rel.split(sep).join("\\"),
+    data: readFileSync(join(dir, rel)),
+  }));
+  writeFileSync(outFile, buildBig(files));
+  return files.length;
+}
+
 function walk(dir: string, base = dir): string[] {
   const out: string[] = [];
   for (const name of readdirSync(dir)) {
@@ -172,12 +182,8 @@ function main(argv: string[]): number {
       return 0;
     }
     case "pack": {
-      const files = walk(a).map((rel) => ({
-        path: rel.split(sep).join("\\"),
-        data: readFileSync(join(a, rel)),
-      }));
-      writeFileSync(b, buildBig(files));
-      console.log(`packed ${files.length} files into ${b}`);
+      const n = packDir(a, b);
+      console.log(`packed ${n} files into ${b}`);
       return 0;
     }
     default:

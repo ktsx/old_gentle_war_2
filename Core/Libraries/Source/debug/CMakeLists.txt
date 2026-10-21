@@ -32,11 +32,12 @@ target_include_directories(core_debug INTERFACE
 if(EMSCRIPTEN)
     target_precompile_headers(core_debug PRIVATE
         [["Precompiled/precompiled.h"]] # Must be first
+        [["WWLib/osdep.h"]] # GeneralsX WebPort — __forceinline & co. for non-MSVC
         "debug.h"
         "internal.h"
         "internal_except.h"
         "internal_io.h"
-        )
+    )
 else()
     target_precompile_headers(core_debug PRIVATE
         [["Precompiled/precompiled.h"]] # Must be first

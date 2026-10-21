@@ -153,9 +153,11 @@ export function buildWnd(spec: LayoutSpec): string {
   const out: string[] = [];
   out.push(`FILE_VERSION = ${spec.version ?? 2};`);
   out.push("STARTLAYOUTBLOCK");
-  out.push(`  LAYOUTINIT = "${spec.layout?.init ?? "[None]"}";`);
-  out.push(`  LAYOUTUPDATE = "${spec.layout?.update ?? "[None]"}";`);
-  out.push(`  LAYOUTSHUTDOWN = "${spec.layout?.shutdown ?? "[None]"}";`);
+  // No quotes here: parseInit/parseUpdate/parseShutdown take the raw token
+  // (GameWindowManagerScript.cpp), unlike the window callbacks below.
+  out.push(`  LAYOUTINIT = ${spec.layout?.init ?? "[None]"};`);
+  out.push(`  LAYOUTUPDATE = ${spec.layout?.update ?? "[None]"};`);
+  out.push(`  LAYOUTSHUTDOWN = ${spec.layout?.shutdown ?? "[None]"};`);
   out.push("ENDLAYOUTBLOCK");
   for (const w of spec.windows) emitWindow(w, spec, out, "");
   out.push("");

@@ -3,6 +3,7 @@
 //   --begin            press the shell's Begin button once the engine is Ready, then wait afterBeginMs
 //   SMOKE_KEYS=Space;Escape    keys to press after Begin
 //   SMOKE_CLICKS=512,282;...   canvas clicks after Begin (viewport is 1024x768)
+//   SMOKE_EXPECT=a;b            console substrings that must appear (pair with ?diag=1)
 // exit 2 on FATAL C++ CRASH / page error / Begin never reached.
 const { chromium } = require('playwright');
 (async () => {
@@ -63,6 +64,10 @@ const { chromium } = require('playwright');
   console.log(show.join('\n'));
   await browser.close();
   const fatal = lines.filter(l => l.includes('FATAL C++ CRASH') || l.includes('[PAGEERROR]') || l.includes('begin failed'));
+  // SMOKE_EXPECT="substr;substr" — each must appear in the console (use with ?diag=1 traces)
+  for (const want of (process.env.SMOKE_EXPECT || '').split(';').filter(Boolean)) {
+    if (!lines.some(l => l.includes(want))) fatal.push(`[SMOKE] expected console line not seen: ${want}`);
+  }
   if (fatal.length) { console.error('=== SMOKE VERDICT: FAIL ===\n' + fatal.join('\n')); process.exit(2); }
   console.log('=== SMOKE VERDICT: OK (stage=' + stage.stage + ') ===');
 })().catch(e => { console.error('SMOKE FAILED', e); console.error('=== CONSOLE (tail 60) ==='); console.error((globalThis.__smokeLines || []).slice(-60).join('\n')); process.exit(1); });

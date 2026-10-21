@@ -173,7 +173,11 @@ jobs:
           cp scripts/serve.py site/serve.py
           (cd site && python3 serve.py 8888 > ../serve.log 2>&1 &)
           sleep 2
-          SMOKE_KEYS=Space node tools/asset-pipeline/smoke.js http://localhost:8888/GeneralsZH.html 120000 menu.png 8000 --begin | tee smoke.log
+          # Begin, press Space (reveals the menu), click SOLO PLAY, BACK, EXIT GAME; ?diag=1 traces must show
+          # the button presses reaching MainMenuSystem and the transition gate clearing.
+          SMOKE_KEYS=Space SMOKE_CLICKS="512,274;512,504;512,504" \
+          SMOKE_EXPECT="GBM_SELECTED 'MainMenu.wnd:ButtonSinglePlayer';Clearing dontAllowTransitions;GBM_SELECTED 'MainMenu.wnd:ButtonExit'" \
+          node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1" 120000 menu.png 8000 --begin | tee smoke.log
 
       - name: Check the menu is lit
         run: |

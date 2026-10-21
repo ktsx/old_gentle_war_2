@@ -33,11 +33,15 @@ Put `out/assets/` next to `GeneralsZH.html` (the engine fetches `assets/INIZH.bi
 etc. over HTTP Range), run `python3 serve.py`, open the page: the engine boots,
 reports `Ready`, and after the first click/key shows the main menu.
 
-Headless check (what CI runs):
+Headless check (what CI runs): Begin, Space, SOLO PLAY → BACK → EXIT GAME, then the
+screenshot (lit menu, colour probe) and the `?diag=1` traces are checked.
 
 ```bash
 npx playwright install chromium
-SMOKE_KEYS=Space node tools/asset-pipeline/smoke.js http://localhost:8888/GeneralsZH.html 60000 shot.png 8000 --begin
+SMOKE_KEYS=Space SMOKE_CLICKS="512,274;512,504;512,504" \
+SMOKE_EXPECT="GBM_SELECTED 'MainMenu.wnd:ButtonSinglePlayer';Clearing dontAllowTransitions" \
+node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1" 120000 shot.png 8000 --begin
+python3 tools/asset-pipeline/check-menu-shot.py shot.png
 ```
 
 ## How the engine gets there (for the next person)
@@ -48,9 +52,9 @@ Boot order and what each step needs, as discovered by iterating on the
 1. `TheGameText` — `Data\generals.str` (text) or `Data\English\generals.csf` (binary). Without one, every `DisplayName = LABEL` in the INI throws at the first `parseAndTranslateLabel`.
 2. `Data\INI\Default\<X>` + `Data\INI\<X>` for ~40 subsystems (`GameEngine.cpp`), each via `loadFileDirectory` which requires the file *or* a directory of `.ini` files to exist.
 3. `Data\<Language>\Language.ini` (`GlobalLanguage.cpp`) and `Data\<Language>\HeaderTemplate.ini`.
-4. `Window\Menus\MainMenu.wnd` via `TheShell`. Missing → black screen, no crash. On first run the menu stays hidden until a key press or a >20 px mouse move (`MainMenu.cpp`, "press any key" after the logo movie), then `MapBorder2` is shown and the `MainMenuDefaultMenu` transition runs.
+4. `Window\Menus\MainMenu.wnd` via `TheShell`. Two format traps: the layout block names are **unquoted** (`LAYOUTINIT = MainMenuInit;` — quoted names silently bind no callbacks, so the menu draws but never updates), and container panels need `SYSTEMCALLBACK = "PassSelectedButtonsToParentSystem"` or button presses never reach the layout's system callback. Missing → black screen, no crash. On first run the menu stays hidden until a key press or a >20 px mouse move (`MainMenu.cpp`, "press any key" after the logo movie), then `MapBorder2` is shown and the `MainMenuDefaultMenu` transition runs.
 
 ## Next
 
-- `Menus/QuitMessageBox.wnd`, `OptionsMenu.wnd`, `SkirmishGameOptionsMenu.wnd`, ... — each menu the main menu can open.
+- `OptionsMenu.wnd`, `SkirmishGameOptionsMenu.wnd`, `MapSelectMenu.wnd`, ... — each menu the main menu can open (`MessageBox.wnd` / `QuitMessageBox.wnd` are done).
 - One map + a handful of W3D models to reach a running skirmish (see `inventory.ts`).

@@ -43,6 +43,9 @@
 // ----------------------------------------------------------------------------
 
 // SYSTEM INCLUDES
+#ifdef __EMSCRIPTEN__
+#include <Utility/compat.h> // GetTickCount & co. before the compat windows.h
+#endif
 #include <windows.h>
 #include <stdarg.h>
 #include <stdlib.h>

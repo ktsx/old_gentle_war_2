@@ -133,7 +133,6 @@ static CriticalSection critSec1;
 static CriticalSection critSec2;
 static CriticalSection critSec3;
 static CriticalSection critSec4;
-static CriticalSection critSec5;
 
 // GLOBAL COMMAND LINE ARGUMENTS
 int __argc = 0;
@@ -532,7 +531,6 @@ int main(int argc, char *argv[]) {
     TheUnicodeStringCriticalSection = &critSec2;
     TheDmaCriticalSection = &critSec3;
     TheMemoryPoolCriticalSection = &critSec4;
-    TheDebugLogCriticalSection = &critSec5;
 
     initMemoryManager();
 

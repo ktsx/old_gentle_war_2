@@ -158,6 +158,15 @@ if(EMSCRIPTEN)
     )
     set_property(TARGET z_generals APPEND PROPERTY LINK_DEPENDS "${GX_WEB_SHELL}")
 
+    # --pre-js: IDBFS mount for /userdata, compiled with the runtime so FS /
+    # IDBFS resolve under Closure (the shell-side name-guessing broke in
+    # Release). GeneralsX @build WebPort 2026-10-21
+    set(GX_WEB_PRE_JS "${CMAKE_CURRENT_SOURCE_DIR}/web_pre.js")
+    target_link_options(z_generals PRIVATE
+        "SHELL:--pre-js ${GX_WEB_PRE_JS}"
+    )
+    set_property(TARGET z_generals APPEND PROPERTY LINK_DEPENDS "${GX_WEB_PRE_JS}")
+
     target_link_options(z_generals PRIVATE ${EMSCRIPTEN_ASYNC_FLAGS})
     target_compile_options(z_generals PRIVATE "-sUSE_SDL=2")
 

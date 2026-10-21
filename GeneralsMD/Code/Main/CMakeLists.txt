@@ -21,13 +21,11 @@ endif()
 # GeneralsX @build BenderAI 13/02/2026 Windows-specific libraries
 if(WIN32)
     target_link_libraries(z_generals PRIVATE
-        binkstub
         comctl32
         d3d8
         dinput8
         dxguid
         imm32
-        milesstub
         vfw32
         winmm
     )
@@ -35,6 +33,8 @@ endif()
 
 # Cross-platform core libraries
 target_link_libraries(z_generals PRIVATE
+    binkloader
+    milesloader
     d3dx8
     z_gameengine
     z_gameenginedevice

@@ -302,7 +302,7 @@ void ControlBar::populatePurchaseScience( Player* player )
 
 			setControlCommand( m_sciencePurchaseWindowsRank3[ i ], commandButton );
 			ScienceType	st = SCIENCE_INVALID;
-			ScienceVec sv = commandButton->getScienceVec();
+			const ScienceVec &sv = commandButton->getScienceVec();
 			if (! sv.empty())
 			{
 				st = sv[ 0 ];
@@ -2741,13 +2741,15 @@ void ControlBar::showRallyPoint(const Coord3D* loc)
 	if (m_rallyPointDrawableID == INVALID_DRAWABLE_ID)
 	{
 		const ThingTemplate* ttn = TheThingFactory->findTemplate("RallyPointMarker");
+		if (!ttn)
+		{
+			return;
+		}
+
 		marker = TheThingFactory->newDrawable(ttn);
 		DEBUG_ASSERTCRASH(marker, ("showRallyPoint: Unable to create rally point drawable"));
-		if (marker)
-		{
-			marker->setDrawableStatus(DRAWABLE_STATUS_NO_SAVE);
-			m_rallyPointDrawableID = marker->getID();
-		}
+		marker->setDrawableStatus(DRAWABLE_STATUS_NO_SAVE);
+		m_rallyPointDrawableID = marker->getID();
 	}
 	else
 		marker = TheGameClient->findDrawableByID(m_rallyPointDrawableID);
@@ -3601,6 +3603,7 @@ void ControlBar::updateSpecialPowerShortcut()
 	}
 	else if( !hasValidShortcutButton
 					 && !m_specialPowerShortcutParent->winIsHidden()
+					 && m_animateWindowManagerForGenShortcuts
 					 && m_animateWindowManagerForGenShortcuts->isFinished() )
 	{
 		animateSpecialPowerShortcut(FALSE);

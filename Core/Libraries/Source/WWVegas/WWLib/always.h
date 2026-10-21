@@ -84,12 +84,17 @@
 	extern void * __cdecl operator new		(size_t size);
 #if defined(__EMSCRIPTEN__) || __cplusplus >= 201103L
 	extern void __cdecl operator delete		(void *p) noexcept;
+	extern void __cdecl operator delete		(void *p, size_t) noexcept;
 	extern void * __cdecl operator new[]	(size_t size);
 	extern void __cdecl operator delete[]	(void *p) noexcept;
+	extern void __cdecl operator delete[]	(void *p, size_t) noexcept;
 #else
 	extern void __cdecl operator delete		(void *p);
+	extern void __cdecl operator delete		(void *p, size_t);
+
 	extern void * __cdecl operator new[]	(size_t size);
 	extern void __cdecl operator delete[]	(void *p);
+	extern void __cdecl operator delete[]	(void *p, size_t);
 #endif
 
 	// additional overloads to account for VC/MFC funky versions

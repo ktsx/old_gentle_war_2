@@ -40,6 +40,10 @@ if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     message(FATAL_ERROR "Building in-source is not supported! Create a build dir and remove ${CMAKE_SOURCE_DIR}/CMakeCache.txt")
 endif()
 
+# Define VCPKG feature before the project block
+# since they need to be initialized before the toolchain is
+include(cmake/config-vcpkg.cmake)
+
 # Top level project, doesn't really affect anything.
 project(genzh LANGUAGES C CXX)
 
@@ -59,19 +63,11 @@ if(MINGW)
 endif()
 
 # Find/Add build dependencies and stubs shared by all projects
-# Miles/Bink headers needed by WWAudio even on non-Win32 (stub library provides mss.h/bink.h)
-# GeneralsX @feature WebPort 09/03/2026 — Include on all platforms (stubs are header-only)
-include(cmake/miles.cmake)
-include(cmake/bink.cmake)
-
-# Always include DX8 headers (needed for both Windows and Linux builds)
-# On Windows: min-dx8-sdk headers
-# On Linux: DXVK headers (for D3D8→Vulkan translation)
-# On Web: GLES3 wrapper headers (for DX8→WebGL 2.0 translation)
+# DX8 headers: min-dx8-sdk on Win32, the GLES3/WebGL 2.0 compatibility layer on the web.
 # GeneralsX @feature WebPort 09/03/2026
 if(EMSCRIPTEN)
     include(cmake/web.cmake)
-else()
+elseif((WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows") AND ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     include(cmake/dx8.cmake)
 endif()
 
@@ -92,12 +88,34 @@ if (IS_VS6_BUILD)
     # If there is a desire to make this work, then a fixed max sdk needs to be created.
     add_subdirectory(Dependencies/MaxSDK)
 endif()
-add_subdirectory(Dependencies/Utility)
 
-# To be removed when abandoning VC6
-if (IS_VS6_BUILD)
-    include_directories(Dependencies/Utility)
-    add_compile_options(/FIUtility/CppMacros.h)
+# This target is not meant to be linked anywhere.
+# It just makes the files visible in a Visual Studio solution.
+add_subdirectory(Dependencies/Precompiled)
+
+# Makes the C++98 compatibility macros available in every C++ translation unit.
+# Force included rather than precompiled, because a precompiled header entry
+# inherited from an interface library always sorts after the consuming target's
+# own entries, and these macros must be defined before any other header is read.
+# Targets that do have a precompiled header must still list precompiled.h as their
+# first entry, because the Visual Studio generator prepends the precompiled header
+# to the forced include list, so this global one would otherwise be read too late.
+include_directories(Dependencies/Precompiled)
+if (MSVC)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/FIPrecompiled/precompiled.h>)
+else()
+    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include Precompiled/precompiled.h>")
+endif()
+
+add_subdirectory(Dependencies/Utility)
+add_subdirectory(Dependencies/Bink)
+add_subdirectory(Dependencies/Miles)
+if (WIN32)
+    add_subdirectory(Dependencies/DbgHelp)
+    add_subdirectory(Dependencies/Usp10)
+else()
+    add_library(dbghelploader INTERFACE)
+    add_library(usp10loader INTERFACE)
 endif()
 
 add_subdirectory(resources)

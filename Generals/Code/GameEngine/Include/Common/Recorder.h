@@ -39,11 +39,33 @@ private:
 	GameSlot m_ReplaySlot[MAX_SLOTS];
 
 public:
-	ReplayGameInfo()
+	ReplayGameInfo() : m_localSlotNum(-1)
 	{
 		for (Int i = 0; i< MAX_SLOTS; ++i)
 			setSlotPointer(i, &m_ReplaySlot[i]);
 	}
+
+	virtual void reset() override
+	{
+		GameInfo::reset();
+		m_localSlotNum = -1;
+	}
+
+	virtual Int getLocalSlotNum() const override
+	{
+		DEBUG_ASSERTCRASH(isInGame(), ("Looking for local game slot while not in game"));
+		if (!isInGame())
+		{
+			return -1;
+		}
+
+		return m_localSlotNum;
+	}
+
+	void setLocalSlotNum(Int slotNum) { m_localSlotNum = slotNum; }
+
+private:
+	Int m_localSlotNum;
 };
 
 enum RecorderModeType CPP_11(: Int) {
@@ -99,6 +121,7 @@ public:
 	// Methods dealing with playback.
 	void updatePlayback();														///< The update function for playing back a file.
 	Bool playbackFile(AsciiString filename);					///< Starts playback of the specified file.
+	void loadQueuedReplay();													///< Play the replay file requested on startup.
 	Bool replayMatchesGameVersion(AsciiString filename); ///< Returns true if the playback is a valid playback file for this version.
 	static Bool replayMatchesGameVersion(const ReplayHeader& header); ///< Returns true if the playback is a valid playback file for this version.
 	AsciiString getCurrentReplayFilename();			///< valid during playback only
@@ -117,7 +140,6 @@ public:
 	struct ReplayHeader
 	{
 		AsciiString filename;
-		Bool forPlayback;
 		UnicodeString replayName;
 		SYSTEMTIME timeVal;
 		UnicodeString versionString;
@@ -134,13 +156,14 @@ public:
 		AsciiString gameOptions;
 		Int localPlayerIndex;
 	};
-	Bool readReplayHeader( ReplayHeader& header );
+	Bool readReplayHeader( ReplayHeader& header, const AsciiString& filename, Bool forPlayback );
 
 	RecorderModeType getMode();												///< Returns the current operating mode.
 	Bool isPlaybackMode() const { return m_mode == RECORDERMODETYPE_PLAYBACK || m_mode == RECORDERMODETYPE_SIMULATION_PLAYBACK; }
 	void initControls();															///< Show or Hide the Replay controls
 
 	static AsciiString getReplayDir();								///< Returns the directory that holds the replay files.
+	static AsciiString getReplayPathForRead(const AsciiString& filenameOrPath); ///< Returns the path to open for a replay filename or absolute replay path.
 	static AsciiString getReplayArchiveDir();					///< Returns the directory that holds the archived replay files.
 	static AsciiString getReplayExtention();					///< Returns the file extention for replay files.
 	static AsciiString getLastReplayFileName();				///< Returns the filename used for the default replay.

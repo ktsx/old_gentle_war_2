@@ -426,6 +426,7 @@ typedef int (*PROC)(void);
 #endif
 
 inline HINSTANCE LoadLibrary(const char *) { return (HINSTANCE)0; }
+inline HINSTANCE LoadLibraryA(const char *) { return (HINSTANCE)0; } // GeneralsX @merge 2026-10-21 — upstream runtime loaders (Bink/Miles/DbgHelp)
 inline FARPROC GetProcAddress(HINSTANCE, const char *) { return 0; }
 inline void FreeLibrary(HINSTANCE) {}
 

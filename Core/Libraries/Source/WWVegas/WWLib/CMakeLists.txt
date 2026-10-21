@@ -32,11 +32,6 @@ set(WWLIB_SRC
     #crcstraw.h
     cstraw.cpp
     cstraw.h
-    DbgHelpGuard.cpp
-    DbgHelpGuard.h
-    DbgHelpLoader.cpp
-    DbgHelpLoader.h
-    DbgHelpLoader_minidump.h
     Except.cpp
     Except.h
     FastAllocator.cpp
@@ -112,14 +107,11 @@ set(WWLIB_SRC
     SLNODE.h
     stimer.cpp
     stimer.h
-    STLUtils.h
     straw.cpp
     STRAW.h
-    stringex.h
     strtok_r.cpp
     strtok_r.h
     #swap.h
-    SystemAllocator.h
     systimer.cpp
     systimer.h
     TARGA.cpp
@@ -181,24 +173,25 @@ target_include_directories(core_wwlib PUBLIC
 # GeneralsX @feature WebPort 09/03/2026 — windows.h not available on Emscripten
 if(EMSCRIPTEN)
     target_precompile_headers(core_wwlib PRIVATE
-        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["Precompiled/precompiled.h"]] # Must be first
         [["WWLib/always.h"]]
-        [["WWLib/STLUtils.h"]]
+        [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
         [["WWLib/WWCommon.h"]]
         [["WWLib/wwstring.h"]]
-        )
+    )
 else()
     target_precompile_headers(core_wwlib PRIVATE
-        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["Precompiled/precompiled.h"]] # Must be first
         [["WWLib/always.h"]]
-        [["WWLib/STLUtils.h"]]
+        [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
         [["WWLib/WWCommon.h"]]
         [["WWLib/wwstring.h"]]
         <windows.h>
     )
 endif()
+
 
 target_link_libraries(core_wwlib PRIVATE
     core_wwcommon

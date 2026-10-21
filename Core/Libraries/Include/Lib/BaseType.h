@@ -32,6 +32,10 @@
 #include "Lib/BaseTypeCore.h"
 #include "Lib/trig.h"
 
+#if __cplusplus >= 201103L
+#include <type_traits>
+#endif
+
 //-----------------------------------------------------------------------------
 typedef wchar_t WideChar;  ///< multi-byte character representations
 
@@ -320,6 +324,19 @@ struct Coord2D
 		sub(a);
 	}
 
+	Coord2D operator+() const
+	{
+		return *this;
+	}
+
+	Coord2D operator-() const
+	{
+		Coord2D c;
+		c.x = -x;
+		c.y = -y;
+		return c;
+	}
+
 	void set( const Coord2D &a )
 	{
 		x = a.x;
@@ -330,6 +347,24 @@ struct Coord2D
 	{
 		x = ax;
 		y = ay;
+	}
+
+	void updateMin( const Coord2D &other )
+	{
+		if (x > other.x)
+			x = other.x;
+
+		if (y > other.y)
+			y = other.y;
+	}
+
+	void updateMax( const Coord2D &other )
+	{
+		if (x < other.x)
+			x = other.x;
+
+		if (y < other.y)
+			y = other.y;
 	}
 };
 
@@ -447,6 +482,19 @@ struct ICoord2D
 		sub(a);
 	}
 
+	ICoord2D operator+() const
+	{
+		return *this;
+	}
+
+	ICoord2D operator-() const
+	{
+		ICoord2D c;
+		c.x = -x;
+		c.y = -y;
+		return c;
+	}
+
 	void set( const ICoord2D &a )
 	{
 		x = a.x;
@@ -457,6 +505,24 @@ struct ICoord2D
 	{
 		x = ax;
 		y = ay;
+	}
+
+	void updateMin( const ICoord2D &other )
+	{
+		if (x > other.x)
+			x = other.x;
+
+		if (y > other.y)
+			y = other.y;
+	}
+
+	void updateMax( const ICoord2D &other )
+	{
+		if (x < other.x)
+			x = other.x;
+
+		if (y < other.y)
+			y = other.y;
 	}
 };
 
@@ -478,6 +544,27 @@ struct Region2D
 {
 	Coord2D lo, hi;						// bounds of 2D rectangular region
 
+	// Keep only the overlapping portion of both regions.
+	void intersectWith( const Region2D &other )
+	{
+		lo.updateMax(other.lo);
+		hi.updateMin(other.hi);
+	}
+
+	// Expand to include the other region.
+	void uniteWith( const Region2D &other )
+	{
+		lo.updateMin(other.lo);
+		hi.updateMax(other.hi);
+	}
+
+	// Expand to include the point.
+	void uniteWith( const Coord2D &point )
+	{
+		lo.updateMin(point);
+		hi.updateMax(point);
+	}
+
 	void zero()
 	{
 		lo.zero();
@@ -497,6 +584,27 @@ struct Region2D
 struct IRegion2D
 {
 	ICoord2D lo, hi;					// bounds of 2D rectangular region
+
+	// Keep only the overlapping portion of both regions.
+	void intersectWith( const IRegion2D &other )
+	{
+		lo.updateMax(other.lo);
+		hi.updateMin(other.hi);
+	}
+
+	// Expand to include the other region.
+	void uniteWith( const IRegion2D &other )
+	{
+		lo.updateMin(other.lo);
+		hi.updateMax(other.hi);
+	}
+
+	// Expand to include the point.
+	void uniteWith( const ICoord2D &point )
+	{
+		lo.updateMin(point);
+		hi.updateMax(point);
+	}
 
 	void zero()
 	{
@@ -518,6 +626,12 @@ struct IRegion2D
 struct Coord3D
 {
 	Real x, y, z;
+
+	Coord2D asCoord2D() const
+	{
+		const Coord2D xy = { x, y };
+		return xy;
+	}
 
 	Real length() const { return (Real)sqrt( x*x + y*y + z*z ); }
 	Real lengthSqr() const { return ( x*x + y*y + z*z ); }
@@ -577,6 +691,20 @@ struct Coord3D
 		sub(a);
 	}
 
+	Coord3D operator+() const
+	{
+		return *this;
+	}
+
+	Coord3D operator-() const
+	{
+		Coord3D c;
+		c.x = -x;
+		c.y = -y;
+		c.z = -z;
+		return c;
+	}
+
 	void set( const Coord3D &a )
 	{
 		x = a.x;
@@ -611,6 +739,30 @@ struct Coord3D
 						y == r.y &&
 						z == r.z);
 	}
+
+	void updateMin( const Coord3D &other )
+	{
+		if (x > other.x)
+			x = other.x;
+
+		if (y > other.y)
+			y = other.y;
+
+		if (z > other.z)
+			z = other.z;
+	}
+
+	void updateMax( const Coord3D &other )
+	{
+		if (x < other.x)
+			x = other.x;
+
+		if (y < other.y)
+			y = other.y;
+
+		if (z < other.z)
+			z = other.z;
+	}
 };
 
 inline Coord3D operator+( const Coord3D &a, const Coord3D &b )
@@ -630,6 +782,12 @@ inline Coord3D operator-( const Coord3D &a, const Coord3D &b )
 struct ICoord3D
 {
 	Int x, y, z;
+
+	ICoord2D asICoord2D() const
+	{
+		const ICoord2D xy = { x, y };
+		return xy;
+	}
 
 	Int length() const { return (Int)sqrt( (double)(x*x + y*y + z*z) ); }
 	Int lengthSqr() const { return x*x + y*y + z*z; }
@@ -670,6 +828,20 @@ struct ICoord3D
 		sub(a);
 	}
 
+	ICoord3D operator+() const
+	{
+		return *this;
+	}
+
+	ICoord3D operator-() const
+	{
+		ICoord3D c;
+		c.x = -x;
+		c.y = -y;
+		c.z = -z;
+		return c;
+	}
+
 	void set( const ICoord3D &a )
 	{
 		x = a.x;
@@ -682,6 +854,30 @@ struct ICoord3D
 		x = ax;
 		y = ay;
 		z = az;
+	}
+
+	void updateMin( const ICoord3D &other )
+	{
+		if (x > other.x)
+			x = other.x;
+
+		if (y > other.y)
+			y = other.y;
+
+		if (z > other.z)
+			z = other.z;
+	}
+
+	void updateMax( const ICoord3D &other )
+	{
+		if (x < other.x)
+			x = other.x;
+
+		if (y < other.y)
+			y = other.y;
+
+		if (z < other.z)
+			z = other.z;
 	}
 };
 
@@ -703,6 +899,27 @@ inline ICoord3D operator-( const ICoord3D &a, const ICoord3D &b )
 struct Region3D
 {
 	Coord3D lo, hi;						// axis-aligned bounding box
+
+	// Keep only the overlapping portion of both regions.
+	void intersectWith( const Region3D &other )
+	{
+		lo.updateMax(other.lo);
+		hi.updateMin(other.hi);
+	}
+
+	// Expand to include the other region.
+	void uniteWith( const Region3D &other )
+	{
+		lo.updateMin(other.lo);
+		hi.updateMax(other.hi);
+	}
+
+	// Expand to include the point.
+	void uniteWith( const Coord3D &point )
+	{
+		lo.updateMin(point);
+		hi.updateMax(point);
+	}
 
 	Real width() const { return hi.x - lo.x; }
 	Real height() const { return hi.y - lo.y; }
@@ -750,18 +967,7 @@ struct Region3D
 		hi = points[0];
 		for (Int i = 1; i < count; ++i)
 		{
-			if (points[i].x < lo.x)
-				lo.x = points[i].x;
-			if (points[i].y < lo.y)
-				lo.y = points[i].y;
-			if (points[i].z < lo.z)
-				lo.z = points[i].z;
-			if (points[i].x > hi.x)
-				hi.x = points[i].x;
-			if (points[i].y > hi.y)
-				hi.y = points[i].y;
-			if (points[i].z > hi.z)
-				hi.z = points[i].z;
+			uniteWith(points[i]);
 		}
 	}
 
@@ -782,6 +988,27 @@ struct Region3D
 struct IRegion3D
 {
 	ICoord3D lo, hi;					// axis-aligned bounding box
+
+	// Keep only the overlapping portion of both regions.
+	void intersectWith( const IRegion3D &other )
+	{
+		lo.updateMax(other.lo);
+		hi.updateMin(other.hi);
+	}
+
+	// Expand to include the other region.
+	void uniteWith( const IRegion3D &other )
+	{
+		lo.updateMin(other.lo);
+		hi.updateMax(other.hi);
+	}
+
+	// Expand to include the point.
+	void uniteWith( const ICoord3D &point )
+	{
+		lo.updateMin(point);
+		hi.updateMax(point);
+	}
 
 	void zero()
 	{
@@ -817,6 +1044,126 @@ struct RGBColor
 		red = ((c >> 16) & 0xff) / 255.0f;
 		green = ((c >>  8) & 0xff) / 255.0f;
 		blue = ((c >>  0) & 0xff) / 255.0f;
+	}
+
+	RGBColor& operator+=(const RGBColor& c)
+	{
+		red += c.red;
+		green += c.green;
+		blue += c.blue;
+		return *this;
+	}
+
+	RGBColor& operator-=(const RGBColor& c)
+	{
+		red -= c.red;
+		green -= c.green;
+		blue -= c.blue;
+		return *this;
+	}
+
+	RGBColor& operator*=(const RGBColor& c)
+	{
+		red *= c.red;
+		green *= c.green;
+		blue *= c.blue;
+		return *this;
+	}
+
+	RGBColor& operator/=(const RGBColor& c)
+	{
+		red /= c.red;
+		green /= c.green;
+		blue /= c.blue;
+		return *this;
+	}
+
+	RGBColor operator+(const RGBColor& c) const
+	{
+		RGBColor res = *this;
+		res += c;
+		return res;
+	}
+
+	RGBColor operator-(const RGBColor& c) const
+	{
+		RGBColor res = *this;
+		res -= c;
+		return res;
+	}
+
+	RGBColor operator*(const RGBColor& c) const
+	{
+		RGBColor res = *this;
+		res *= c;
+		return res;
+	}
+
+	RGBColor operator/(const RGBColor& c) const
+	{
+		RGBColor res = *this;
+		res /= c;
+		return res;
+	}
+
+	RGBColor& operator+=(Real s)
+	{
+		red += s;
+		green += s;
+		blue += s;
+		return *this;
+	}
+
+	RGBColor& operator-=(Real s)
+	{
+		red -= s;
+		green -= s;
+		blue -= s;
+		return *this;
+	}
+
+	RGBColor& operator*=(Real s)
+	{
+		red *= s;
+		green *= s;
+		blue *= s;
+		return *this;
+	}
+
+	RGBColor& operator/=(Real s)
+	{
+		red /= s;
+		green /= s;
+		blue /= s;
+		return *this;
+	}
+
+	RGBColor operator+(Real s) const
+	{
+		RGBColor res = *this;
+		res += s;
+		return res;
+	}
+
+	RGBColor operator-(Real s) const
+	{
+		RGBColor res = *this;
+		res -= s;
+		return res;
+	}
+
+	RGBColor operator*(Real s) const
+	{
+		RGBColor res = *this;
+		res *= s;
+		return res;
+	}
+
+	RGBColor operator/(Real s) const
+	{
+		RGBColor res = *this;
+		res /= s;
+		return res;
 	}
 
 };

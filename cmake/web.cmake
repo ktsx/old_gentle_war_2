@@ -76,7 +76,7 @@ add_definitions(-DDISABLE_MEMORYPOOL_BOUNDINGWALL=1)
 set(RTS_GAMEMEMORY_ENABLE ON CACHE BOOL "Use the original GameMemory pool on web (OFF = GameMemoryNull / system malloc)" FORCE)
 
 # Audio: the engine's unmodified MilesAudioManager links against the Miles-
-# compatible Web Audio bridge (cmake/miles.cmake -> target `milesstub`,
+# compatible Web Audio bridge (Dependencies/Miles/CMakeLists.txt -> target `milesloader`,
 # Core/Libraries/Source/WebAudioBridge/web_audio_bridge.cpp). There is no
 # OpenAL path; the former SAGE_USE_OPENAL knob was read by nothing.
 # GeneralsX @build WebPort 2026-10-21

@@ -106,7 +106,12 @@ class AggregateDefClass
 #if defined(_UNIX) || defined(PLATFORM_WEB)
 #define _strdup strdup
 #endif
-		void							Set_Name (const char *pname)			{ SAFE_FREE (m_pName); m_pName = ::_strdup (pname); }
+		void Set_Name (const char* pname)
+		{
+			char* name = ::_strdup(pname);
+			SAFE_FREE(m_pName);
+			m_pName = name;
+		}
 		RenderObjClass *			Create ();
 		AggregateDefClass *		Clone () const						{ return W3DNEW AggregateDefClass (*this); }
 

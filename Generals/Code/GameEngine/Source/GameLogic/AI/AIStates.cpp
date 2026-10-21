@@ -818,7 +818,7 @@ void AIStateMachine::loadPostProcess()
  */
 void AIStateMachine::setGoalPath( std::vector<Coord3D>* path )
 {
-	stl::move_or_swap(m_goalPath, *path);
+	MOVE_TO(m_goalPath) = std::move(*path);
 }
 
 #ifdef STATE_MACHINE_DEBUG
@@ -5781,7 +5781,7 @@ Object *AIAttackSquadState::chooseVictim()
 		case DIFFICULTY_EASY:
 		{
 			// pick a random unit
-			VecObjectPtr objects = victimSquad->getLiveObjects();
+			const VecObjectPtr& objects = victimSquad->getLiveObjects();
 			Int numUnits = objects.size();
 			if (numUnits == 0)
 			{
@@ -5809,7 +5809,7 @@ Object *AIAttackSquadState::chooseVictim()
 		case DIFFICULTY_HARD:
 		{
 			// everyone picks the same unit
-			VecObjectPtr objects = victimSquad->getLiveObjects();
+			const VecObjectPtr& objects = victimSquad->getLiveObjects();
 			if (!objects.empty())
 			{
 				return objects[0];

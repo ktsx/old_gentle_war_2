@@ -248,19 +248,19 @@ target_compile_definitions(z_ww3d2 PRIVATE
 
 if(EMSCRIPTEN)
     target_precompile_headers(z_ww3d2 PRIVATE
-        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["Precompiled/precompiled.h"]] # Must be first
             [["WWLib/always.h"]]
-        [["WWLib/STLUtils.h"]]
+        [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
         [["WWLib/WWCommon.h"]]
         [["WWLib/wwstring.h"]]
         )
 else()
     target_precompile_headers(z_ww3d2 PRIVATE
-        [["Utility/CppMacros.h"]] # Must be first, to be removed when abandoning VC6
+        [["Precompiled/precompiled.h"]] # Must be first
         [["dx8wrapper.h"]]
         [["WWLib/always.h"]]
-        [["WWLib/STLUtils.h"]]
+        [["Utility/STLUtils.h"]]
         [["WWLib/win.h"]]
         [["WWLib/WWCommon.h"]]
         [["WWLib/wwstring.h"]]

@@ -644,7 +644,7 @@ Bool W3DTerrainVisual::load( AsciiString filename )
 #ifdef DO_UNIT_TIMINGS
 #pragma MESSAGE("********************* WARNING- Doing UNIT TIMINGS. ")
 #else
-	if (m_waterRenderObject)
+	if (m_waterRenderObject && W3DDisplay::m_3DScene)
 	{
 		W3DDisplay::m_3DScene->Add_Render_Object( m_waterRenderObject);
 		m_waterRenderObject->enableWaterGrid(false);
@@ -991,7 +991,7 @@ void W3DTerrainVisual::addFactionBib(Object *factionBuilding, Bool highlight, Re
 		pos.set(0,0,0);
 		Real exitWidth = factionBuilding->getTemplate()->getFactoryExitWidth();
 		Real extraWidth = factionBuilding->getTemplate()->getFactoryExtraBibWidth() + extra;
-		const GeometryInfo info = factionBuilding->getGeometryInfo();
+		const GeometryInfo &info = factionBuilding->getGeometryInfo();
 		Real sizeX = info.getMajorRadius();
 		Real sizeY = info.getMinorRadius();
 		if (info.getGeomType() != GEOMETRY_BOX) {

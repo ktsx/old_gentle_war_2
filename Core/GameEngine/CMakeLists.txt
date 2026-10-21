@@ -70,7 +70,7 @@ set(GAMEENGINE_SRC
     Include/Common/LocalFile.h
     Include/Common/LocalFileSystem.h
     Include/Common/MapObject.h
-#    Include/Common/MapReaderWriterInfo.h
+    Include/Common/MapReaderWriterInfo.h
     Include/Common/MessageStream.h
     Include/Common/MiniDumper.h
     Include/Common/MiniLog.h
@@ -136,13 +136,14 @@ set(GAMEENGINE_SRC
     Include/Common/version.h
 #    Include/Common/WellKnownKeys.h
     Include/Common/WorkerProcess.h
+    Include/Common/WorkingDirectory.h
     Include/Common/Xfer.h
     Include/Common/XferCRC.h
     Include/Common/XferDeepCRC.h
     Include/Common/XferLoad.h
     Include/Common/XferSave.h
     Include/GameClient/Anim2D.h
-#    Include/GameClient/AnimateWindowManager.h
+    Include/GameClient/AnimateWindowManager.h
 #    Include/GameClient/CampaignManager.h
     Include/GameClient/ChallengeGenerals.h
     Include/GameClient/ClientInstance.h
@@ -184,8 +185,8 @@ set(GAMEENGINE_SRC
     Include/GameClient/GameText.h
     Include/GameClient/GameWindow.h
     Include/GameClient/GameWindowGlobal.h
-#    Include/GameClient/GameWindowID.h
-#    Include/GameClient/GameWindowManager.h
+    Include/GameClient/GameWindowID.h
+    Include/GameClient/GameWindowManager.h
     Include/GameClient/GameWindowTransitions.h
     Include/GameClient/GlobalLanguage.h
     Include/GameClient/GraphDraw.h
@@ -485,17 +486,25 @@ set(GAMEENGINE_SRC
 #    Include/GameLogic/ObjectIter.h
 #    Include/GameLogic/ObjectScriptStatusBits.h
 #    Include/GameLogic/ObjectTypes.h
+     Include/GameLogic/Pathfinder/Path.h
+     Include/GameLogic/Pathfinder/PathfindCell.h
+     Include/GameLogic/Pathfinder/PathfindCellInfo.h
+     Include/GameLogic/Pathfinder/PathfindCellList.h
+     Include/GameLogic/Pathfinder/PathfindLayer.h
+     Include/GameLogic/Pathfinder/PathfindZoneManager.h
+     Include/GameLogic/Pathfinder/PathNode.h
+     Include/GameLogic/Pathfinder/ZoneBlock.h
 #    Include/GameLogic/PartitionManager.h
-#    Include/GameLogic/PolygonTrigger.h
+    Include/GameLogic/PolygonTrigger.h
 #    Include/GameLogic/Powers.h
     Include/GameLogic/RankInfo.h
 #    Include/GameLogic/ScriptActions.h
 #    Include/GameLogic/ScriptConditions.h
 #    Include/GameLogic/ScriptEngine.h
 #    Include/GameLogic/Scripts.h
-#    Include/GameLogic/SidesList.h
+    Include/GameLogic/SidesList.h
 #    Include/GameLogic/Squad.h
-#    Include/GameLogic/TerrainLogic.h
+    Include/GameLogic/TerrainLogic.h
 #    Include/GameLogic/TurretAI.h
 #    Include/GameLogic/VictoryConditions.h
 #    Include/GameLogic/Weapon.h
@@ -693,6 +702,7 @@ set(GAMEENGINE_SRC
     Source/Common/UserPreferences.cpp
     Source/Common/version.cpp
     Source/Common/WorkerProcess.cpp
+    Source/Common/WorkingDirectory.cpp
     Source/GameClient/ClientInstance.cpp
     Source/GameClient/Color.cpp
     Source/GameClient/Credits.cpp
@@ -711,7 +721,7 @@ set(GAMEENGINE_SRC
     Source/GameClient/GameText.cpp
     Source/GameClient/GlobalLanguage.cpp
     Source/GameClient/GraphDraw.cpp
-#    Source/GameClient/GUI/AnimateWindowManager.cpp
+    Source/GameClient/GUI/AnimateWindowManager.cpp
     Source/GameClient/GUI/ChallengeGenerals.cpp
     Source/GameClient/GUI/ControlBar/ControlBar.cpp
     Source/GameClient/GUI/ControlBar/ControlBarBeacon.cpp
@@ -741,10 +751,10 @@ set(GAMEENGINE_SRC
     Source/GameClient/GUI/GameFont.cpp
     Source/GameClient/GUI/GameWindow.cpp
     Source/GameClient/GUI/GameWindowGlobal.cpp
-#    Source/GameClient/GUI/GameWindowManager.cpp
-#    Source/GameClient/GUI/GameWindowManagerScript.cpp
+    Source/GameClient/GUI/GameWindowManager.cpp
+    Source/GameClient/GUI/GameWindowManagerScript.cpp
     Source/GameClient/GUI/GameWindowTransitions.cpp
-#    Source/GameClient/GUI/GameWindowTransitionsStyles.cpp
+    Source/GameClient/GUI/GameWindowTransitionsStyles.cpp
     Source/GameClient/GUI/GUICallbacks/ControlBarCallback.cpp
     Source/GameClient/GUI/GUICallbacks/ControlBarPopupDescription.cpp
     Source/GameClient/GUI/GUICallbacks/Diplomacy.cpp
@@ -853,9 +863,9 @@ set(GAMEENGINE_SRC
 #    Source/GameLogic/AI/AITNGuard.cpp
 #    Source/GameLogic/AI/Squad.cpp
 #    Source/GameLogic/AI/TurretAI.cpp
-#    Source/GameLogic/Map/PolygonTrigger.cpp
-#    Source/GameLogic/Map/SidesList.cpp
-#    Source/GameLogic/Map/TerrainLogic.cpp
+    Source/GameLogic/Map/PolygonTrigger.cpp
+    Source/GameLogic/Map/SidesList.cpp
+    Source/GameLogic/Map/TerrainLogic.cpp
 #    Source/GameLogic/Object/Armor.cpp
 #    Source/GameLogic/Object/Behavior/AutoHealBehavior.cpp
 #    Source/GameLogic/Object/Behavior/BattleBusSlowDeathBehavior.cpp
@@ -1199,6 +1209,7 @@ target_include_directories(corei_gameengine_public INTERFACE
 target_link_libraries(corei_gameengine_public INTERFACE
     core_compression
     core_browserdispatch
+    dbghelploader
     #core_wwvegas
     d3d8lib
     gamespy::gamespy

@@ -6661,7 +6661,7 @@ Bool ScriptEngine::isSpecialPowerTriggered( Int playerIndex, const AsciiString& 
 
 	for (ListAsciiStringObjectIDIt findIt = specialList->begin(); findIt != specialList->end(); ++findIt)
 	{
-		AsciiStringObjectIDPair pair = *findIt;
+		const AsciiStringObjectIDPair &pair = *findIt;
 		if (pair.first == completedPower && (sourceObj == INVALID_ID || sourceObj == pair.second))
 		{
 			if (removeFromList) {
@@ -6686,7 +6686,7 @@ Bool ScriptEngine::isSpecialPowerMidway( Int playerIndex, const AsciiString& com
 
 	for (ListAsciiStringObjectIDIt findIt = specialList->begin(); findIt != specialList->end(); ++findIt)
 	{
-		AsciiStringObjectIDPair pair = *findIt;
+		const AsciiStringObjectIDPair &pair = *findIt;
 		if (pair.first == completedPower && (sourceObj == INVALID_ID || sourceObj == pair.second))
 		{
 			if (removeFromList) {
@@ -6711,7 +6711,7 @@ Bool ScriptEngine::isSpecialPowerComplete( Int playerIndex, const AsciiString& c
 
 	for (ListAsciiStringObjectIDIt findIt = specialList->begin(); findIt != specialList->end(); ++findIt)
 	{
-		AsciiStringObjectIDPair pair = *findIt;
+		const AsciiStringObjectIDPair &pair = *findIt;
 		if (pair.first == completedPower && (sourceObj == INVALID_ID || sourceObj == pair.second))
 		{
 			if (removeFromList) {
@@ -6736,7 +6736,7 @@ Bool ScriptEngine::isUpgradeComplete( Int playerIndex, const AsciiString& upgrad
 
 	for (ListAsciiStringObjectIDIt findIt = specialList->begin(); findIt != specialList->end(); ++findIt)
 	{
-		AsciiStringObjectIDPair pair = *findIt;
+		const AsciiStringObjectIDPair &pair = *findIt;
 		if (pair.first == upgrade && (sourceObj == INVALID_ID || sourceObj == pair.second))
 		{
 			if (removeFromList) {
@@ -6853,7 +6853,7 @@ void ScriptEngine::adjustToppleDirection( Object *object, Coord2D *direction)
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::adjustToppleDirection( Object *object, Coord3D *direction)
 {
-	AsciiString objName = object->getName();
+	const AsciiString &objName = object->getName();
 	if (objName.isEmpty() || !direction) {
 		return;
 	}
@@ -7082,12 +7082,21 @@ void ScriptEngine::removeAllSequentialScripts(Object *obj)
 	for (it = m_sequentialScripts.begin(); it != m_sequentialScripts.end(); /* empty */) {
 		SequentialScript *seqScript = (*it);
 		if (!seqScript) {
+			++it;
 			continue;
 		}
 		if (seqScript->m_objectID == id) {
-			cleanupSequentialScript(it, TRUE);
+			it = cleanupSequentialScript(it, TRUE);
+
+#if RTS_GENERALS && RETAIL_COMPATIBLE_CRC
+			// TheSuperHackers @info Preserve the original (bugged) traversal behavior by skipping the next element, if any.
+			if (it != m_sequentialScripts.end()) {
+				++it;
+			}
+#endif
 		}
-		++it;
+		else
+			++it;
 	}
 }
 
@@ -9073,7 +9082,7 @@ static const std::string F_VOLSPHERERAD	=	"VolSphereRadius";
 static const std::string F_VOLCYLRAD =		"VolCylinderRadius";
 static const std::string F_VOLCYLLEN =		"VolCylinderLength";
 static const std::string F_ISHOLLOW =			"IsHollow";
-static const std::string F_ISXYPLANAR =		"IsGroundAligned";
+static const std::string F_PARTICLEALIGNMENT =		"IsGroundAligned";
 static const std::string F_ISEMITABOVEGROUNDONLY
 																			=		"IsEmitAboveGroundOnly";
 static const std::string F_ISPARTICLEUPTOWARDSEMITTER
@@ -9375,7 +9384,7 @@ void _writeSingleParticleSystem( File *out, ParticleSystemTemplate *templ )
 	}
 
 	thisEntry.append(SEP_HEAD).append(F_ISHOLLOW).append(EQ_WITH_SPACES).append((templ->m_isEmissionVolumeHollow ? STR_TRUE : STR_FALSE)).append(SEP_EOL);
-	thisEntry.append(SEP_HEAD).append(F_ISXYPLANAR).append(EQ_WITH_SPACES).append((templ->m_isGroundAligned ? STR_TRUE : STR_FALSE)).append(SEP_EOL);
+	thisEntry.append(SEP_HEAD).append(F_PARTICLEALIGNMENT).append(EQ_WITH_SPACES).append(GroundAlignmentTypeNames[templ->m_particleAlignment]).append(SEP_EOL);
 	thisEntry.append(SEP_HEAD).append(F_ISEMITABOVEGROUNDONLY).append(EQ_WITH_SPACES).append((templ->m_isEmitAboveGroundOnly ? STR_TRUE : STR_FALSE)).append(SEP_EOL);
 	thisEntry.append(SEP_HEAD).append(F_ISPARTICLEUPTOWARDSEMITTER).append(EQ_WITH_SPACES).append((templ->m_isParticleUpTowardsEmitter ? STR_TRUE : STR_FALSE)).append(SEP_EOL);
 

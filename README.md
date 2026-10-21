@@ -190,6 +190,14 @@ emcmake cmake -G Ninja -B build-web \
 && ninja -C build-web z_generals
 ```
 
+### Dependency management
+
+The repository uses a vcpkg manifest (`vcpkg.json`). Dependency versions come from the `builtin-baseline` commit
+recorded there, with per-port `overrides` when a specific version is required. Update the baseline to pick up new
+versions. GitHub Actions consumes these ports through a vcpkg binary cache backed by a NuGet feed on GitHub
+Packages, keyed by vcpkg's own ABI hashes, so the first CI build warms the feed and subsequent builds pull prebuilt
+binaries instead of re-compiling everything. Pull requests from forks restore from the feed but cannot write to it.
+
 ---
 
 ### Profiling

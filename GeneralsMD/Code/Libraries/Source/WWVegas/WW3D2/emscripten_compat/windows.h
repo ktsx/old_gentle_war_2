@@ -48,7 +48,14 @@
 #define LOWORD(l) ((unsigned short)(((unsigned long)(l)) & 0xffff))
 #endif
 
-inline void GetCurrentDirectory(int, char *) {}
+// GeneralsX @merge 2026-10-21 — Win32 semantics (return length / non-zero on
+// success) over the MEMFS cwd, for upstream's WorkingDirectory.cpp.
+inline unsigned long GetCurrentDirectory(unsigned long size, char *buf) {
+  if (!buf || size == 0) return 0;
+  if (!getcwd(buf, size)) return 0;
+  return (unsigned long)strlen(buf);
+}
+inline int SetCurrentDirectory(const char *path) { return chdir(path) == 0 ? 1 : 0; }
 inline int GetFileAttributes(const char *) { return -1; }
 
 #ifndef HFONT

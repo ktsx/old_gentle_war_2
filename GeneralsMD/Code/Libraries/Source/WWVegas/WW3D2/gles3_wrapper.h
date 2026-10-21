@@ -443,6 +443,12 @@ void GLES3_Set_Fog(bool enable, float r, float g, float b,
                     float start, float end);
 
 // Draw calls — VBO/IBO must be bound and vertex attribs configured first
+// Web diag: dump the next N draws (state + first triangles through W*V*P). See gles3_wrapper.cpp.
+extern "C" void GLES3_Dump_Next_Draws(int n);
+void GLES3_Diag_Dump_Draw(const char* kind, unsigned int fvf, unsigned int stride, unsigned int base_vtx,
+                          const unsigned char* vb, size_t vb_bytes, const unsigned char* ib, size_t ib_bytes,
+                          unsigned int start_index, unsigned int prim_count);
+
 void GLES3_Draw_Triangles(unsigned int prim_type,
                            unsigned int start_index,
                            unsigned int prim_count,

@@ -448,6 +448,12 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
     if (TheGameLogic && TheFramePacer) {
       Coord3D camPos = {0, 0, 0};
       if (TheTacticalView) camPos = TheTacticalView->getPosition();
+      // First in-game tick: dump the next draw calls (GL state + transformed vertices), see gles3_wrapper.cpp.
+      static bool s_armedDrawDump = false;
+      if (!s_armedDrawDump && TheGameLogic->isInGame()) {
+        s_armedDrawDump = true;
+        GLES3_Dump_Next_Draws(24);
+      }
       fprintf(stderr,
               "TICK-DIAG: logicFrame=%u inGame=%d isPaused=%d "
               "updateTime=%.4f maxFps=%d frozen=%d halted=%d "

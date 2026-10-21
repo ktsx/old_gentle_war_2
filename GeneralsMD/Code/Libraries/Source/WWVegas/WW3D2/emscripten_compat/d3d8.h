@@ -1019,6 +1019,9 @@ struct Emscripten_IDirect3DDevice8 : public IDirect3DDevice8 {
         current_vb->Upload_And_Bind();
         current_ib->Upload_And_Bind();
         _setup_vertex_attribs();
+        GLES3_Diag_Dump_Draw("DIP", current_fvf, current_stride, base_vtx_index,
+                             current_vb->data.data(), current_vb->data.size(),
+                             current_ib->data.data(), current_ib->data.size(), StartIndex, PrimCount);
         GLES3_Draw_Triangles((unsigned int)PrimType, StartIndex, PrimCount,
                              MinIndex, NumVertices);
         return 0;

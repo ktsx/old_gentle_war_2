@@ -701,6 +701,73 @@ static void Apply_Pipeline_State() {
     GLES3_ShaderManager::Apply_Uniforms(program, g_State);
 }
 
+// ---------------------------------------------------------------------------
+// Web diag: dump the next N draw calls (GL state + the first triangle of the
+// draw pushed through world*view*projection on the CPU). Armed from the
+// engine (TICK-DIAG arms it on the first in-game tick) so "geometry is
+// submitted but nothing shows" can be told apart into cull / depth / clip /
+// blend problems without a GPU debugger.
+// ---------------------------------------------------------------------------
+static int g_dumpDraws = 0;
+extern "C" void GLES3_Dump_Next_Draws(int n) { g_dumpDraws = n; }
+
+static void Mul_Row_Vec(const float* m /*row-major, D3D*/, const float* v, float* out) {
+    for (int c = 0; c < 4; c++) out[c] = v[0] * m[0 * 4 + c] + v[1] * m[1 * 4 + c] + v[2] * m[2 * 4 + c] + v[3] * m[3 * 4 + c];
+}
+
+void GLES3_Diag_Dump_Draw(const char* kind, unsigned int fvf, unsigned int stride, unsigned int base_vtx,
+                          const unsigned char* vb, size_t vb_bytes, const unsigned char* ib, size_t ib_bytes,
+                          unsigned int start_index, unsigned int prim_count) {
+    if (g_dumpDraws <= 0) return;
+    g_dumpDraws--;
+    GLint cullEnabled = glIsEnabled(GL_CULL_FACE), cullMode = 0, frontFace = 0, depthTest = glIsEnabled(GL_DEPTH_TEST);
+    GLint depthFunc = 0, blend = glIsEnabled(GL_BLEND), blendSrc = 0, blendDst = 0, scissor = glIsEnabled(GL_SCISSOR_TEST);
+    GLboolean depthMask = 0, colorMask[4] = {0, 0, 0, 0};
+    GLint vp[4] = {0, 0, 0, 0};
+    glGetIntegerv(GL_CULL_FACE_MODE, &cullMode); glGetIntegerv(GL_FRONT_FACE, &frontFace);
+    glGetIntegerv(GL_DEPTH_FUNC, &depthFunc); glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrc); glGetIntegerv(GL_BLEND_DST_RGB, &blendDst);
+    glGetBooleanv(GL_COLOR_WRITEMASK, colorMask); glGetIntegerv(GL_VIEWPORT, vp);
+    fprintf(stderr, "DRAW-DIAG[%s]: fvf=0x%x stride=%u base=%u prims=%u start=%u vb=%zuB ib=%zuB | cull=%d mode=%s front=%s "
+            "depth=%d func=0x%x mask=%d blend=%d src=0x%x dst=0x%x cmask=%d%d%d%d scissor=%d vp=%d,%d,%d,%d | "
+            "light=%d stages=%d tex0=%u tex1=%u s0op=%u/%u s1op=%u/%u alphatest=%d\n",
+            kind, fvf, stride, base_vtx, prim_count, start_index, vb_bytes, ib_bytes,
+            (int)cullEnabled, cullMode == GL_BACK ? "BACK" : cullMode == GL_FRONT ? "FRONT" : "?", frontFace == GL_CW ? "CW" : "CCW",
+            (int)depthTest, depthFunc, (int)depthMask, (int)blend, blendSrc, blendDst,
+            colorMask[0], colorMask[1], colorMask[2], colorMask[3], (int)scissor, vp[0], vp[1], vp[2], vp[3],
+            (int)g_State.lighting_enabled, (int)(g_State.bound_textures[1] || g_State.texture_stage_state[1][GLES3_TSS_COLOROP] > 1 ? 2 : g_State.bound_textures[0] ? 1 : 0),
+            g_State.bound_textures[0], g_State.bound_textures[1],
+            g_State.texture_stage_state[0][GLES3_TSS_COLOROP], g_State.texture_stage_state[0][GLES3_TSS_ALPHAOP],
+            g_State.texture_stage_state[1][GLES3_TSS_COLOROP], g_State.texture_stage_state[1][GLES3_TSS_ALPHAOP],
+            (int)g_State.alpha_test_enabled);
+    // first triangle through W*V*P (D3D row-vector convention: v * W * V * P)
+    if (vb && ib && stride >= 12 && prim_count > 0) {
+        const unsigned short* idx = (const unsigned short*)ib;
+        size_t idx_count = ib_bytes / 2;
+        for (int t = 0; t < 2 && (size_t)(start_index + t * 3 + 2) < idx_count; t++) {
+            char line[512]; int n = snprintf(line, sizeof(line), "DRAW-DIAG   tri%d:", t);
+            for (int k = 0; k < 3; k++) {
+                unsigned int vi = idx[start_index + t * 3 + k] + base_vtx;
+                size_t off = (size_t)vi * stride;
+                if (off + 12 > vb_bytes) { n += snprintf(line + n, sizeof(line) - n, " v%u=OOB", vi); continue; }
+                const float* pos = (const float*)(vb + off);
+                float v[4] = {pos[0], pos[1], pos[2], 1.0f}, a[4], b[4], c[4];
+                Mul_Row_Vec(g_State.world_matrix, v, a); Mul_Row_Vec(g_State.view_matrix, a, b); Mul_Row_Vec(g_State.projection_matrix, b, c);
+                n += snprintf(line + n, sizeof(line) - n, " (%.1f,%.1f,%.1f)->ndc(%.2f,%.2f,%.2f w=%.1f)",
+                              pos[0], pos[1], pos[2], c[3] != 0 ? c[0] / c[3] : 0, c[3] != 0 ? c[1] / c[3] : 0, c[3] != 0 ? c[2] / c[3] : 0, c[3]);
+            }
+            fprintf(stderr, "%s\n", line);
+        }
+    }
+    if (g_dumpDraws == 0) {
+        const float* P = g_State.projection_matrix; const float* V = g_State.view_matrix;
+        fprintf(stderr, "DRAW-DIAG proj=[%.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f]\n",
+                P[0], P[1], P[2], P[3], P[4], P[5], P[6], P[7], P[8], P[9], P[10], P[11], P[12], P[13], P[14], P[15]);
+        fprintf(stderr, "DRAW-DIAG view=[%.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f | %.3f %.3f %.3f %.3f]\n",
+                V[0], V[1], V[2], V[3], V[4], V[5], V[6], V[7], V[8], V[9], V[10], V[11], V[12], V[13], V[14], V[15]);
+    }
+}
+
 /*
 ** Draw_Triangles — The main draw call. Maps to glDrawElements.
 **

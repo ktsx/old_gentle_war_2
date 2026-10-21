@@ -120,7 +120,6 @@ set(GAMEENGINE_SRC
     Include/Common/STLTypedefs.h
     Include/Common/StreamingArchiveFile.h
     Include/Common/SubsystemInterface.h
-#    Include/Common/SystemInfo.h
 #    Include/Common/Team.h
 #    Include/Common/Terrain.h
 #    Include/Common/TerrainTypes.h
@@ -1138,6 +1137,7 @@ set(GAMEENGINE_SRC
     Source/GameNetwork/NetCommandWrapperList.cpp
     Source/GameNetwork/NetMessageStream.cpp
     Source/GameNetwork/NetPacket.cpp
+    Source/GameNetwork/NetPacketStructs.cpp
     Source/GameNetwork/Network.cpp
     Source/GameNetwork/NetworkUtil.cpp
     Source/GameNetwork/Transport.cpp

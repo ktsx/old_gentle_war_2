@@ -76,7 +76,7 @@ public:
 		bool strip,
 		unsigned pass);
 	DX8PolygonRendererClass(const DX8PolygonRendererClass& src,MeshModelClass* mmc_);
-	~DX8PolygonRendererClass();
+	virtual ~DX8PolygonRendererClass() override;
 
 	bool								Is_Strip() const { return strip; }
 

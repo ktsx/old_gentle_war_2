@@ -600,7 +600,7 @@ public:
 		MSG_CREATE_FORMATION,												///< Creates a formation.
 		MSG_LOGIC_CRC,															///< CRC from the logic passed around in a network game :)
 		MSG_SET_MINE_CLEARING_DETAIL,								///< CRC from the logic passed around in a network game :)
-		MSG_ENABLE_RETALIATION_MODE,								///< Turn retaliation mode on or off for the specified player.
+		MSG_ENABLE_RETALIATION_MODE,								///< Turn retaliation mode on or off.
 
 		MSG_BEGIN_DEBUG_NETWORK_MESSAGES = 1900,		///< network messages that exist only in debug/internal builds. all grouped separately.
 
@@ -662,7 +662,7 @@ public:
 	 * @todo This should be a more list-like interface.  Very inefficient.
 	 */
 	const GameMessageArgumentType *getArgument( Int argIndex ) const;
-	GameMessageArgumentDataType getArgumentDataType( Int argIndex );
+	GameMessageArgumentDataType getArgumentDataType( Int argIndex ) const;
 
 	void friend_setNext(GameMessage* m) { m_next = m; }
 	void friend_setPrev(GameMessage* m) { m_prev = m; }
@@ -701,11 +701,11 @@ class GameMessageList : public SubsystemInterface
 public:
 
 	GameMessageList();
-	virtual ~GameMessageList();
+	virtual ~GameMessageList() override;
 
-	virtual void init() { };			///< Initialize system
-	virtual void reset() { };			///< Reset system
-	virtual void update() { };		///< Update system
+	virtual void init() override { };			///< Initialize system
+	virtual void reset() override { };			///< Reset system
+	virtual void update() override { };		///< Update system
 
 	GameMessage *getFirstMessage() { return m_firstMessage; }	///< Return the first message
 
@@ -748,12 +748,12 @@ class MessageStream : public GameMessageList
 public:
 
 	MessageStream();
-	virtual ~MessageStream();
+	virtual ~MessageStream() override;
 
 	// Inherited Methods ----------------------------------------------------------------------------
-	virtual void init();
-	virtual void reset();
-	virtual void update();
+	virtual void init() override;
+	virtual void reset() override;
+	virtual void update() override;
 
 	virtual GameMessage *appendMessage( GameMessage::Type type );		///< Append a message to the end of the stream
 	virtual GameMessage *insertMessage( GameMessage::Type type, GameMessage *messageToInsertAfter );	// Insert message after messageToInsertAfter.
@@ -804,11 +804,11 @@ class CommandList : public GameMessageList
 {
 public:
 	CommandList();
-	virtual ~CommandList();
+	virtual ~CommandList() override;
 
-	virtual void init();			///< Init command list
-	virtual void reset();			///< Destroy all messages and reset list to empty
-	virtual void update();		///< Update hook
+	virtual void init() override;			///< Init command list
+	virtual void reset() override;			///< Destroy all messages and reset list to empty
+	virtual void update() override;		///< Update hook
 
 	void appendMessageList( GameMessage *list );			///< Adds messages to the end of the command list
 

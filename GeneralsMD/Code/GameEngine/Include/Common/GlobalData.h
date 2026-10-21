@@ -81,11 +81,11 @@ class GlobalData : public SubsystemInterface
 public:
 
 	GlobalData();
-	virtual ~GlobalData();
+	virtual ~GlobalData() override;
 
-	virtual void init();
-	virtual void reset();
-	virtual void update() { }
+	virtual void init() override;
+	virtual void reset() override;
+	virtual void update() override { }
 
 	Bool setTimeOfDay( TimeOfDay tod );		///< Use this function to set the Time of day;
 
@@ -185,7 +185,9 @@ public:
 	Real m_viewportHeightScale; // The height scale of the tactical view ranging 0..1. Used to hide the world behind the Control Bar.
 	Real m_cameraPitch;
 	Real m_cameraYaw;
+#if PRESERVE_RETAIL_SCRIPTED_CAMERA
 	Real m_cameraHeight;
+#endif
 	Real m_maxCameraHeight;
 	Real m_minCameraHeight;
 	Real m_terrainHeightAtEdgeOfMap;
@@ -576,10 +578,11 @@ private:
 	// this is private, since we read the info from Windows and cache it for
 	// future use. No one is allowed to change it, ever. (srj)
 	AsciiString m_userDataDir;
+	AsciiString BuildUserDataPathFromRegistry();
 
 	static GlobalData *m_theOriginal;		///< the original global data instance (no overrides)
 	GlobalData *m_next;									///< next instance (for overrides)
-	GlobalData *newOverride();		/** create a new override, copy data from previous
+	virtual GlobalData *newOverride();		/** create a new override, copy data from previous
 																			override, and return it */
 
 #if defined(_MSC_VER) && _MSC_VER < 1300

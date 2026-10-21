@@ -497,6 +497,11 @@ void W3DDisplay::setGamma(Real gamma, Real bright, Real contrast, Bool calibrate
 //=============================================================================
 Bool W3DDisplay::setDisplayMode( UnsignedInt xres, UnsignedInt yres, UnsignedInt bitdepth, Bool windowed )
 {
+	const UnsignedInt oldWidth = getWidth();
+	const UnsignedInt oldHeight = getHeight();
+	const UnsignedInt oldBitDepth = getBitDepth();
+	const Bool oldWindowed = getWindowed();
+
 	if (WW3D_ERROR_OK == WW3D::Set_Device_Resolution(xres,yres,bitdepth,windowed,true))
 	{
 		Render2DClass::Set_Screen_Resolution(RectClass(0, 0, xres, yres));
@@ -505,9 +510,9 @@ Bool W3DDisplay::setDisplayMode( UnsignedInt xres, UnsignedInt yres, UnsignedInt
 	}
 
 	//set back to the original mode.
-	WW3D::Set_Device_Resolution(getWidth(),getHeight(),getBitDepth(),getWindowed(), true);
-	Render2DClass::Set_Screen_Resolution(RectClass(0, 0, getWidth(),getHeight()));
-	Display::setDisplayMode(getWidth(),getHeight(),getBitDepth(), getWindowed());
+	WW3D::Set_Device_Resolution(oldWidth, oldHeight, oldBitDepth, oldWindowed, true);
+	Render2DClass::Set_Screen_Resolution(RectClass(0, 0, oldWidth, oldHeight));
+	Display::setDisplayMode(oldWidth, oldHeight, oldBitDepth, oldWindowed);
 	return FALSE;	//did not change to a new mode.
 }
 
@@ -715,6 +720,9 @@ void W3DDisplay::init()
 				break;
 			}
 			}
+
+			// TheSuperHackers @feature Mauller 13/03/2026 Add native MSAA support, must be set before creating render device
+			WW3D::Set_MSAA_Mode(WW3D::MULTISAMPLE_MODE_NONE);
 
 			renderDeviceError = WW3D::Set_Render_Device(
 				0,

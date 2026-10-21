@@ -59,6 +59,17 @@
 #include "GameLogic/ScriptEngine.h"
 #include "GameLogic/Weapon.h"
 
+#if __cplusplus >= 201611L
+#define USE_STD_FROM_CHARS_PARSING 1
+#else
+#define USE_STD_FROM_CHARS_PARSING 0
+#endif
+
+#if USE_STD_FROM_CHARS_PARSING
+#include <charconv>
+#include <string_view>
+#include <type_traits>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIVATE DATA ///////////////////////////////////////////////////////////////////////////////////
@@ -78,70 +89,68 @@ struct BlockParse
 };
 static const BlockParse theTypeTable[] =
 {
-	{ "AIData",							INI::parseAIDataDefinition },
-	{ "Animation",					INI::parseAnim2DDefinition },
-	{ "Armor",							INI::parseArmorDefinition },
-	{ "AudioEvent",					INI::parseAudioEventDefinition },
-	{ "AudioSettings",			INI::parseAudioSettingsDefinition },
-	{ "Bridge",							INI::parseTerrainBridgeDefinition },
-	{ "Campaign",						INI::parseCampaignDefinition },
- 	{ "ChallengeGenerals",				INI::parseChallengeModeDefinition },
-	{ "CommandButton",			INI::parseCommandButtonDefinition },
-	{ "CommandMap",					INI::parseMetaMapDefinition },
-	{ "CommandSet",					INI::parseCommandSetDefinition },
-	{ "ControlBarScheme",		INI::parseControlBarSchemeDefinition },
-	{ "ControlBarResizer",	INI::parseControlBarResizerDefinition },
-	{ "CrateData",					INI::parseCrateTemplateDefinition },
-	{ "Credits",						INI::parseCredits},
-	{ "WindowTransition",		INI::parseWindowTransitions},
-	{ "DamageFX",						INI::parseDamageFXDefinition },
-	{ "DialogEvent",				INI::parseDialogDefinition },
-	{ "DrawGroupInfo",		INI::parseDrawGroupNumberDefinition },
-	{ "EvaEvent",						INI::parseEvaEvent },
-	{ "FXList",							INI::parseFXListDefinition },
-	{ "GameData",						INI::parseGameDataDefinition },
-	{ "InGameUI",						INI::parseInGameUIDefinition },
-	{ "Locomotor",					INI::parseLocomotorTemplateDefinition },
-	{ "Language",						INI::parseLanguageDefinition },
-	{ "MapCache",						INI::parseMapCacheDefinition },
-	{ "MapData",						INI::parseMapDataDefinition },
-	{ "MappedImage",				INI::parseMappedImageDefinition },
-	{ "MiscAudio",					INI::parseMiscAudio},
-	{ "Mouse",							INI::parseMouseDefinition },
-	{ "MouseCursor",				INI::parseMouseCursorDefinition },
-	{ "MultiplayerColor",		INI::parseMultiplayerColorDefinition },
-  { "MultiplayerStartingMoneyChoice",		INI::parseMultiplayerStartingMoneyChoiceDefinition },
-	{ "OnlineChatColors",		INI::parseOnlineChatColorDefinition },
-	{ "MultiplayerSettings",INI::parseMultiplayerSettingsDefinition },
-	{ "MusicTrack",					INI::parseMusicTrackDefinition },
-	{ "Object",							INI::parseObjectDefinition },
-	{ "ObjectCreationList",	INI::parseObjectCreationListDefinition },
-	{ "ObjectReskin",				INI::parseObjectReskinDefinition },
-	{ "ParticleSystem",			INI::parseParticleSystemDefinition },
-	{ "PlayerTemplate",			INI::parsePlayerTemplateDefinition },
-	{ "Road",								INI::parseTerrainRoadDefinition },
-	{ "Science",						INI::parseScienceDefinition },
-	{ "Rank",								INI::parseRankDefinition },
-	{ "SpecialPower",				INI::parseSpecialPowerDefinition },
-	{ "ShellMenuScheme",		INI::parseShellMenuSchemeDefinition },
-	{ "Terrain",						INI::parseTerrainDefinition },
-	{ "Upgrade",						INI::parseUpgradeDefinition },
-	{ "Video",							INI::parseVideoDefinition },
-	{ "WaterSet",						INI::parseWaterSettingDefinition },
-	{ "WaterTransparency",	INI::parseWaterTransparencyDefinition},
-	{ "Weather",	INI::parseWeatherDefinition},
-	{ "Weapon",							INI::parseWeaponTemplateDefinition },
-	{ "WebpageURL",					INI::parseWebpageURLDefinition },
-	{ "HeaderTemplate",			INI::parseHeaderTemplateDefinition },
-	{ "StaticGameLOD",			INI::parseStaticGameLODDefinition },
-	{ "DynamicGameLOD",			INI::parseDynamicGameLODDefinition },
-	{ "LODPreset",					INI::parseLODPreset },
-	{	"BenchProfile",				INI::parseBenchProfile },
-	{	"ReallyLowMHz",				parseReallyLowMHz },
-	{	"ScriptAction",				ScriptEngine::parseScriptAction },
-	{	"ScriptCondition",		ScriptEngine::parseScriptCondition },
-
-	{ nullptr,									nullptr },
+	{ "AIData",                         INI::parseAIDataDefinition },
+	{ "Animation",                      INI::parseAnim2DDefinition },
+	{ "Armor",                          INI::parseArmorDefinition },
+	{ "AudioEvent",                     INI::parseAudioEventDefinition },
+	{ "AudioSettings",                  INI::parseAudioSettingsDefinition },
+	{ "BenchProfile",                   INI::parseBenchProfile },
+	{ "Bridge",                         INI::parseTerrainBridgeDefinition },
+	{ "Campaign",                       INI::parseCampaignDefinition },
+	{ "ChallengeGenerals",              INI::parseChallengeModeDefinition },
+	{ "CommandButton",                  INI::parseCommandButtonDefinition },
+	{ "CommandMap",                     INI::parseMetaMapDefinition },
+	{ "CommandSet",                     INI::parseCommandSetDefinition },
+	{ "ControlBarResizer",              INI::parseControlBarResizerDefinition },
+	{ "ControlBarScheme",               INI::parseControlBarSchemeDefinition },
+	{ "CrateData",                      INI::parseCrateTemplateDefinition },
+	{ "Credits",                        INI::parseCredits },
+	{ "DamageFX",                       INI::parseDamageFXDefinition },
+	{ "DialogEvent",                    INI::parseDialogDefinition },
+	{ "DrawGroupInfo",                  INI::parseDrawGroupNumberDefinition },
+	{ "DynamicGameLOD",                 INI::parseDynamicGameLODDefinition },
+	{ "EvaEvent",                       INI::parseEvaEvent },
+	{ "FXList",                         INI::parseFXListDefinition },
+	{ "GameData",                       INI::parseGameDataDefinition },
+	{ "HeaderTemplate",                 INI::parseHeaderTemplateDefinition },
+	{ "InGameUI",                       INI::parseInGameUIDefinition },
+	{ "LODPreset",                      INI::parseLODPreset },
+	{ "Language",                       INI::parseLanguageDefinition },
+	{ "Locomotor",                      INI::parseLocomotorTemplateDefinition },
+	{ "MapCache",                       INI::parseMapCacheDefinition },
+	{ "MapData",                        INI::parseMapDataDefinition },
+	{ "MappedImage",                    INI::parseMappedImageDefinition },
+	{ "MiscAudio",                      INI::parseMiscAudio },
+	{ "Mouse",                          INI::parseMouseDefinition },
+	{ "MouseCursor",                    INI::parseMouseCursorDefinition },
+	{ "MultiplayerColor",               INI::parseMultiplayerColorDefinition },
+	{ "MultiplayerSettings",            INI::parseMultiplayerSettingsDefinition },
+	{ "MultiplayerStartingMoneyChoice", INI::parseMultiplayerStartingMoneyChoiceDefinition },
+	{ "MusicTrack",                     INI::parseMusicTrackDefinition },
+	{ "Object",                         INI::parseObjectDefinition },
+	{ "ObjectCreationList",             INI::parseObjectCreationListDefinition },
+	{ "ObjectReskin",                   INI::parseObjectReskinDefinition },
+	{ "OnlineChatColors",               INI::parseOnlineChatColorDefinition },
+	{ "ParticleSystem",                 INI::parseParticleSystemDefinition },
+	{ "PlayerTemplate",                 INI::parsePlayerTemplateDefinition },
+	{ "Rank",                           INI::parseRankDefinition },
+	{ "ReallyLowMHz",                   parseReallyLowMHz },
+	{ "Road",                           INI::parseTerrainRoadDefinition },
+	{ "Science",                        INI::parseScienceDefinition },
+	{ "ScriptAction",                   ScriptEngine::parseScriptAction },
+	{ "ScriptCondition",                ScriptEngine::parseScriptCondition },
+	{ "ShellMenuScheme",                INI::parseShellMenuSchemeDefinition },
+	{ "SpecialPower",                   INI::parseSpecialPowerDefinition },
+	{ "StaticGameLOD",                  INI::parseStaticGameLODDefinition },
+	{ "Terrain",                        INI::parseTerrainDefinition },
+	{ "Upgrade",                        INI::parseUpgradeDefinition },
+	{ "Video",                          INI::parseVideoDefinition },
+	{ "WaterSet",                       INI::parseWaterSettingDefinition },
+	{ "WaterTransparency",              INI::parseWaterTransparencyDefinition },
+	{ "Weapon",                         INI::parseWeaponTemplateDefinition },
+	{ "Weather",                        INI::parseWeatherDefinition },
+	{ "WebpageURL",                     INI::parseWebpageURLDefinition },
+	{ "WindowTransition",               INI::parseWindowTransitions },
 };
 
 
@@ -153,21 +162,7 @@ Bool INI::isValidINIFilename( const char *filename )
 	if( filename == nullptr )
 		return FALSE;
 
-	Int len = strlen( filename );
-	if( len < 3 )
-		return FALSE;
-
-	if( filename[ len - 1 ] != 'I' && filename[ len - 1 ] != 'i' )
-		return FALSE;
-
-	if( filename[ len - 2 ] != 'N' && filename[ len - 2 ] != 'n' )
-		return FALSE;
-
-	if( filename[ len - 3 ] != 'I' && filename[ len - 3 ] != 'i' )
-		return FALSE;
-
-	return TRUE;
-
+	return endsWithNoCase(filename, ".ini");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,42 +253,34 @@ UnsignedInt INI::loadDirectory( AsciiString dirName, INILoadType loadType, Xfer 
 	if( dirName.isEmpty() )
 		throw INI_INVALID_DIRECTORY;
 
-	try
+	FilenameList filenameList;
+	dirName.concat('\\');
+	TheFileSystem->getFileListInDirectory(dirName, "*.ini", filenameList, subdirs);
+	// Load the INI files in the dir now, in a sorted order.  This keeps things the same between machines
+	// in a network game.
+	FilenameList::const_iterator it = filenameList.begin();
+	while (it != filenameList.end())
 	{
-		FilenameList filenameList;
-		dirName.concat('\\');
-		TheFileSystem->getFileListInDirectory(dirName, "*.ini", filenameList, subdirs);
-		// Load the INI files in the dir now, in a sorted order.  This keeps things the same between machines
-		// in a network game.
-		FilenameList::const_iterator it = filenameList.begin();
-		while (it != filenameList.end())
-		{
-			AsciiString tempname;
-			tempname = (*it).str() + dirName.getLength();
+		AsciiString tempname;
+		tempname = (*it).str() + dirName.getLength();
 
-			if ((tempname.find('\\') == nullptr) && (tempname.find('/') == nullptr)) {
-				// this file doesn't reside in a subdirectory, load it first.
-				filesRead += load( *it, loadType, pXfer );
-			}
-			++it;
+		if ((tempname.find('\\') == nullptr) && (tempname.find('/') == nullptr)) {
+			// this file doesn't reside in a subdirectory, load it first.
+			filesRead += load( *it, loadType, pXfer );
 		}
-
-		it = filenameList.begin();
-		while (it != filenameList.end())
-		{
-			AsciiString tempname;
-			tempname = (*it).str() + dirName.getLength();
-
-			if ((tempname.find('\\') != nullptr) || (tempname.find('/') != nullptr)) {
-				filesRead += load( *it, loadType, pXfer );
-			}
-			++it;
-		}
+		++it;
 	}
-	catch (...)
+
+	it = filenameList.begin();
+	while (it != filenameList.end())
 	{
-		// propagate the exception
-		throw;
+		AsciiString tempname;
+		tempname = (*it).str() + dirName.getLength();
+
+		if ((tempname.find('\\') != nullptr) || (tempname.find('/') != nullptr)) {
+			filesRead += load( *it, loadType, pXfer );
+		}
+		++it;
 	}
 
 	return filesRead;
@@ -353,13 +340,14 @@ void INI::unPrepFile()
 //-------------------------------------------------------------------------------------------------
 static INIBlockParse findBlockParse(const char* token)
 {
-	for (const BlockParse* parse = theTypeTable; parse->token; ++parse)
+	for (size_t i = 0; i < ARRAY_SIZE(theTypeTable); ++i)
 	{
-		if (strcmp( parse->token, token ) == 0)
+		if (strcmp(theTypeTable[i].token, token) == 0)
 		{
-			return parse->parse;
+			return theTypeTable[i].parse;
 		}
 	}
+
 	return nullptr;
 }
 
@@ -1628,40 +1616,86 @@ void INI::initFromINIMulti( void *what, const MultiIniFieldParse& parseTableList
 	return TheScienceStore->friend_lookupScience( token );
 }
 
+#if USE_STD_FROM_CHARS_PARSING
+
+template <typename Type>
+Type scanType(std::string_view token)
+{
+	// TheSuperHackers @info std::from_chars cannot parse "-1" as uint32 so the result needs to be int64 for integers.
+	std::conditional_t<std::is_integral_v<Type>, Int64, Real> result{};
+	const auto [ptr, ec] = std::from_chars(token.data(), token.data() + token.size(), result);
+
+	if (ec != std::errc{})
+	{
+		throw INI_INVALID_DATA;
+	}
+
+	return static_cast<Type>(result);
+}
+
+#endif
+
 //-------------------------------------------------------------------------------------------------
 /*static*/ Int INI::scanInt(const char* token)
 {
+#if USE_STD_FROM_CHARS_PARSING == 1
+	return scanType<Int>(token);
+#else
 	Int value;
 	if (sscanf( token, "%d", &value ) != 1)
 		throw INI_INVALID_DATA;
+
+#if USE_STD_FROM_CHARS_PARSING == -1
+	if (value != scanType<Int>(token))
+		throw INI_INVALID_DATA;
+#endif
+
 	return value;
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
 /*static*/ UnsignedInt INI::scanUnsignedInt(const char* token)
 {
+#if USE_STD_FROM_CHARS_PARSING == 1
+	return scanType<UnsignedInt>(token);
+#else
 	UnsignedInt value;
 	if (sscanf( token, "%u", &value ) != 1)	// unsigned int is %u, not %d
 		throw INI_INVALID_DATA;
+
+#if USE_STD_FROM_CHARS_PARSING == -1
+	if (value != scanType<UnsignedInt>(token))
+		throw INI_INVALID_DATA;
+#endif
+
 	return value;
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
 /*static*/ Real INI::scanReal(const char* token)
 {
+#if USE_STD_FROM_CHARS_PARSING == 1
+	return scanType<Real>(token);
+#else
 	Real value;
 	if (sscanf( token, "%f", &value ) != 1)
 		throw INI_INVALID_DATA;
+
+#if USE_STD_FROM_CHARS_PARSING == -1
+	if (value != scanType<Real>(token))
+		throw INI_INVALID_DATA;
+#endif
+
 	return value;
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
 /*static*/ Real INI::scanPercentToReal(const char* token)
 {
-	Real value;
-	if (sscanf( token, "%f", &value ) != 1)
-		throw INI_INVALID_DATA;
-	return value / 100.0f;
+	return scanReal(token) / 100.0f;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1700,14 +1734,11 @@ void INI::initFromINIMulti( void *what, const MultiIniFieldParse& parseTableList
 	}
 
 	// search for matching name
-	Bool found = false;
 	for( const LookupListRec* lookup = &lookupList[0]; lookup->name; lookup++ )
 	{
 		if( stricmp( lookup->name, token ) == 0 )
 		{
 			return lookup->value;
-			found = true;
-			break;
 		}
 	}
 

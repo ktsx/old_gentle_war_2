@@ -20,14 +20,9 @@
 // Simple interface for storing/retrieving registry values
 // Author: Matthew D. Campbell, December 2001
 
-#include <string>
-
-#define WIN32_LEAN_AND_MEAN
-#ifndef __EMSCRIPTEN__
-#include <windows.h>
-#endif
-
 #include "Registry.h"
+#include <string>
+#include "win.h"
 
 #ifdef __EMSCRIPTEN__
 

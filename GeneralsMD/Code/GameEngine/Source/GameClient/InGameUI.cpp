@@ -1366,17 +1366,17 @@ void InGameUI::init()
 	to order the translators when the code is not centralized so it has
 	been moved to where all the other translators are attached in game client */
 	// create the tactical view
-	if (TheDisplay)
+	TheTacticalView = createView(TheGlobalData->m_headless);
+	if (TheTacticalView && TheDisplay)
 	{
-		TheTacticalView = createView();
 		TheTacticalView->init();
 		TheDisplay->attachView( TheTacticalView );
 
 		// make the tactical display the full screen width and height
 		TheTacticalView->setWidth( TheDisplay->getWidth() );
 		TheTacticalView->setHeight( TheDisplay->getHeight() );
+		TheTacticalView->setDefaultView(0.0f, 0.0f, 1.0f);
 	}
-	TheTacticalView->setDefaultView(0.0f, 0.0f, 1.0f);
 
 	createControlBar();
 
@@ -4499,9 +4499,10 @@ Bool InGameUI::areSelectedObjectsControllable() const
 //------------------------------------------------------------------------------
 void InGameUI::resetCamera()
 {
-	ViewLocation currentView;
-	TheTacticalView->getLocation( &currentView );
-	TheTacticalView->resetCamera( &currentView.getPosition(), 1, 0.0f, 0.0f );
+	TheTacticalView->userResetPivotToGround();
+	TheTacticalView->userSetAngleToDefault();
+	TheTacticalView->userSetPitchToDefault();
+	TheTacticalView->userSetZoomToDefault();
 }
 
 //------------------------------------------------------------------------------

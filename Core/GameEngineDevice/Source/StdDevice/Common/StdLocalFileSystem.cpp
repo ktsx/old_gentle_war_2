@@ -69,7 +69,7 @@ static std::filesystem::path fixFilenameFromWindowsPath(const Char *filename, In
 		// for a relative path. The first part of a relative path is then matched like the parts after it.
 		std::filesystem::path pathFixed = path.root_path();
 		std::filesystem::path pathCurrent = path.root_path();
-		for (auto& p : path.relative_path())
+		for (const auto& p : path.relative_path())
 		{
 			std::filesystem::path pathFixedPart;
 			if (std::filesystem::exists(pathCurrent / p, ec))

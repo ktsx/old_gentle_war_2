@@ -47,3 +47,8 @@ target_link_libraries(core_profile_legacy PRIVATE
     deps_utility
     stlport
 )
+
+# Web: <windows.h> resolves to the Emscripten compat header exported by d3d8lib.
+if(EMSCRIPTEN)
+    target_link_libraries(core_profile_legacy PRIVATE d3d8lib)
+endif()

@@ -30,6 +30,8 @@ jobs:
     name: Emscripten Build (GeneralsMD / Zero Hour)
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: write   # rolling "ci-latest" release (see last step)
 
     steps:
       - name: Checkout Code
@@ -79,3 +81,24 @@ jobs:
             build-web/GeneralsMD/GeneralsZH.html
             build-web/GeneralsMD/GeneralsZH.js
             build-web/GeneralsMD/GeneralsZH.wasm
+
+      # Artifacts live on Azure blob storage, which some corporate/agent proxies
+      # block. Mirror the build into a rolling pre-release so it is reachable via
+      # plain github.com/<repo>/releases/download/ci-latest/<file>.
+      - name: Publish rolling release (ci-latest)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          cp scripts/serve.py build-web/GeneralsMD/serve.py
+          gh release delete ci-latest --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
+          gh release create ci-latest --prerelease \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "CI build ${GITHUB_SHA::7}" \
+            --notes "Automated web build of ${GITHUB_SHA} (Emscripten ${EMSDK_VERSION}, RelWithDebInfo). Engine only — no game assets." \
+            build-web/GeneralsMD/GeneralsZH.html \
+            build-web/GeneralsMD/GeneralsZH.js \
+            build-web/GeneralsMD/GeneralsZH.wasm \
+            build-web/GeneralsMD/serve.py

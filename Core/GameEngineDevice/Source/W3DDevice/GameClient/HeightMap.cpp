@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #include <WW3D2/assetmgr.h>
 #include <WW3D2/texture.h>
+#include <Utility/gx_trace.h>
 #include <WWMath/tri.h>
 #include <WWMath/colmath.h>
 #include <WW3D2/coltest.h>
@@ -2022,6 +2023,22 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 			DX8Wrapper::Set_DX8_Render_State(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 	}
 
+#ifdef __EMSCRIPTEN__
+	// Web diag (?diag=1): what the terrain pass is about to draw, once a second or so.
+	{
+		static int s_terrainDiag = 0;
+		if (++s_terrainDiag >= 60) {
+			s_terrainDiag = 0;
+			GX_DIAG_LOG("TERRAIN: shader=%d passes=%d tiles=%dx%d hidden=%d notex=%d tex0=%dx%d(%p) cloud=%d "
+						"wire=%d numVertsPerTile=%d map=%dx%d\n",
+						(int)st, devicePasses, m_numVBTilesX, m_numVBTilesY, (int)Is_Hidden(), (int)m_disableTextures,
+						m_stageZeroTexture ? m_stageZeroTexture->Get_Width() : -1,
+						m_stageZeroTexture ? m_stageZeroTexture->Get_Height() : -1, (void*)m_stageZeroTexture,
+						(int)doCloud, (int)doMultiPassWireFrame, m_numVertexBufferTiles,
+						m_map ? m_map->getXExtent() : -1, m_map ? m_map->getYExtent() : -1);
+		}
+	}
+#endif
 	Int pass;
  	for (pass=0; pass<devicePasses; pass++) {
 #ifdef TIMING_TESTS

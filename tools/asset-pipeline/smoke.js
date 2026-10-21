@@ -4,6 +4,7 @@
 //   SMOKE_KEYS=Space;Escape    keys to press after Begin
 //   SMOKE_CLICKS=512,282;...   canvas clicks after Begin (viewport is 1024x768)
 //   SMOKE_EXPECT=a;b            console substrings that must appear (pair with ?diag=1)
+//   SMOKE_FULL=1               print the whole console instead of head/tail
 // exit 2 on FATAL C++ CRASH / page error / Begin never reached.
 const { chromium } = require('playwright');
 (async () => {
@@ -60,7 +61,7 @@ const { chromium } = require('playwright');
   console.log('=== UI STATE ===', JSON.stringify(stage, null, 1));
   console.log('=== HTTP STATUSES ===', JSON.stringify(statuses));
   console.log('=== CONSOLE (' + lines.length + ' lines, first 60 + last 40) ===');
-  const show = lines.length > 100 ? [...lines.slice(0, 60), '...', ...lines.slice(60, -40).filter(l => /\[SMOKE\]|FATAL|INI ERROR|LOAD:|GAMELOGIC:|\[MessageBox\]|PAGEERROR/.test(l)), ...lines.slice(-40)] : lines;
+  const show = (process.env.SMOKE_FULL || lines.length <= 100) ? lines : [...lines.slice(0, 60), '...', ...lines.slice(60, -40).filter(l => /\[SMOKE\]|FATAL|INI ERROR|LOAD:|GAMELOGIC:|\[MessageBox\]|PAGEERROR/.test(l)), ...lines.slice(-40)];
   console.log(show.join('\n'));
   await browser.close();
   const fatal = lines.filter(l => l.includes('FATAL C++ CRASH') || l.includes('[PAGEERROR]') || l.includes('begin failed'));

@@ -46,6 +46,7 @@
 // Game Client display/view
 #include "GameClient/Display.h"
 #include "GameClient/View.h"
+#include "WW3D2/statistics.h"  // Debug_Statistics: per-frame polygon / draw-call counts for TICK-DIAG
 
 // WWAudio delayed-release
 #include "Threads.h"
@@ -445,16 +446,23 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
   if (GX_DiagEnabled() && ++s_diagFrameTick >= 60) {
     s_diagFrameTick = 0;
     if (TheGameLogic && TheFramePacer) {
+      Coord3D camPos = {0, 0, 0};
+      if (TheTacticalView) camPos = TheTacticalView->getPosition();
       fprintf(stderr,
               "TICK-DIAG: logicFrame=%u inGame=%d isPaused=%d "
-              "updateTime=%.4f maxFps=%d frozen=%d halted=%d\n",
+              "updateTime=%.4f maxFps=%d frozen=%d halted=%d "
+              "polys=%d verts=%d draws=%d cam=(%.0f,%.0f,%.0f)\n",
               (unsigned)TheGameLogic->getFrame(),
               TheGameLogic->isInGame() ? 1 : 0,
               TheGameLogic->isGamePaused() ? 1 : 0,
               TheFramePacer->getUpdateTime(),
               TheFramePacer->getActualFramesPerSecondLimit(),
               TheFramePacer->isTimeFrozen() ? 1 : 0,
-              TheFramePacer->isGameHalted() ? 1 : 0);
+              TheFramePacer->isGameHalted() ? 1 : 0,
+              Debug_Statistics::Get_DX8_Polygons(),
+              Debug_Statistics::Get_DX8_Vertices(),
+              Debug_Statistics::Get_Draw_Calls(),
+              camPos.x, camPos.y, camPos.z);
     }
   }
 

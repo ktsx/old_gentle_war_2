@@ -920,12 +920,12 @@ GLenum GLES3_TextureConverter::DX8_Format_To_GL_Internal(unsigned int dx8_fmt) {
             return GL_RGB5_A1;
         case 26: // D3DFMT_A4R4G4B4
             return GL_RGBA4;
-        case 50: // D3DFMT_L8
-            return GL_R8; // luminance → red channel
+        case 50: // D3DFMT_L8 — unsized LUMINANCE: WebGL2 replicates L into RGB (no swizzle needed)
+            return GL_LUMINANCE;
         case 51: // D3DFMT_A8L8
-            return GL_RG8; // luminance+alpha → RG
+            return GL_LUMINANCE_ALPHA;
         case 28: // D3DFMT_A8
-            return GL_R8;
+            return GL_ALPHA;
         case 827611204: // D3DFMT_DXT1 (FOURCC)
             return GL_COMPRESSED_RGB_S3TC_DXT1_EXT; // if available
         case 861165636: // D3DFMT_DXT3
@@ -940,16 +940,92 @@ GLenum GLES3_TextureConverter::DX8_Format_To_GL_Internal(unsigned int dx8_fmt) {
 }
 
 // ---------------------------------------------------------------------------
+// Convert_For_Upload — turn a D3D8-format pixel block into something
+// glTexImage2D / glTexSubImage2D accept on WebGL2.
+//
+// WebGL2 has no GL_TEXTURE_SWIZZLE_* (it is a GLES 3.0 feature the WebGL2
+// spec deliberately left out — the calls raise INVALID_ENUM and do nothing),
+// so every channel reorder has to happen on the CPU:
+//   A8R8G8B8 / X8R8G8B8  memory is B,G,R,A  → swap to R,G,B,A (X8: alpha = 255)
+//   A4R4G4B4 / A1R5G5B5  repacked to the GL 4444 / 5551 bit layouts
+//   L8 / A8L8 / A8       uploaded as the unsized LUMINANCE / LUMINANCE_ALPHA /
+//                        ALPHA formats WebGL2 still provides, which replicate
+//                        luminance into RGB for us.
+// Returns the pointer to upload (data itself or `temp`).
+// ---------------------------------------------------------------------------
+static const void* Convert_For_Upload(unsigned int dx8_format,
+                                      unsigned int width, unsigned int height,
+                                      const void* data,
+                                      std::vector<unsigned char>& temp,
+                                      GLenum* src_fmt, GLenum* src_type) {
+    const unsigned int num_pixels = width * height;
+    *src_fmt = GL_RGBA;
+    *src_type = GL_UNSIGNED_BYTE;
+    switch (dx8_format) {
+        case 23: // D3DFMT_R5G6B5 — same bit layout as GL 565
+            *src_fmt = GL_RGB; *src_type = GL_UNSIGNED_SHORT_5_6_5;
+            return data;
+        case 25: { // D3DFMT_A1R5G5B5: A[15] R[14:10] G[9:5] B[4:0] → GL 5551: R G B A
+            *src_type = GL_UNSIGNED_SHORT_5_5_5_1;
+            if (!data) return data;
+            temp.resize(num_pixels * 2);
+            const unsigned short* src = (const unsigned short*)data;
+            unsigned short* dst = (unsigned short*)temp.data();
+            for (unsigned int i = 0; i < num_pixels; i++) {
+                unsigned short v = src[i];
+                dst[i] = (unsigned short)((((v >> 10) & 0x1F) << 11) | (((v >> 5) & 0x1F) << 6) | ((v & 0x1F) << 1) | ((v >> 15) & 1));
+            }
+            return temp.data();
+        }
+        case 26: { // D3DFMT_A4R4G4B4 → GL 4444: R G B A
+            *src_type = GL_UNSIGNED_SHORT_4_4_4_4;
+            if (!data) return data;
+            temp.resize(num_pixels * 2);
+            const unsigned short* src = (const unsigned short*)data;
+            unsigned short* dst = (unsigned short*)temp.data();
+            for (unsigned int i = 0; i < num_pixels; i++) {
+                unsigned short v = src[i];
+                dst[i] = (unsigned short)((((v >> 8) & 0xF) << 12) | (((v >> 4) & 0xF) << 8) | ((v & 0xF) << 4) | ((v >> 12) & 0xF));
+            }
+            return temp.data();
+        }
+        case 50: // D3DFMT_L8
+            *src_fmt = GL_LUMINANCE;
+            return data;
+        case 51: // D3DFMT_A8L8 — bytes L, A
+            *src_fmt = GL_LUMINANCE_ALPHA;
+            return data;
+        case 28: // D3DFMT_A8
+            *src_fmt = GL_ALPHA;
+            return data;
+        case 22: // D3DFMT_X8R8G8B8 — bytes B G R X
+        case 21: // D3DFMT_A8R8G8B8 — bytes B G R A
+        default: { // unknown: assume BGRA
+            if (!data) return data;
+            const bool alpha_one = (dx8_format == 22);
+            temp.resize(num_pixels * 4);
+            const unsigned char* src = (const unsigned char*)data;
+            unsigned char* dst = temp.data();
+            for (unsigned int i = 0; i < num_pixels; i++, src += 4, dst += 4) {
+                dst[0] = src[2];
+                dst[1] = src[1];
+                dst[2] = src[0];
+                dst[3] = alpha_one ? 255 : src[3];
+            }
+            return temp.data();
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Create_Texture — Upload one mip level (level 0) of a D3D8 texture to GL.
 //
 // Each D3D format needs a specific GL source-format + source-type pair.
 // The most important correctness issue is BGRA vs RGBA byte ordering:
 //   D3DFMT_A8R8G8B8 / X8R8G8B8 pixels are stored BGRA in memory (the 'R'
 //   in the name is the most-significant byte; in little-endian the byte
-//   stream is B,G,R,A).  We upload them with GL_RGBA/GL_UNSIGNED_BYTE which
-//   assigns B→R slot, G→G slot, R→B slot, A→A slot.  We then fix the
-//   channel mapping with GL_TEXTURE_SWIZZLE so that sampling reads correctly.
-//   WebGL2 / GLES3 support GL_TEXTURE_SWIZZLE_* natively.
+//   stream is B,G,R,A).  Convert_For_Upload reorders them on the CPU, because
+//   WebGL2 has no GL_TEXTURE_SWIZZLE_*.
 //
 // For DXT compressed textures glGenerateMipmap on a compressed base is
 // unreliable; Upload_To_GL (d3d8.h) uploads each mip level separately and
@@ -983,141 +1059,13 @@ GLuint GLES3_TextureConverter::Create_Texture(unsigned int width,
                                (GLsizei)width, (GLsizei)height, 0,
                                (GLsizei)data_size, data);
     } else {
-        // --- Uncompressed: choose correct GL source format + type ---
-        GLenum src_fmt  = GL_RGBA;
-        GLenum src_type = GL_UNSIGNED_BYTE;
-        bool need_rb_swizzle = false;   // true: stored as BGRA → swizzle R↔B
-        bool need_a4r4g4b4_swizzle = false; // true: A4R4G4B4 → swizzle to match GL_RGBA4
-        bool need_a1r5g5b5_swizzle = false; // true: A1R5G5B5 → swizzle to match GL_RGBA5551
-        bool force_alpha_one = false;   // true: X8R8G8B8 — force alpha channel=1
-        bool is_luminance    = false;   // true: L8 — replicate R to G,B; A=1
-        bool is_lum_alpha    = false;   // true: A8L8 — R/G → L/A swizzle
-        bool is_alpha_only   = false;   // true: A8 — R=G=B=0, A=texel
-
-        switch (dx8_format) {
-            case 21: // D3DFMT_A8R8G8B8 — memory bytes: B G R A
-                src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-                need_rb_swizzle = true;
-                break;
-            case 22: // D3DFMT_X8R8G8B8 — memory bytes: B G R X
-                src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-                need_rb_swizzle = true;
-                force_alpha_one = true;
-                break;
-            case 23: // D3DFMT_R5G6B5 — 16-bit, R[15:11] G[10:5] B[4:0]
-                src_fmt = GL_RGB; src_type = GL_UNSIGNED_SHORT_5_6_5;
-                break;
-            case 25: // D3DFMT_A1R5G5B5 — 16-bit, A[15] R[14:10] G[9:5] B[4:0]
-                src_fmt = GL_RGBA; src_type = GL_UNSIGNED_SHORT_5_5_5_1;
-                need_a1r5g5b5_swizzle = true;
-                break;
-            case 26: // D3DFMT_A4R4G4B4
-                src_fmt = GL_RGBA; src_type = GL_UNSIGNED_SHORT_4_4_4_4;
-                need_a4r4g4b4_swizzle = true;
-                break;
-            case 50: // D3DFMT_L8 — 1 byte luminance per pixel
-                src_fmt = GL_RED; src_type = GL_UNSIGNED_BYTE;
-                is_luminance = true;
-                break;
-            case 51: // D3DFMT_A8L8 — 2 bytes: L, A
-                src_fmt = GL_RG; src_type = GL_UNSIGNED_BYTE;
-                is_lum_alpha = true;
-                break;
-            case 28: // D3DFMT_A8 — 1 byte alpha per pixel
-                src_fmt = GL_RED; src_type = GL_UNSIGNED_BYTE;
-                is_alpha_only = true;
-                break;
-            default:
-                src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-                need_rb_swizzle = true; // assume BGRA unless otherwise known
-                break;
-        }
-
-        const void* upload_data = data;
         std::vector<unsigned char> temp_buffer;
-
-        if (data) {
-            if (need_rb_swizzle) {
-                upload_data = data;
-                src_fmt = GL_RGBA;
-            } else if (need_a4r4g4b4_swizzle) {
-                unsigned int num_pixels = width * height;
-                temp_buffer.resize(num_pixels * sizeof(unsigned short));
-                const unsigned short* src = (const unsigned short*)data;
-                unsigned short* dst = (unsigned short*)temp_buffer.data();
-                for (unsigned int i = 0; i < num_pixels; i++) {
-                    unsigned short val = src[i];
-                    unsigned short a = (val >> 12) & 0xF;
-                    unsigned short r = (val >> 8) & 0xF;
-                    unsigned short g = (val >> 4) & 0xF;
-                    unsigned short b = val & 0xF;
-                    dst[i] = (r << 12) | (g << 8) | (b << 4) | a;
-                }
-                upload_data = temp_buffer.data();
-            } else if (need_a1r5g5b5_swizzle) {
-                unsigned int num_pixels = width * height;
-                temp_buffer.resize(num_pixels * sizeof(unsigned short));
-                const unsigned short* src = (const unsigned short*)data;
-                unsigned short* dst = (unsigned short*)temp_buffer.data();
-                for (unsigned int i = 0; i < num_pixels; i++) {
-                    unsigned short val = src[i];
-                    unsigned short a = (val >> 15) & 1;
-                    unsigned short r = (val >> 10) & 0x1F;
-                    unsigned short g = (val >> 5) & 0x1F;
-                    unsigned short b = val & 0x1F;
-                    dst[i] = (r << 11) | (g << 6) | (b << 1) | a;
-                }
-                upload_data = temp_buffer.data();
-            } else if (is_luminance) {
-                upload_data = data;
-                src_fmt = GL_RED;
-            } else if (is_lum_alpha) {
-                upload_data = data;
-                src_fmt = GL_RG;
-            } else if (is_alpha_only) {
-                upload_data = data;
-                src_fmt = GL_RED;
-            }
-        }
+        GLenum src_fmt, src_type;
+        const void* upload_data = Convert_For_Upload(dx8_format, width, height, data, temp_buffer, &src_fmt, &src_type);
 
         glTexImage2D(GL_TEXTURE_2D, 0, internal_fmt,
                      (GLsizei)width, (GLsizei)height, 0,
                      src_fmt, src_type, upload_data);
-
-        // Set GPU swizzling to avoid CPU swizzling/expansion overhead
-        GLenum swizzle_r = GL_RED;
-        GLenum swizzle_g = GL_GREEN;
-        GLenum swizzle_b = GL_BLUE;
-        GLenum swizzle_a = GL_ALPHA;
-
-        if (need_rb_swizzle) {
-            swizzle_r = GL_BLUE;
-            swizzle_g = GL_GREEN;
-            swizzle_b = GL_RED;
-            if (force_alpha_one) {
-                swizzle_a = GL_ONE;
-            }
-        } else if (is_luminance) {
-            swizzle_r = GL_RED;
-            swizzle_g = GL_RED;
-            swizzle_b = GL_RED;
-            swizzle_a = GL_ONE;
-        } else if (is_lum_alpha) {
-            swizzle_r = GL_RED;
-            swizzle_g = GL_RED;
-            swizzle_b = GL_RED;
-            swizzle_a = GL_GREEN;
-        } else if (is_alpha_only) {
-            swizzle_r = GL_ZERO;
-            swizzle_g = GL_ZERO;
-            swizzle_b = GL_ZERO;
-            swizzle_a = GL_RED;
-        }
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, swizzle_r);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, swizzle_g);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, swizzle_b);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, swizzle_a);
 
         // Generate mipmaps from the uploaded base level (uncompressed only)
         if (mip_levels != 1) {
@@ -1153,100 +1101,9 @@ void GLES3_TextureConverter::Update_Texture(GLuint gl_tex_id,
 
     if (!data) return;
 
-    // --- Choose correct GL source format + type ---
-    GLenum src_fmt  = GL_RGBA;
-    GLenum src_type = GL_UNSIGNED_BYTE;
-    bool need_rb_swizzle = false;   // true: stored as BGRA → swizzle R↔B
-    bool need_a4r4g4b4_swizzle = false; // true: A4R4G4B4 → swizzle to match GL_RGBA4
-    bool need_a1r5g5b5_swizzle = false; // true: A1R5G5B5 → swizzle to match GL_RGBA5551
-    bool force_alpha_one = false;   // true: X8R8G8B8 — force alpha channel=1
-    bool is_luminance    = false;   // true: L8 — replicate R to G,B; A=1
-    bool is_lum_alpha    = false;   // true: A8L8 — R/G → L/A swizzle
-    bool is_alpha_only   = false;   // true: A8 — R=G=B=0, A=texel
-
-    switch (dx8_format) {
-        case 21: // D3DFMT_A8R8G8B8 — memory bytes: B G R A
-            src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-            need_rb_swizzle = true;
-            break;
-        case 22: // D3DFMT_X8R8G8B8 — memory bytes: B G R X
-            src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-            need_rb_swizzle = true;
-            force_alpha_one = true;
-            break;
-        case 23: // D3DFMT_R5G6B5 — 16-bit, R[15:11] G[10:5] B[4:0]
-            src_fmt = GL_RGB; src_type = GL_UNSIGNED_SHORT_5_6_5;
-            break;
-        case 25: // D3DFMT_A1R5G5B5 — 16-bit, A[15] R[14:10] G[9:5] B[4:0]
-            src_fmt = GL_RGBA; src_type = GL_UNSIGNED_SHORT_5_5_5_1;
-            need_a1r5g5b5_swizzle = true;
-            break;
-        case 26: // D3DFMT_A4R4G4B4
-            src_fmt = GL_RGBA; src_type = GL_UNSIGNED_SHORT_4_4_4_4;
-            need_a4r4g4b4_swizzle = true;
-            break;
-        case 50: // D3DFMT_L8 — 1 byte luminance per pixel
-            src_fmt = GL_RED; src_type = GL_UNSIGNED_BYTE;
-            is_luminance = true;
-            break;
-        case 51: // D3DFMT_A8L8 — 2 bytes: L, A
-            src_fmt = GL_RG; src_type = GL_UNSIGNED_BYTE;
-            is_lum_alpha = true;
-            break;
-        case 28: // D3DFMT_A8 — 1 byte alpha per pixel
-            src_fmt = GL_RED; src_type = GL_UNSIGNED_BYTE;
-            is_alpha_only = true;
-            break;
-        default:
-            src_fmt = GL_RGBA; src_type = GL_UNSIGNED_BYTE;
-            need_rb_swizzle = true; // assume BGRA unless otherwise known
-            break;
-    }
-
-    const void* upload_data = data;
     std::vector<unsigned char> temp_buffer;
-
-    if (need_rb_swizzle) {
-        upload_data = data;
-        src_fmt = GL_RGBA;
-    } else if (need_a4r4g4b4_swizzle) {
-        unsigned int num_pixels = width * height;
-        temp_buffer.resize(num_pixels * sizeof(unsigned short));
-        const unsigned short* src = (const unsigned short*)data;
-        unsigned short* dst = (unsigned short*)temp_buffer.data();
-        for (unsigned int i = 0; i < num_pixels; i++) {
-            unsigned short val = src[i];
-            unsigned short a = (val >> 12) & 0xF;
-            unsigned short r = (val >> 8) & 0xF;
-            unsigned short g = (val >> 4) & 0xF;
-            unsigned short b = val & 0xF;
-            dst[i] = (r << 12) | (g << 8) | (b << 4) | a;
-        }
-        upload_data = temp_buffer.data();
-    } else if (need_a1r5g5b5_swizzle) {
-        unsigned int num_pixels = width * height;
-        temp_buffer.resize(num_pixels * sizeof(unsigned short));
-        const unsigned short* src = (const unsigned short*)data;
-        unsigned short* dst = (unsigned short*)temp_buffer.data();
-        for (unsigned int i = 0; i < num_pixels; i++) {
-            unsigned short val = src[i];
-            unsigned short a = (val >> 15) & 1;
-            unsigned short r = (val >> 10) & 0x1F;
-            unsigned short g = (val >> 5) & 0x1F;
-            unsigned short b = val & 0x1F;
-            dst[i] = (r << 11) | (g << 6) | (b << 1) | a;
-        }
-        upload_data = temp_buffer.data();
-    } else if (is_luminance) {
-        upload_data = data;
-        src_fmt = GL_RED;
-    } else if (is_lum_alpha) {
-        upload_data = data;
-        src_fmt = GL_RG;
-    } else if (is_alpha_only) {
-        upload_data = data;
-        src_fmt = GL_RED;
-    }
+    GLenum src_fmt, src_type;
+    const void* upload_data = Convert_For_Upload(dx8_format, width, height, data, temp_buffer, &src_fmt, &src_type);
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
                     (GLsizei)width, (GLsizei)height,

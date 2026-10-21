@@ -552,6 +552,8 @@ void EmscriptenInput_PumpEvents() {
                 int sx = ScaleMouseX(x);
                 int sy = ScaleMouseY(y);
                 long lp = (long)((sx & 0xFFFF) | ((sy & 0xFFFF) << 16));
+                GX_DIAG_LOG("INPUT: button %u down sdl=(%d,%d) engine=(%d,%d) relative=%d\n",
+                            (unsigned)event.button.button, x, y, sx, sy, (int)g_relativeMouseActive);
                 EmscriptenInput_RouteMouseEvent(msg, 0, lp, SDL_GetTicks());
             }
             break;

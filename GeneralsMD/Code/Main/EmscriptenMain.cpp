@@ -369,7 +369,7 @@ static void DeferredAudio_Step() {
 // Runtime switch for the per-second console diagnostics (see the frame
 // callback). Trace builds always have them on; Release builds opt in with
 // ?diag=1 or #diag in the URL.
-static bool GX_DiagEnabled() {
+extern "C" int GX_DiagEnabled(void) {
   static int s_enabled = -1;
   if (s_enabled < 0) {
 #if GX_TRACE_LOGGING
@@ -384,7 +384,7 @@ static bool GX_DiagEnabled() {
     }));
 #endif
   }
-  return s_enabled == 1;
+  return s_enabled;
 }
 
 static bool GameWebFrameCallback(float /*delta_time_ms*/) {

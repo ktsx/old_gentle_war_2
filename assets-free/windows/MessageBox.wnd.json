@@ -1,0 +1,224 @@
+{
+ "file": "MessageBox.wnd",
+ "version": 2,
+ "layout": {
+  "init": "[None]",
+  "update": "[None]",
+  "shutdown": "[None]"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "MessageBoxParent",
+   "type": "USER",
+   "rect": [
+    190,
+    200,
+    420,
+    200
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "style": [
+    "MOUSETRACK"
+   ],
+   "system": "MessageBoxSystem",
+   "colors": {
+    "enabled": [
+     24,
+     28,
+     36,
+     245
+    ],
+    "enabledBorder": [
+     150,
+     160,
+     180,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      206,
+      214,
+      388,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "style": [],
+     "text": "",
+     "headerTemplate": "Subtitle",
+     "staticText": {
+      "centered": true
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "name": "StaticTextMessage",
+     "type": "STATICTEXT",
+     "rect": [
+      206,
+      250,
+      388,
+      90
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "style": [],
+     "text": "",
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": true
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "name": "ButtonOk",
+     "type": "PUSHBUTTON",
+     "rect": [
+      212,
+      350,
+      110,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN",
+      "IMAGE"
+     ],
+     "style": [
+      "MOUSETRACK"
+     ],
+     "text": "GUI:Ok",
+     "headerTemplate": "Button",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     }
+    },
+    {
+     "name": "ButtonYes",
+     "type": "PUSHBUTTON",
+     "rect": [
+      212,
+      350,
+      110,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN",
+      "IMAGE"
+     ],
+     "style": [
+      "MOUSETRACK"
+     ],
+     "text": "GUI:Yes",
+     "headerTemplate": "Button",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     }
+    },
+    {
+     "name": "ButtonNo",
+     "type": "PUSHBUTTON",
+     "rect": [
+      345,
+      350,
+      110,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN",
+      "IMAGE"
+     ],
+     "style": [
+      "MOUSETRACK"
+     ],
+     "text": "GUI:No",
+     "headerTemplate": "Button",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     }
+    },
+    {
+     "name": "ButtonCancel",
+     "type": "PUSHBUTTON",
+     "rect": [
+      478,
+      350,
+      110,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN",
+      "IMAGE"
+     ],
+     "style": [
+      "MOUSETRACK"
+     ],
+     "text": "GUI:Cancel",
+     "headerTemplate": "Button",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -53,6 +53,7 @@
 #include "GameClient/GlobalLanguage.h"
 #include "GameClient/GameWindowTransitions.h"
 #include "Common/NameKeyGenerator.h"
+#include <Utility/gx_trace.h>
 
 // PUBLIC DATA ////////////////////////////////////////////////////////////////////////////////////
 GameWindowManager *TheWindowManager = nullptr;
@@ -690,6 +691,11 @@ WindowMsgHandledType GameWindowManager::winSendSystemMsg( GameWindow *window,
 	if( msg != GWM_DESTROY && BitIsSet( window->m_status, WIN_STATUS_DESTROYED ) )
 		return MSG_IGNORED;
 
+	if( msg == GBM_SELECTED )
+		GX_DIAG_LOG("WINDOW: GBM_SELECTED '%s' -> '%s'\n",
+			mData1 ? ((GameWindow *)mData1)->winGetInstanceData()->m_decoratedNameString.str() : "?",
+			window->winGetInstanceData()->m_decoratedNameString.str());
+
 	return window->m_system( window, msg, mData1, mData2 );
 
 }
@@ -829,6 +835,16 @@ WinInputReturnCode GameWindowManager::winProcessMouseEvent( GameWindowMessage ms
 
 	// pack mouse coords into one entity for message passing
 	packedMouseCoords = SHORTTOLONG( mousePos->x, mousePos->y );
+
+	if( msg == GWM_LEFT_DOWN || msg == GWM_LEFT_UP )
+	{
+		GameWindow *under = m_mouseCaptor ? m_mouseCaptor : getWindowUnderCursor( mousePos->x, mousePos->y );
+		GX_DIAG_LOG("WINDOW: %s at (%d,%d) captor=%s grab=%s under='%s' modal=%s\n",
+			msg == GWM_LEFT_DOWN ? "LEFT_DOWN" : "LEFT_UP", mousePos->x, mousePos->y,
+			m_mouseCaptor ? "yes" : "no", m_grabWindow ? "yes" : "no",
+			under ? under->winGetInstanceData()->m_decoratedNameString.str() : "(none)",
+			m_modalHead ? "yes" : "no");
+	}
 
 	// clear tooltip ... it will be reset if necessary
 	TheMouse->setCursorTooltip( UnicodeString::TheEmptyString );

@@ -40,7 +40,7 @@ const { chromium } = require('playwright');
       for (const pt of (process.env.SMOKE_CLICKS || '').split(';').filter(Boolean)) {
         const [cx, cy] = pt.split(',').map(Number);
         await page.mouse.move(cx, cy); await page.waitForTimeout(300);
-        await page.mouse.click(cx, cy);
+        await page.mouse.click(cx, cy, { delay: 150 }); // down and up a few frames apart, as a human would
         lines.push(`${stamp()} [SMOKE] clicked canvas ${cx},${cy}`);
         await page.waitForTimeout(2000);
       }

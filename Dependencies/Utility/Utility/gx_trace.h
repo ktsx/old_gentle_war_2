@@ -20,6 +20,15 @@
 #endif
 #endif
 
+// Runtime diagnostics (web only): on when the page is opened with ?diag=1 /
+// #diag, or always in trace builds. Defined in GeneralsMD/Code/Main/EmscriptenMain.cpp.
+#ifdef __EMSCRIPTEN__
+extern "C" int GX_DiagEnabled(void);
+#define GX_DIAG_LOG(...) do { if (GX_DiagEnabled()) { fprintf(stderr, __VA_ARGS__); } } while (0)
+#else
+#define GX_DIAG_LOG(...) ((void)0)
+#endif
+
 #if GX_TRACE_LOGGING
 // Console trace — stderr reaches the browser console on Emscripten.
 #define GX_TRACE_LOG(...) fprintf(stderr, __VA_ARGS__)

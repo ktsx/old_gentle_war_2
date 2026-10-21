@@ -224,7 +224,8 @@
         "hilite": "GxButtonHi"
        }
       }
-     ]
+     ],
+     "system": "PassSelectedButtonsToParentSystem"
     },
     {
      "name": "MapBorder",
@@ -551,7 +552,8 @@
        "text": "GUI:LoadGame",
        "headerTemplate": "Button"
       }
-     ]
+     ],
+     "system": "PassSelectedButtonsToParentSystem"
     },
     {
      "name": "MapBorder1",
@@ -654,7 +656,8 @@
         "hilite": "GxButtonHi"
        }
       }
-     ]
+     ],
+     "system": "PassSelectedButtonsToParentSystem"
     },
     {
      "name": "MapBorder3",
@@ -757,7 +760,8 @@
         "hilite": "GxButtonHi"
        }
       }
-     ]
+     ],
+     "system": "PassSelectedButtonsToParentSystem"
     },
     {
      "name": "MapBorder4",
@@ -915,7 +919,8 @@
         "hilite": "GxButtonHi"
        }
       }
-     ]
+     ],
+     "system": "PassSelectedButtonsToParentSystem"
     },
     {
      "name": "MainMenuRuler",

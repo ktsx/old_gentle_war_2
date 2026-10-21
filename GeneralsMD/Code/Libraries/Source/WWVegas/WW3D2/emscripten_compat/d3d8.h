@@ -22,22 +22,6 @@
 void GLES3_Swap_Buffers();
 
 // GeneralsX @feature WebPort 2026-05-05 — black-canvas triage counters.
-// Defined in dx8wrapper.cpp; bumped from inline DrawIndexedPrimitive below
-// and read from EmscriptenMain.cpp once a second to localise where draws
-// are getting lost.
-extern "C" {
-extern int gx_d3d_dip_called;
-extern int gx_d3d_dip_no_vb;
-extern int gx_d3d_dip_empty_vb;
-extern int gx_d3d_dip_no_ib;
-extern int gx_d3d_dip_empty_ib;
-extern int gx_d3d_dip_drew;
-extern int gx_d3d_setstreamsource_calls;
-extern int gx_d3d_setstreamsource_null;
-extern int gx_d3d_setindices_calls;
-extern int gx_d3d_setindices_null;
-}
-
 #define D3DCURSOR_IMMEDIATE_UPDATE 0x00000001L
 
 #define D3DUSAGE_POINTS 0x00000040L
@@ -938,10 +922,6 @@ struct Emscripten_IDirect3DDevice8 : public IDirect3DDevice8 {
     virtual HRESULT SetStreamSource(UINT StreamNumber,
                                   IDirect3DVertexBuffer8 *pStreamData,
                                   UINT Stride) override {
-        extern int gx_d3d_setstreamsource_calls;
-        extern int gx_d3d_setstreamsource_null;
-        ++gx_d3d_setstreamsource_calls;
-        if (!pStreamData) ++gx_d3d_setstreamsource_null;
         // GeneralsX @feature WebPort 2026-05-05 — black-canvas root cause #4
         //
         // The W3D engine sets streams in a loop over MAX_VERTEX_STREAMS,
@@ -961,10 +941,6 @@ struct Emscripten_IDirect3DDevice8 : public IDirect3DDevice8 {
     }
     virtual HRESULT SetIndices(IDirect3DIndexBuffer8 *pIndexData,
                              UINT BaseVertexIndex) override {
-        extern int gx_d3d_setindices_calls;
-        extern int gx_d3d_setindices_null;
-        ++gx_d3d_setindices_calls;
-        if (!pIndexData) ++gx_d3d_setindices_null;
         current_ib       = static_cast<Emscripten_IDirect3DIndexBuffer8*>(pIndexData);
         base_vtx_index   = BaseVertexIndex;
         return 0;
@@ -1038,20 +1014,13 @@ struct Emscripten_IDirect3DDevice8 : public IDirect3DDevice8 {
     virtual HRESULT DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimType, UINT MinIndex,
                                        UINT NumVertices, UINT StartIndex,
                                        UINT PrimCount) override {
-        // GeneralsX @feature WebPort 2026-05-05 — black-canvas triage
-        // Counters declared with C linkage at file scope; defined in
-        // dx8wrapper.cpp.
-        ++gx_d3d_dip_called;
-        if (!current_vb) { ++gx_d3d_dip_no_vb; return 0; }
-        if (current_vb->data.empty()) { ++gx_d3d_dip_empty_vb; return 0; }
-        if (!current_ib) { ++gx_d3d_dip_no_ib; return 0; }
-        if (current_ib->data.empty()) { ++gx_d3d_dip_empty_ib; return 0; }
+        if (!current_vb || current_vb->data.empty()) return 0;
+        if (!current_ib || current_ib->data.empty()) return 0;
         current_vb->Upload_And_Bind();
         current_ib->Upload_And_Bind();
         _setup_vertex_attribs();
         GLES3_Draw_Triangles((unsigned int)PrimType, StartIndex, PrimCount,
                              MinIndex, NumVertices);
-        ++gx_d3d_dip_drew;
         return 0;
     }
 

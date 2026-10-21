@@ -56,39 +56,6 @@
 // Win32Mouse
 #include "Win32Device/GameClient/Win32Mouse.h"
 
-// BigVFS read function (defined in gles3_big_vfs.cpp). Forward-declared here
-// for the diagnostic probe in main() that tests path resolution against the
-// .big archives. GeneralsX @feature WebPort 2026-05-05 — black-canvas triage
-extern "C" bool Web_VFS_Read_File_Sync(const char *path, void **out_data,
-                                       unsigned int *out_size);
-
-// DX8Wrapper diagnostic counters defined in dx8wrapper.cpp. Sampled once a
-// second from GameWebFrameCallback to localise where draws are getting lost.
-extern "C" int gx_dx8_draw_triangles_calls;
-extern "C" int gx_dx8_sorting_path;
-extern "C" int gx_dx8_path;
-extern "C" int gx_dx8_draw_called;
-extern "C" int gx_dx8_draw_polygon_low_skip;
-extern "C" int gx_dx8_draw_triangle_disabled;
-extern "C" int gx_dx8_draw_dispatched;
-extern "C" int gx_dx8_draw_zero_indexbuffer;
-extern "C" int gx_dx8_draw_zero_vertexbuffer;
-extern "C" int gx_d3d_dip_called;
-extern "C" int gx_d3d_dip_no_vb;
-extern "C" int gx_d3d_dip_empty_vb;
-extern "C" int gx_d3d_dip_no_ib;
-extern "C" int gx_d3d_dip_empty_ib;
-extern "C" int gx_d3d_dip_drew;
-extern "C" int gx_dx8_buftype_dx8;
-extern "C" int gx_dx8_buftype_dyn_dx8;
-extern "C" int gx_dx8_buftype_sort;
-extern "C" int gx_dx8_buftype_dyn_sort;
-extern "C" int gx_dx8_buftype_other;
-extern "C" int gx_d3d_setstreamsource_calls;
-extern "C" int gx_d3d_setstreamsource_null;
-extern "C" int gx_d3d_setindices_calls;
-extern "C" int gx_d3d_setindices_null;
-
 // WWAudio delayed-release drain helper exists in
 // Core/Libraries/Source/WWVegas/WWAudio/Threads.{h,cpp} (see
 // Tick_Delayed_Release_Objects). It is NOT included here because the web
@@ -471,22 +438,12 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
     TheWritableGlobalData->m_loadScreenRender = false;
   }
 
-  // Once-a-second diagnostics: DX8Wrapper draw counters and the game-logic
-  // tick state. Off by default in Release; enabled by trace builds or at
+  // Once-a-second diagnostics: the game-logic tick state. Off by default in Release; enabled by trace builds or at
   // runtime with ?diag=1 / #diag (scripts/dev/gx_harness.py keys off
   // "TICK-DIAG ... inGame=1").
   static int s_diagFrameTick = 0;
   if (GX_DiagEnabled() && ++s_diagFrameTick >= 60) {
     s_diagFrameTick = 0;
-    fprintf(stderr,
-            "DX8-DIAG: dip:called=%d no_vb=%d empty_vb=%d drew=%d  "
-            "SetStreamSource:%d (null=%d)  SetIndices:%d (null=%d)  "
-            "buftype dyn_dx8=%d\n",
-            gx_d3d_dip_called, gx_d3d_dip_no_vb, gx_d3d_dip_empty_vb,
-            gx_d3d_dip_drew,
-            gx_d3d_setstreamsource_calls, gx_d3d_setstreamsource_null,
-            gx_d3d_setindices_calls, gx_d3d_setindices_null,
-            gx_dx8_buftype_dyn_dx8);
     if (TheGameLogic && TheFramePacer) {
       fprintf(stderr,
               "TICK-DIAG: logicFrame=%u inGame=%d isPaused=%d "

@@ -28,6 +28,7 @@ if(EMSCRIPTEN)
     target_precompile_headers(core_profile_legacy PRIVATE
         [["Precompiled/precompiled.h"]] # Must be first
         [["Utility/compat.h"]] # web: __forceinline, size_t & co. for non-MSVC
+        <stdarg.h> # web: va_start/va_end (comes with windows.h on MSVC)
         "Include/profile/profile.h"
         "internal.h"
     )

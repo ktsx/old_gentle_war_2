@@ -71,7 +71,24 @@ jobs:
             -DCMAKE_PROJECT_INCLUDE=$PWD/cmake/web.cmake
 
       - name: Build z_generals
-        run: ninja -C build-web z_generals
+        # Log is tee'd so the step below can surface compiler errors as
+        # annotations (job logs live on blob storage that some proxies block).
+        run: |
+          set -o pipefail
+          ninja -C build-web z_generals 2>&1 | tee build-web/build.log
+
+      - name: Surface compiler errors as annotations
+        if: failure()
+        run: |
+          grep -nE "error:|Error:|undefined symbol|FAILED:" build-web/build.log | head -40 | while IFS= read -r line; do
+            echo "::error::${line:0:900}"
+          done
+          # also the 60 lines before the first error, for context
+          n=$(grep -nE "error:" build-web/build.log | head -1 | cut -d: -f1)
+          if [ -n "$n" ]; then
+            s=$(( n > 60 ? n - 60 : 1 ))
+            sed -n "${s},$((n+20))p" build-web/build.log | while IFS= read -r line; do echo "::warning::${line:0:900}"; done
+          fi
 
       - name: Verify Outputs
         run: |

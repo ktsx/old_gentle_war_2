@@ -131,7 +131,7 @@ public:
 		MSG_RAW_MOUSE_RIGHT_DOUBLE_CLICK,						///< (pixel, modifiers, time)
 		MSG_RAW_MOUSE_RIGHT_BUTTON_UP,							///< (pixel, modifiers, time)
 		MSG_RAW_MOUSE_RIGHT_DRAG,										///< drag of the mouse with a button held down
-		MSG_RAW_MOUSE_WHEEL,												///< (Int spin, + is away, - is toward user)
+		MSG_RAW_MOUSE_WHEEL,												///< (Real spin, + is away, - is toward user)
 		MSG_RAW_MOUSE_END,
 
 		MSG_RAW_KEY_DOWN,														///< (KeyDefType) the given key was pressed (uses Microsoft VK_ codes)
@@ -218,7 +218,7 @@ public:
 		MSG_META_SELECT_PREV_UNIT,									///< select 'prev' unit
 		MSG_META_SELECT_NEXT_WORKER,                ///< select 'next' worker
 		MSG_META_SELECT_PREV_WORKER,                ///< select 'prev' worker
-		MSG_META_SELECT_NEXT_IDLE_WORKER,                        ///< TheSuperHackers @feature L3-M 03/08/2025 select next idle worker
+		MSG_META_SELECT_NEXT_IDLE_WORKER,           ///< TheSuperHackers @feature L3-M 03/08/2025 select next idle worker
 		MSG_META_VIEW_COMMAND_CENTER,								///< center view on command center
 		MSG_META_VIEW_LAST_RADAR_EVENT,							///< center view on last radar event
 		MSG_META_SELECT_HERO,                       ///< selects player's hero character, if exists...
@@ -277,6 +277,7 @@ public:
 		MSG_META_TOGGLE_PAUSE_ALT,									///< TheSuperHackers @feature Toggle game pause (alternative mapping)
 		MSG_META_STEP_FRAME,												///< TheSuperHackers @feature Step one frame
 		MSG_META_STEP_FRAME_ALT,										///< TheSuperHackers @feature Step one frame (alternative mapping)
+		MSG_META_DEMO_INSTANT_QUIT,									///< bail out of game immediately
 
 
 		// META items that are really for debug/demo/development use only...
@@ -289,7 +290,6 @@ public:
 		MSG_META_DEMO_LOD_INCREASE,                 ///< increase LOD by 1
 		MSG_META_DEMO_TOGGLE_ZOOM_LOCK,							///< Toggle the camera zoom lock on/off
 		MSG_META_DEMO_PLAY_CAMEO_MOVIE,							///< Play a movie in the cameo spot
-		MSG_META_DEMO_INSTANT_QUIT,									///< bail out of game immediately
 		MSG_META_DEMO_TOGGLE_SPECIAL_POWER_DELAYS,	///< Toggle special power delays on/off
 		MSG_META_DEMO_BATTLE_CRY,										///< battle cry
 		MSG_META_DEMO_SWITCH_TEAMS,									///< switch local control to another team
@@ -319,6 +319,8 @@ public:
 		MSG_META_DEMO_PLAY_OBJECTIVE_MOVIE6,				///< play specific "Objective" movie
 		MSG_META_DEMO_BEGIN_ADJUST_PITCH,						///< enter adjust-pitch mode
 		MSG_META_DEMO_END_ADJUST_PITCH,							///< exit adjust-pitch mode
+		MSG_META_DEMO_BEGIN_ADJUST_DEFAULTPITCH,		///< TheSuperHackers @feature Enter adjust-default-pitch mode
+		MSG_META_DEMO_END_ADJUST_DEFAULTPITCH,			///< TheSuperHackers @feature Exit adjust-default-pitch mode
 		MSG_META_DEMO_BEGIN_ADJUST_FOV,							///< enter adjust-FOV mode
 		MSG_META_DEMO_END_ADJUST_FOV,								///< exit adjust-FOV mode
 		MSG_META_DEMO_LOCK_CAMERA_TO_PLANES,				///< lock camera to airborne thingies
@@ -470,7 +472,7 @@ public:
 																									* The selected team is created/augmented with the given team members.
 																									* Do not play their selection sounds.
 																									*/
-		MSG_DESTROY_SELECTED_GROUP,									///< (teamID) the given team is no longer valid
+		MSG_DESTROY_SELECTED_GROUP,									///< deselect currently selected objects (which can be none)
 		MSG_REMOVE_FROM_SELECTED_GROUP,							/**< (objectID1, objectID2, ... objectIDN)
 																									* Remove these units from the selected group. (N should almost always be 1)
 																									*/
@@ -723,6 +725,7 @@ public:
 
 	virtual GameMessage *appendMessage( GameMessage::Type type );		///< Append a message to the end of the stream
 	virtual GameMessage *insertMessage( GameMessage::Type type, GameMessage *messageToInsertAfter );	// Insert message after messageToInsertAfter.
+	virtual Bool isReadyForMessages() const;											///< Return true if a local player is present and ready to accept messages
 
 	// Methods NOT Inherited ------------------------------------------------------------------------
 	void propagateMessages();													///< Propagate messages through attached translators

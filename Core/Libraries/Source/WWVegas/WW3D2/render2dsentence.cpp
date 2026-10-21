@@ -79,7 +79,6 @@ Render2DSentenceClass::Render2DSentenceClass () :
 	useHardWordWrap( false)
 {
 	Shader = Render2DClass::Get_Default_Shader ();
-	return ;
 }
 
 
@@ -92,7 +91,6 @@ Render2DSentenceClass::~Render2DSentenceClass ()
 {
 	REF_PTR_RELEASE (Font);
 	Reset ();
-	return ;
 }
 
 
@@ -106,7 +104,6 @@ Render2DSentenceClass::Set_Font (FontCharsClass *font)
 {
 	Reset ();
 	REF_PTR_SET (Font, font);
-	return ;
 }
 
 
@@ -121,8 +118,6 @@ Render2DSentenceClass::Reset_Polys ()
 	for (int index = 0; index < Renderers.Count (); index ++) {
 		Renderers[index].Renderer->Reset ();
 	}
-
-	return ;
 }
 
 
@@ -161,7 +156,6 @@ Render2DSentenceClass::Reset ()
 
 	Release_Pending_Surfaces ();
 	Reset_Sentence_Data ();
-	return ;
 }
 
 
@@ -179,7 +173,6 @@ Render2DSentenceClass::Make_Additive ()
 	Shader.Set_Secondary_Gradient (ShaderClass::SECONDARY_GRADIENT_DISABLE);
 
 	Set_Shader (Shader);
-	return ;
 }
 
 
@@ -200,8 +193,6 @@ Render2DSentenceClass::Set_Shader (ShaderClass shader)
 		ShaderClass *curr_shader = Renderers[i].Renderer->Get_Shader ();
 		(*curr_shader) = Shader;
 	}
-
-	return ;
 }
 
 
@@ -224,8 +215,6 @@ Render2DSentenceClass::Render ()
 	for (int i = 0; i < Renderers.Count (); i ++) {
 		Renderers[i].Renderer->Render ();
 	}
-
-	return ;
 }
 
 
@@ -242,8 +231,6 @@ Render2DSentenceClass::Set_Base_Location (const Vector2 &loc)
 	for (int i = 0; i < Renderers.Count (); i ++) {
 		Renderers[i].Renderer->Move (dif);
 	}
-
-	return ;
 }
 
 
@@ -256,7 +243,6 @@ void
 Render2DSentenceClass::Set_Location (const Vector2 &loc)
 {
 	Location	= loc;
-	return ;
 }
 
 
@@ -312,7 +298,6 @@ Render2DSentenceClass::Reset_Sentence_Data ()
 	if (SentenceData.Count()>0) {
 		SentenceData.Delete_All ();
 	}
-	return ;
 }
 
 
@@ -333,7 +318,6 @@ Render2DSentenceClass::Release_Pending_Surfaces ()
 	}
 
 	if (PendingSurfaces.Count()>0) PendingSurfaces.Delete_All ();
-	return;
 }
 
 
@@ -414,7 +398,6 @@ Render2DSentenceClass::Build_Textures ()
 	if (PendingSurfaces.Count()>0) {
 		PendingSurfaces.Delete_All ();
 	}
-	return ;
 }
 
 
@@ -576,8 +559,6 @@ Render2DSentenceClass::Draw_Sentence (uint32 color)
 			}
 		}
 	}
-
-	return ;
 }
 
 
@@ -617,8 +598,6 @@ Render2DSentenceClass::Record_Sentence_Chunk ()
 		//
 		SentenceData.Add (sentence_data);
 	}
-
-	return ;
 }
 
 
@@ -717,7 +696,6 @@ Render2DSentenceClass::Allocate_New_Surface (const WCHAR *text, bool justCalcExt
 	//
 	TextureOffset.Set (0, 0);
 	TextureStartX = 0;
-	return ;
 }
 
 float FindStartingXPos( const WCHAR *text )
@@ -1009,7 +987,6 @@ void	Render2DSentenceClass::Build_Sentence_Centered (const WCHAR *text, int *hkX
 			*hkX = hotKeyPosX;
 		if(hkX)
 			*hkY = hotKeyPosY;
-	return ;
 }
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1218,8 +1195,6 @@ Render2DSentenceClass::Build_Sentence (const WCHAR *text, int *hkX, int *hkY)
 	else
 		Build_Sentence_Not_Centered(text, hkX, hkY);
 
-	return;
-
 }
 
 
@@ -1245,7 +1220,6 @@ FontCharsClass::FontCharsClass () :
 {
 	AlternateUnicodeFont = nullptr;
 	::memset( ASCIICharArray, 0, sizeof (ASCIICharArray) );
-	return ;
 }
 
 
@@ -1263,7 +1237,6 @@ FontCharsClass::~FontCharsClass ()
 
 	Free_GDI_Font();
 	Free_Character_Arrays();
-	return ;
 }
 
 
@@ -1393,8 +1366,6 @@ FontCharsClass::Blit_Char (WCHAR ch, uint16 *dest_ptr, int dest_stride, int x, i
 		}
 #endif
 	}
-
-	return ;
 }
 
 
@@ -1658,8 +1629,6 @@ FontCharsClass::Update_Current_Buffer (int char_width)
 		BufferList.Add( new_buffer );
 		CurrPixelOffset = 0;
 	}
-
-	return ;
 }
 
 
@@ -1827,7 +1796,6 @@ FontCharsClass::Free_GDI_Font ()
 	}
 
 #endif
-	return ;
 }
 
 
@@ -1932,7 +1900,6 @@ FontCharsClass::Grow_Unicode_Array (WCHAR ch)
 	FirstUnicodeChar	= first_index;
 	LastUnicodeChar	= last_index;
 	UnicodeCharArray	= new_array;
-	return ;
 }
 
 
@@ -1970,6 +1937,4 @@ FontCharsClass::Free_Character_Arrays ()
 		delete ASCIICharArray[index];
 		ASCIICharArray[index] = nullptr;
 	}
-
-	return ;
 }

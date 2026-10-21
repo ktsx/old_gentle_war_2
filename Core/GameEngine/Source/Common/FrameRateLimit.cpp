@@ -32,6 +32,7 @@ FrameRateLimit::FrameRateLimit()
 
 Real FrameRateLimit::wait(UnsignedInt maxFps)
 {
+	PROFILER_SECTION;
 #ifdef __EMSCRIPTEN__
 	LARGE_INTEGER tick;
 	QueryPerformanceCounter(&tick);

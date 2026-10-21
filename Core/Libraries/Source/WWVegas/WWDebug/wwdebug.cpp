@@ -523,7 +523,5 @@ void WWDebug_DBWin32_Message_Handler( const char * str )
     CloseHandle(hSharedFile);
     CloseHandle(heventData);
     CloseHandle(heventDBWIN);
-
-    return;
 }
 #endif // WWDEBUG

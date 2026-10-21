@@ -152,8 +152,6 @@ StringClass::Resize (int new_len)
 		//
 		Set_Buffer_And_Allocated_Length (new_buffer, new_len);
 	}
-
-	return ;
 }
 
 
@@ -181,7 +179,6 @@ StringClass::Uninitialised_Grow (int new_len)
 	// Whenever this function is called, clear the cached length
 	//
 	Store_Length (0);
-	return ;
 }
 
 
@@ -228,8 +225,6 @@ StringClass::Free_String ()
 		//
 		m_Buffer = m_EmptyString;
 	}
-
-	return ;
 }
 
 

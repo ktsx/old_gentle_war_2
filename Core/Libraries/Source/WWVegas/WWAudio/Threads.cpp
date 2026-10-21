@@ -55,7 +55,6 @@ bool							WWAudioThreadsClass::m_IsShuttingDown			= false;
 ///////////////////////////////////////////////////////////////////////////////////////////
 WWAudioThreadsClass::WWAudioThreadsClass ()
 {
-	return ;
 }
 
 
@@ -66,7 +65,6 @@ WWAudioThreadsClass::WWAudioThreadsClass ()
 ///////////////////////////////////////////////////////////////////////////////////////////
 WWAudioThreadsClass::~WWAudioThreadsClass ()
 {
-	return ;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +107,6 @@ WWAudioThreadsClass::End_Delayed_Release_Thread (DWORD timeout)
 		m_hDelayedReleaseEvent	= (HANDLE)-1;
 		m_hDelayedReleaseThread	= (HANDLE)-1;
 	}
-
-	return ;
 }
 
 
@@ -157,8 +153,6 @@ WWAudioThreadsClass::Add_Delayed_Release_Object
 			m_ReleaseListHead = info;
 		}
 	}
-
-	return ;
 }
 
 
@@ -189,7 +183,6 @@ WWAudioThreadsClass::Flush_Delayed_Release_Objects ()
 	}
 
 	m_ReleaseListHead = nullptr;
-	return ;
 }
 
 
@@ -305,7 +298,6 @@ WWAudioThreadsClass::Delayed_Release_Thread_Proc (LPVOID /*param*/)
 	}
 
 	Flush_Delayed_Release_Objects ();
-	return ;
 }
 
 /*
@@ -345,8 +337,6 @@ WWAudioThreadsClass::End_Modify_List ()
 	if (m_ListMutex != nullptr) {
 		::ReleaseMutex (m_ListMutex);
 	}
-
-	return ;
 }
 */
 

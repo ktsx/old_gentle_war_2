@@ -45,8 +45,6 @@
 #include "Common/GameAudio.h"
 #include "Common/AudioEventRTS.h"
 
-#include <rts/profile.h>
-
 // PUBLIC DATA ////////////////////////////////////////////////////////////////////////////////////
 Shell *TheShell = nullptr;  ///< the shell singleton definition
 
@@ -540,7 +538,7 @@ void Shell::showShell( Bool runInit )
 
 	if (!TheGlobalData->m_shellMapOn && m_screenCount == 0)
   {
-#ifdef RTS_PROFILE
+#ifdef RTS_PROFILE_LEGACY
     Profile::StopRange("init");
 #endif
 	//else

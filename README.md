@@ -192,6 +192,12 @@ emcmake cmake -G Ninja -B build-web \
 
 ---
 
+### Profiling
+
+Tracy profiling is supported in the CMake preset `win32-profile`.
+Use `tracy-profiler.exe` from [Tracy v0.13.1](https://github.com/wolfpld/tracy/releases/tag/v0.13.1).
+If you get an error when using Tracy, try removing `dbghelp.dll` from the game binary directory.
+
 ## Contributing
 
 Start with **[CONTRIBUTING.md](CONTRIBUTING.md)** and the curated **[good first issues](docs/web-port/GOOD-FIRST-ISSUES.md)**. Four lanes where help moves the needle most:

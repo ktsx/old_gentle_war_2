@@ -573,7 +573,7 @@ HRESULT  Cftp::LoginToServer( LPCSTR szUserName, LPCSTR szPassword )
 
 /*$_Function****************************************************************
 * $_Name        :
-*	STDMETHOD Cftp::LogoffFromServer( void )
+*	STDMETHOD Cftp::LogoffFromServer()
 *
 * $_Description :
 *	Logs off from a server.  LoginToServer() must have succeeded before this
@@ -1087,7 +1087,7 @@ unsigned long MyIPAddress( int sockfd )
 
 /*$_Function****************************************************************
 * $_Name        :
-*	int Cftp::SendNewPort( void )
+*	int Cftp::SendNewPort()
 *
 * $_Description :
 *	Sends a PORT command to the server specifying a new ephemeral port to
@@ -1831,7 +1831,6 @@ void Cftp::GetDownloadFilename(const char *localname, char *downloadname, size_t
 	name.replace(" ","_");
 	sprintf(downloadname,"download\\%s_%d.tmp",name.get(),m_iFileSize);
 	*/
-	return;
 }
 
 

@@ -1502,7 +1502,7 @@ void Debug::WriteBuildInfo()
     (*this) << " internal " << m_intVersion;
   #if defined(RTS_DEBUG)
     operator<<(" debug");
-  #elif defined(RTS_PROFILE)
+  #elif defined(RTS_PROFILE_LEGACY) || defined(RTS_PROFILE_TRACY)
     operator<<(" profile");
   #else
     operator<<(" release");

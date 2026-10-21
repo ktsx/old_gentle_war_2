@@ -1,5 +1,5 @@
 /*
-**	Command & Conquer Generals(tm)
+**	Command & Conquer Generals Zero Hour(tm)
 **	Copyright 2025 Electronic Arts Inc.
 **
 **	This program is free software: you can redistribute it and/or modify
@@ -66,6 +66,12 @@ public:
 	//changes the mode of drag selecting to it's opposite
 	void setDragSelecting(Bool dragSelect);
 	void setLeftMouseButton(Bool state);
+
+#if defined(RTS_DEBUG) || defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)
+  Bool m_HandOfGodSelectionMode;
+  Bool isHandOfGodSelectionMode() { return m_HandOfGodSelectionMode; };
+#endif
+
 };
 
 Bool CanSelectDrawable( const Drawable *draw, Bool dragSelecting );

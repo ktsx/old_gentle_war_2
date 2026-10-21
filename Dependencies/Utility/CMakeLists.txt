@@ -5,6 +5,7 @@ set(UTILITY_SRC
     Utility/fstream_adapter.h
     Utility/gx_trace.h
     Utility/hash_map_adapter.h
+    Utility/interlocked_adapter.h
     Utility/intrin_compat.h
     Utility/iostream_adapter.h
     Utility/mem_compat.h

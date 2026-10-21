@@ -1671,7 +1671,7 @@ void Player::healAllObjects()
 }
 
 //=============================================================================
-void Player::iterateObjects( ObjectIterateFunc func, void *userData )
+void Player::iterateObjects( ObjectIterateFunc func, void *userData ) const
 {
 	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin();
 			 it != m_playerTeamPrototypes.end(); ++it)
@@ -2978,8 +2978,8 @@ void Player::removeUpgrade( const UpgradeTemplate *upgradeTemplate )
 		if( upgrade->getStatus() == UPGRADE_STATUS_COMPLETE )
 			onUpgradeRemoved();
 
+		deleteInstance(upgrade);
 	}
-
 }
 
 

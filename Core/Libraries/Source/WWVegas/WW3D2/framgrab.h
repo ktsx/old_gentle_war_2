@@ -17,90 +17,91 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
- ****
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WW3D *
+ *                 Project Name : WW3D                                                         *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/ww3d2/framgrab.h $*
+ *                     $Archive:: /Commando/Code/ww3d2/framgrab.h                             $*
  *                                                                                             *
- *                       Author:: Greg Hjelstrom *
+ *                       Author:: Greg Hjelstrom                                               *
  *                                                                                             *
- *                     $Modtime:: 1/08/01 10:04a $*
+ *                     $Modtime:: 1/08/01 10:04a                                              $*
  *                                                                                             *
- *                    $Revision:: 1 $*
+ *                    $Revision:: 1                                                           $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions: *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *- - - - - - - */
+ * Functions:                                                                                  *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #pragma once
 
 #include "WWLib/always.h"
 
-#if defined(_MSC_VER)
-#pragma warning(push, 3) // (gth) system headers complain at warning level 4...
+#if defined (_MSC_VER)
+#pragma warning (push, 3)	// (gth) system headers complain at warning level 4...
 #endif
 
 #ifndef __EMSCRIPTEN__
-#include "vfw.h"
 #include "windows.h"
 #include "windowsx.h"
+#include "vfw.h"
 #endif
 
-#if defined(_MSC_VER)
-#pragma warning(pop)
+#if defined (_MSC_VER)
+#pragma warning (pop)
 #endif
 
 // FramGrab.h: interface for the FrameGrabClass class.
 //
 //////////////////////////////////////////////////////////////////////
 
-class FrameGrabClass {
+class FrameGrabClass
+{
 public:
-  enum MODE { RAW, AVI };
+	enum MODE {
+		RAW,
+		AVI
+	};
 
-  // depending on which mode you select, it will produce either frames or an
-  // AVI.
-  FrameGrabClass(const char *filename, MODE mode, int width, int height,
-                 int bitdepth, float framerate);
+	// depending on which mode you select, it will produce either frames or an AVI.
+	FrameGrabClass(const char *filename, MODE mode, int width, int height, int bitdepth, float framerate );
 
-  virtual ~FrameGrabClass();
+	virtual ~FrameGrabClass();
 
-  void ConvertGrab(void *BitmapPointer);
-  void Grab(void *BitmapPointer);
+	void ConvertGrab(void *BitmapPointer);
+	void Grab(void *BitmapPointer);
 
 #ifndef __EMSCRIPTEN__
-  long *GetBuffer() { return Bitmap; }
+	long * GetBuffer()			{ return Bitmap; }
 #else
-  long *GetBuffer() { return nullptr; }
+	long * GetBuffer()			{ return nullptr; }
 #endif
-  float GetFrameRate() { return FrameRate; }
+	float	GetFrameRate()			{ return FrameRate; }
 
 protected:
-  const char *Filename;
-  float FrameRate;
+	const char *Filename;
+	float			FrameRate;
 
-  MODE Mode;
-  long Counter; // used for incrementing filename cunter, etc.
+	MODE Mode;
+	long Counter; // used for incrementing filename cunter, etc.
 
-  void GrabAVI(void *BitmapPointer);
-  void GrabRawFrame(void *BitmapPointer);
+	void GrabAVI(void *BitmapPointer);
+	void GrabRawFrame(void *BitmapPointer);
 
 #ifndef __EMSCRIPTEN__
-  // avi settings
-  PAVIFILE AVIFile;
-  long *Bitmap;
-  PAVISTREAM Stream;
-  AVISTREAMINFO AVIStreamInfo;
-  BITMAPINFOHEADER BitmapInfoHeader;
+	// avi settings
+	PAVIFILE				AVIFile;
+	long					*Bitmap;
+	PAVISTREAM			Stream;
+	AVISTREAMINFO		AVIStreamInfo;
+	BITMAPINFOHEADER	BitmapInfoHeader;
 #endif
 
-  // general purpose cleanup routine
-  void CleanupAVI();
+	// general purpose cleanup routine
+	void CleanupAVI();
 
-  // convert the SR image into AVI byte ordering
-  void ConvertFrame(void *BitmapPointer);
+	// convert the SR image into AVI byte ordering
+	void ConvertFrame(void *BitmapPointer);
+
 };

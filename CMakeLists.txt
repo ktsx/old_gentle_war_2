@@ -79,7 +79,10 @@ endif()
 
 include(cmake/config.cmake)
 include(cmake/gamespy.cmake)
-if (IS_VS6_BUILD)
+# Web: GameMath's rounding routines raise FE_INVALID/FE_INEXACT, which wasm's
+# fenv.h does not define (no FP exceptions). Deterministic math is off anyway
+# while RETAIL_COMPATIBLE_CRC is set, so the library is only a stub there.
+if (IS_VS6_BUILD OR EMSCRIPTEN)
     add_library(gamemath INTERFACE)
 else()
     include(cmake/gamemath.cmake)

@@ -130,22 +130,25 @@ void main() {
 
     // Texture coordinates: pick the input set or generate them (camera-space position is what the
     // terrain's cloud/noise pass and the shroud use, with a texture matrix mapping view space back
-    // to a map-aligned lookup), then apply the stage's texture matrix when transforms are enabled.
+    // to a map-aligned lookup), then apply the stage's texture matrix. Generation only happens
+    // while a texture transform is enabled: the engine leaves TCI_CAMERASPACEPOSITION behind on
+    // stages whose transform it has already disabled (seen on the terrain base pass), and those
+    // draws expect the vertex UVs.
     vec3 viewNormal = normalize(mat3(u_View) * mat3(worldMat) * a_Normal);
     vec2 texOut[4];
     for (int s = 0; s < 4; s++) {
         int src = u_TexSource[s];
         int gen = src & 0x70000;
         int idx = src & 0xffff;
+        int ttf = u_TexTransform[s];
+        int count = ttf & 0xff;
         vec4 tc;
-        if (gen == 0x20000)      tc = vec4(viewPos.xyz, 1.0);
-        else if (gen == 0x10000) tc = vec4(viewNormal, 1.0);
+        if (count != 0 && gen == 0x20000)      tc = vec4(viewPos.xyz, 1.0);
+        else if (count != 0 && gen == 0x10000) tc = vec4(viewNormal, 1.0);
         else {
             vec2 uv = idx == 1 ? a_TexCoord1 : idx == 2 ? a_TexCoord2 : idx == 3 ? a_TexCoord3 : a_TexCoord0;
             tc = vec4(uv, 0.0, 1.0);
         }
-        int ttf = u_TexTransform[s];
-        int count = ttf & 0xff;
         if (count != 0) {
             tc = u_TexMatrix[s] * tc;
             if ((ttf & 0x100) != 0) {

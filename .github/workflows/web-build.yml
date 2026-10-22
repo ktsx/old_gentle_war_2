@@ -180,20 +180,24 @@ jobs:
       # Artifacts live on Azure blob storage, which some corporate/agent proxies
       # block. Mirror the build into a rolling pre-release so it is reachable via
       # plain github.com/<repo>/releases/download/ci-latest/<file>.
+      # Pushes to main publish ci-latest / ci-latest-release; pushes to merge/** publish the same
+      # files under ci-branch / ci-branch-release (one rolling slot for whichever branch built last),
+      # so a branch build can be fetched and tested without merging it first.
       - name: Publish rolling release (${{ matrix.release_tag }})
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/merge/'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -e
           cp scripts/serve.py build-web/GeneralsMD/serve.py
           TAG='${{ matrix.release_tag }}'
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then TAG="${TAG/ci-latest/ci-branch}"; fi
           gh release delete "$TAG" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
           gh release create "$TAG" --prerelease \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "CI build ${GITHUB_SHA::7} (${{ matrix.build_type }})" \
-            --notes "Automated web build of ${GITHUB_SHA} (Emscripten ${EMSDK_VERSION}, ${{ matrix.build_type }}). Engine only — no game assets." \
+            --title "CI build ${GITHUB_SHA::7} (${{ matrix.build_type }}, ${GITHUB_REF_NAME})" \
+            --notes "Automated web build of ${GITHUB_SHA} (${GITHUB_REF_NAME}, Emscripten ${EMSDK_VERSION}, ${{ matrix.build_type }}). Engine only — no game assets." \
             build-web/GeneralsMD/GeneralsZH.html \
             build-web/GeneralsMD/GeneralsZH.js \
             build-web/GeneralsMD/GeneralsZH.wasm \

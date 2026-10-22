@@ -42,6 +42,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import { Image32 } from "./tga.ts";
 
 export interface MapPlayer {
   name: string;
@@ -367,6 +368,46 @@ export function mapCacheEntry(spec: MapSpec, buf: Buffer): string {
     `END`,
   ];
   return lines.join("\n") + "\n";
+}
+
+/**
+ * The 128×128 preview the skirmish/map-select menus show (Maps/<name>/<name>.tga; the engine
+ * copies it to <UserData>/MapPreviews/ and loads it as a mapped image): the playable area in
+ * terrain green with a darker border, buildings as blocks and units as dots in their owner's
+ * colour. Start positions are overlaid by the menu itself.
+ */
+export function buildMapPreview(spec: MapSpec): Image32 {
+  const SIZE = 128;
+  const [pw, ph] = spec.playable, border = spec.border ?? 0;
+  const w = pw + 2 * border, h = ph + 2 * border;
+  const img = new Image32(SIZE, SIZE, [60, 78, 40, 255]);
+  let seed = 11; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 2 ** 32; };
+  const sx = SIZE / w, sy = SIZE / h;
+  for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) {
+    const cx = x / sx, cy = h - y / sy;                       // image rows run top→bottom, map y runs upwards
+    const inside = cx >= border && cx < border + pw && cy >= border && cy < border + ph;
+    const n = Math.round((rnd() - 0.5) * 14);
+    img.set(x, y, inside ? [92 + n, 128 + n, 56 + n, 255] : [60 + n, 74 + n, 40 + n, 255]);
+  }
+  const colourOf = (owner?: string): [number, number, number] => {
+    const p = spec.players.find((pl) => pl.name === owner);
+    return p?.color ?? [200, 200, 200];
+  };
+  const footprint = (template: string) => /CommandCenter/.test(template) ? 13 : /WarFactory|ArmsDealer/.test(template) ? 11
+    : /Barracks|Supply|PowerPlant/.test(template) ? 8 : /Hole/.test(template) ? 5 : 0;
+  for (const o of spec.objects ?? []) {
+    const [r, g, b] = colourOf(o.owner);
+    const cx = Math.round((border + o.at[0]) * sx), cy = Math.round(SIZE - (border + o.at[1]) * sy);
+    const f = footprint(o.template);
+    if (f) {
+      const hw = Math.max(2, Math.round(f * sx / 2)), hh = Math.max(2, Math.round(f * sy / 2));
+      img.fillRect(cx - hw, cy - hh, 2 * hw, 2 * hh, [Math.round(r * 0.6 + 60), Math.round(g * 0.6 + 60), Math.round(b * 0.6 + 60), 255]);
+      img.strokeRect(cx - hw, cy - hh, 2 * hw, 2 * hh, [r, g, b, 255]);
+    } else {
+      img.fillRect(cx - 1, cy - 1, 2, 2, [r, g, b, 255]);
+    }
+  }
+  return img;
 }
 
 export function buildMapCacheIni(entries: string[]): string {

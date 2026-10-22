@@ -31,11 +31,11 @@ import { execFileSync } from "node:child_process";
 import { parseStr, buildCsf } from "./strings.ts";
 import { buildWnd } from "./wnd.ts";
 import { packDir } from "./big.ts";
-import { writeFreeImages } from "./tga.ts";
+import { encodeTga, writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
 import { writeFxTextures } from "./fx-textures.ts";
-import { buildMap, mapCacheEntry, buildMapCacheIni } from "./map.ts";
+import { buildMap, buildMapPreview, mapCacheEntry, buildMapCacheIni } from "./map.ts";
 import { writeFreeModels } from "./free-models.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
@@ -131,7 +131,8 @@ function main() {
     mkdirSync(dir, { recursive: true });
     const buf = buildMap(spec);
     writeFileSync(join(dir, `${spec.name}.map`), buf);
-    console.log(`Maps/${spec.name}/${spec.name}.map: ${buf.length} bytes`);
+    writeFileSync(join(dir, `${spec.name}.tga`), encodeTga(buildMapPreview(spec)));
+    console.log(`Maps/${spec.name}/${spec.name}.map: ${buf.length} bytes (+ preview tga)`);
     mapCache.push(mapCacheEntry(spec, buf));
   }
   // the standard-map list the skirmish/map-select menus read (MapCache::updateCache)

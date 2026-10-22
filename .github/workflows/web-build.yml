@@ -83,6 +83,7 @@ jobs:
           echo "CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime,include_file_ctime" >> "$GITHUB_ENV"
           echo "CCACHE_NOHASHDIR=1" >> "$GITHUB_ENV"
           echo "CCACHE_PCH_EXTSUM=1" >> "$GITHUB_ENV"
+          echo "CCACHE_LAUNCHER_LOG=$RUNNER_TEMP/launcher.log" >> "$GITHUB_ENV"
           echo "CCACHE_LOGFILE=$RUNNER_TEMP/ccache.log" >> "$GITHUB_ENV"
           ccache --zero-stats
 
@@ -115,6 +116,7 @@ jobs:
           # one line in the check-run annotations, so the hit rate is visible without the logs
           echo "::notice title=ccache (${{ matrix.build_type }})::$(ccache --show-stats | grep -E 'Hits|Misses|Cache size|Uncacheable' | tr -s ' ' | paste -sd ';' -)"
           # why misses happen (temporary diagnostics while the cache is being tuned)
+          [ -f "$RUNNER_TEMP/launcher.log" ] && echo "::notice title=launcher::$(head -c 1500 "$RUNNER_TEMP/launcher.log" | paste -sd ';' -)"
           echo "::notice title=pch sums::$(find build-web -name '*.pch.sum' | head -6 | xargs -r -I{} sh -c 'printf "%s %s\n" "$(cut -c1-12 {})" "{}"' | sed 's#build-web/##' | paste -sd ';' -)"
           if [ -f "$RUNNER_TEMP/ccache.log" ]; then
             echo "::notice title=ccache results::$(grep -oE 'Result: .*' "$RUNNER_TEMP/ccache.log" | sort | uniq -c | sort -rn | head -8 | tr -s ' ' | paste -sd ';' -)"

@@ -16,7 +16,8 @@
  *                 placeholder atlases for every corpus MappedImage texture, fx-textures.ts particle/shadow/
  *                 track/beam sprites, free-models.ts unit atlas), Art/Terrain/*.tga
  *   MapsZH.big    Maps/<name>/<name>.map
- *   W3DZH.big     Art/W3D/*.w3d (free-models.ts: procedural models named after the corpus' retail model names)
+ *   W3DZH.big     Art/W3D/*.w3d (free-models.ts: procedural models named after the corpus' retail model names;
+ *                 placeholder-models.ts: sized stand-ins for every other faction model the INIs reference)
  *
  * Usage:
  *   node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts <outDir> [--patch <dir>] [--cache <dir>]
@@ -37,6 +38,7 @@ import { writePlaceholderAtlases } from "./mapped-images.ts";
 import { writeFxTextures } from "./fx-textures.ts";
 import { buildMap, buildMapPreview, mapCacheEntry, buildMapCacheIni } from "./map.ts";
 import { writeFreeModels } from "./free-models.ts";
+import { writePlaceholderModels } from "./placeholder-models.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
 const PATCH_COMMIT = "6c7f40d6af6a4babb77a33a4502ec7656446c13e"; // 2026-09-18
@@ -121,6 +123,8 @@ function main() {
 
   // 6. models (their shared texture goes into TexturesZH.big)
   console.log(`models: ${writeFreeModels(w3dStage, texStage).join(", ")}`);
+  const placeholders = writePlaceholderModels(patchData, w3dStage);
+  console.log(`placeholder models: ${placeholders.models} (${(placeholders.bytes / 1e6).toFixed(2)} MB) for the rest of the faction rosters`);
 
   // 7. maps
   const mapDir = join(freeRoot, "maps");

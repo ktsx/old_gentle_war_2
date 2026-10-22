@@ -35,11 +35,11 @@ export const UNIT_TEXTURE = "ZHCAGxUnits.tga";
 /** The same atlas scorched (DAMAGED states) and charred (REALLYDAMAGED / RUBBLE states). */
 export const UNIT_TEXTURE_DAMAGED = "ZHCAGxUnitsD.tga";
 export const UNIT_TEXTURE_RUBBLE = "ZHCAGxUnitsE.tga";
-const ATLAS = 512, CELL = 64;
+export const ATLAS = 512, CELL = 64;
 
 /** Atlas cells (column, row) → inset region, so bilinear filtering never bleeds into a neighbour. */
 function R(col: number, row: number): Region { return { x: col * CELL + 3, y: row * CELL + 3, w: CELL - 6, h: CELL - 6 }; }
-const TEX = {
+export const TEX = {
   concrete: R(0, 0), roof: R(1, 0), housePanel: R(2, 0), metal: R(3, 0),
   yellow: R(0, 1), tread: R(1, 1), glass: R(2, 1), redConcrete: R(3, 1),
   olive: R(0, 2), skin: R(1, 2), black: R(2, 2), khaki: R(3, 2),
@@ -188,7 +188,7 @@ function meshBounds(m: Mesh) {
 }
 
 /** The same model with another name and texture (DAMAGED: scorched walls, nothing fell yet). */
-function retextured(m: Mesh, name: string, texture: string): Mesh {
+export function retextured(m: Mesh, name: string, texture: string): Mesh {
   return { ...m, name, texture };
 }
 
@@ -196,7 +196,7 @@ function retextured(m: Mesh, name: string, texture: string): Mesh {
  * REALLYDAMAGED / RUBBLE: the model squashed to `squash` of its height, leaning a little, with
  * rubble heaps around the footprint for buildings, all in the charred texture.
  */
-function collapsed(m: Mesh, name: string, texture: string, squash: number, heaps: boolean): Mesh {
+export function collapsed(m: Mesh, name: string, texture: string, squash: number, heaps: boolean): Mesh {
   const { lo, hi } = meshBounds(m);
   const cx = (lo[0] + hi[0]) / 2, cy = (lo[1] + hi[1]) / 2;
   const lean = 0.08;                                                      // x shift per unit of height
@@ -253,7 +253,7 @@ const DAMAGE_STATES: Record<string, { damaged?: string; rubble?: string; squash:
 };
 
 // --- models ----------------------------------------------------------------------------------
-const PICKABLE = MESH_FLAG.COLLISION_TYPE_PHYSICAL | MESH_FLAG.COLLISION_TYPE_VIS;
+export const PICKABLE = MESH_FLAG.COLLISION_TYPE_PHYSICAL | MESH_FLAG.COLLISION_TYPE_VIS;
 
 function commandCenterUSA(): Mesh {
   const b = new MeshBuilder("ABBtCmdHQ", UNIT_TEXTURE, ATLAS, PICKABLE);
@@ -298,7 +298,7 @@ function dozer(name: string, paint: Region): Mesh {
   return b.mesh();
 }
 
-function infantry(name: string, uniform: Region, helmet: Region): Mesh {
+export function infantry(name: string, uniform: Region, helmet: Region): Mesh {
   const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
   for (const s of [-1, 1]) {
     b.box([-2.2, s * 1.0 - 1.0, 0], [2.4, s * 1.0 + 1.0, 1.3], { side: TEX.black, top: TEX.black });        // boots
@@ -316,12 +316,12 @@ function infantry(name: string, uniform: Region, helmet: Region): Mesh {
 // --- the rest of a starting base ------------------------------------------------------------
 // Sizes follow each template's Geometry (major/minor radius, height); USA = concrete + flat roofs,
 // China = red-brown walls + tiled hip roofs. Model names are the templates' day/undamaged state.
-type Style = { wall: Region; roof: Region; hip: boolean };
-const USA: Style = { wall: TEX.concrete, roof: TEX.roof, hip: false };
-const CHINA: Style = { wall: TEX.redConcrete, roof: TEX.tileRoof, hip: true };
+export type Style = { wall: Region; roof: Region; hip: boolean };
+export const USA: Style = { wall: TEX.concrete, roof: TEX.roof, hip: false };
+export const CHINA: Style = { wall: TEX.redConcrete, roof: TEX.tileRoof, hip: true };
 
 /** A building body: slab, walls, roof (flat or hipped), a house-colour band and a door on +X. */
-function body(b: MeshBuilder, hx: number, hy: number, h: number, st: Style, door = true) {
+export function body(b: MeshBuilder, hx: number, hy: number, h: number, st: Style, door = true) {
   b.box([-hx - 4, -hy - 4, 0], [hx + 4, hy + 4, 2], { side: TEX.metal, top: TEX.roof });
   b.box([-hx, -hy, 2], [hx, hy, h], { side: st.wall, top: st.roof, front: TEX.housePanel });
   if (st.hip) b.frustum([-hx - 3, -hy - 3, h], [hx + 3, hy + 3, h + 7], 9, { side: st.roof, top: st.roof });
@@ -376,7 +376,7 @@ function warFactory(name: string, st: Style, hx: number, hy: number, h: number):
   return b.mesh();
 }
 
-function tank(name: string, paint: Region, hx: number, hy: number, h: number, turret: number): Mesh {
+export function tank(name: string, paint: Region, hx: number, hy: number, h: number, turret: number): Mesh {
   const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
   b.box([-hx, -hy, 0], [hx, -hy + 4, h * 0.5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread });   // tracks
   b.box([-hx, hy - 4, 0], [hx, hy, h * 0.5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread });
@@ -402,6 +402,8 @@ function humvee(name: string): Mesh {
 // GLABarracks UBBARRACKS, GLASupplyStash UBSupply, GLAArmsDealer UBArmDeal, GLAHole UBHole,
 // GLATankScorpion UVLiteTank, GLAVehicleTechnical UVTechTrck, GLAInfantryWorker UIWRKR_SKN,
 // GLAInfantryRebel UIRGrd_SKN.
+
+export const GLA: Style = { wall: TEX.mudBrick, roof: TEX.tarp, hip: false };
 
 /** UBCmdHQ (130×130×54): a walled compound — corner towers, a domed hall, a radio mast. */
 function commandCenterGLA(): Mesh {

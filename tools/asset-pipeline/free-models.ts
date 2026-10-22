@@ -25,9 +25,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Image32, encodeTga, type RGBA } from "./tga.ts";
-import { MeshBuilder, MESH_FLAG, encodeW3D, type Mesh, type Region } from "./w3d.ts";
+import { MeshBuilder, MESH_FLAG, encodeW3D, type Mesh, type Region, type Vec3 } from "./w3d.ts";
 
 export const UNIT_TEXTURE = "ZHCAGxUnits.tga";
+/** The same atlas scorched (DAMAGED states) and charred (REALLYDAMAGED / RUBBLE states). */
+export const UNIT_TEXTURE_DAMAGED = "ZHCAGxUnitsD.tga";
+export const UNIT_TEXTURE_RUBBLE = "ZHCAGxUnitsE.tga";
 const ATLAS = 256, CELL = 64;
 
 /** Atlas cells (column, row) → inset region, so bilinear filtering never bleeds into a neighbour. */
@@ -103,6 +106,107 @@ export function buildUnitAtlas(): Image32 {
   for (let i = -CELL; i < CELL; i += 16) for (let r = 0; r < CELL; r++) img.fillRect(x + ((i + r) % CELL + CELL) % CELL, y + r, 1, 1, [30, 30, 30, 255]);
   return img;
 }
+
+/**
+ * The atlas after a fight: every cell darkened, soot splats and cracks drawn over it. Soot raises
+ * the alpha too, so a sooty house-colour panel shows soot rather than player colour.
+ * `level` 0..1 — 0.45 for DAMAGED, 1 for REALLYDAMAGED/RUBBLE.
+ */
+export function scorchAtlas(src: Image32, level: number, seed: number): Image32 {
+  const img = new Image32(ATLAS, ATLAS, [0, 0, 0, 0]);
+  let s = seed >>> 0;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 2 ** 32; };
+  const dark = 1 - 0.3 - 0.15 * level;                                   // 0.7 damaged, 0.55 rubble
+  const splats: [number, number, number][] = [];
+  for (let i = 0; i < 10 + 26 * level; i++) splats.push([rnd() * ATLAS, rnd() * ATLAS, 6 + rnd() * (10 + 12 * level)]);
+  for (let y = 0; y < ATLAS; y++) for (let x = 0; x < ATLAS; x++) {
+    const [r, g, b, a] = src.get(x, y);
+    let soot = 0;
+    for (const [cx, cy, rad] of splats) {
+      // wrap within the 64-px cell so a splat never crosses into a neighbouring material
+      const dx = ((x - cx) % CELL + CELL * 1.5) % CELL - CELL / 2, dy = ((y - cy) % CELL + CELL * 1.5) % CELL - CELL / 2;
+      const d = Math.hypot(dx, dy) / rad;
+      if (d < 1) soot = Math.max(soot, Math.pow(1 - d, 1.4) * (0.6 + 0.4 * level));
+    }
+    const k = dark * (1 - 0.9 * soot);
+    img.set(x, y, [clamp(Math.round(r * k)), clamp(Math.round(g * k)), clamp(Math.round(b * k)), clamp(Math.round(a + (255 - a) * soot))]);
+  }
+  for (let i = 0; i < 6 + 14 * level; i++) {                              // cracks: short dark jagged polylines
+    let x = Math.floor(rnd() * ATLAS), y = Math.floor(rnd() * ATLAS);
+    const cx0 = Math.floor(x / CELL) * CELL, cy0 = Math.floor(y / CELL) * CELL;
+    for (let k = 0; k < 4 + rnd() * 4; k++) {
+      const nx = clamp(Math.min(cx0 + CELL - 1, Math.max(cx0, x + Math.round((rnd() - 0.5) * 14))));
+      const ny = clamp(Math.min(cy0 + CELL - 1, Math.max(cy0, y + Math.round((rnd() - 0.5) * 14))));
+      img.line(x, y, nx, ny, [24, 22, 20, 255]);
+      x = nx; y = ny;
+    }
+  }
+  return img;
+}
+
+// --- damage states ---------------------------------------------------------------------------
+function meshBounds(m: Mesh) {
+  const lo: Vec3 = [Infinity, Infinity, Infinity], hi: Vec3 = [-Infinity, -Infinity, -Infinity];
+  for (const v of m.verts) for (let i = 0; i < 3; i++) { lo[i] = Math.min(lo[i], v[i]); hi[i] = Math.max(hi[i], v[i]); }
+  return { lo, hi };
+}
+
+/** The same model with another name and texture (DAMAGED: scorched walls, nothing fell yet). */
+function retextured(m: Mesh, name: string, texture: string): Mesh {
+  return { ...m, name, texture };
+}
+
+/**
+ * REALLYDAMAGED / RUBBLE: the model squashed to `squash` of its height, leaning a little, with
+ * rubble heaps around the footprint for buildings, all in the charred texture.
+ */
+function collapsed(m: Mesh, name: string, texture: string, squash: number, heaps: boolean): Mesh {
+  const { lo, hi } = meshBounds(m);
+  const cx = (lo[0] + hi[0]) / 2, cy = (lo[1] + hi[1]) / 2;
+  const lean = 0.08;                                                      // x shift per unit of height
+  const verts: Vec3[] = m.verts.map(([x, y, z]) => [x + (z - lo[2]) * squash * lean, y, lo[2] + (z - lo[2]) * squash]);
+  const normals: Vec3[] = m.normals.map(([x, y, z]) => {
+    const l = Math.hypot(x, y, z / squash) || 1;                          // normals scale by the inverse
+    return [x / l, y / l, (z / squash) / l];
+  });
+  const out: Mesh = { ...m, name, texture, verts, normals: normals, uvs: [...m.uvs], tris: [...m.tris] };
+  if (heaps) {
+    const b = new MeshBuilder(name, texture, ATLAS, m.flags ?? 0);
+    const rx = (hi[0] - lo[0]) / 2, ry = (hi[1] - lo[1]) / 2;
+    let s = 7; const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 2 ** 32; };
+    for (let i = 0; i < 5; i++) {
+      const ang = (i / 5) * Math.PI * 2 + rnd() * 0.6, d = 0.75 + rnd() * 0.35;
+      const hx = cx + Math.cos(ang) * rx * d, hy = cy + Math.sin(ang) * ry * d;
+      const w = 6 + rnd() * Math.min(14, rx * 0.3), h = 3 + rnd() * Math.min(9, (hi[2] - lo[2]) * 0.2);
+      b.frustum([hx - w, hy - w * 0.8, lo[2]], [hx + w, hy + w * 0.8, lo[2] + h], w * 0.55, { side: TEX.concrete, top: TEX.metal });
+    }
+    const base = out.verts.length;
+    out.verts.push(...b.verts); out.normals.push(...b.normals); out.uvs.push(...b.uvs);
+    for (const [a, c, d] of b.tris) out.tris.push([a + base, c + base, d + base]);
+  }
+  return out;
+}
+
+/** Which damage-state render objects the corpus INIs reference for each of our models. */
+const DAMAGE_STATES: Record<string, { damaged?: string; rubble?: string; squash: number; heaps: boolean }> = {
+  // buildings: ConditionState DAMAGED → _D, REALLYDAMAGED RUBBLE → _E
+  ABBtCmdHQ: { damaged: "ABBtCmdHQ_D", rubble: "ABBtCmdHQ_E", squash: 0.4, heaps: true },
+  NBConYard: { damaged: "NBConYard_D", rubble: "NBConYard_E", squash: 0.4, heaps: true },
+  ABPWRPLANT: { damaged: "ABPWRPLANT_D", rubble: "ABPWRPLANT_E", squash: 0.4, heaps: true },
+  NBPwrPlant: { damaged: "NBPwrPlant_D", rubble: "NBPwrPlant_E", squash: 0.4, heaps: true },
+  ABBARRACKS: { damaged: "ABBarracks_D", rubble: "ABBarracks_E", squash: 0.45, heaps: true },
+  NBBarracks: { damaged: "NBBarracks_D", rubble: "NBBarracks_E", squash: 0.45, heaps: true },
+  ABSupplyCT: { damaged: "ABSupplyCT_D", rubble: "ABSupplyCT_E", squash: 0.45, heaps: true },
+  NBSupCent: { damaged: "NBSupCent_D", rubble: "NBSupCent_E", squash: 0.45, heaps: true },
+  ABWarFact: { damaged: "ABWarFact_D", rubble: "ABWarFact_E", squash: 0.4, heaps: true },
+  NBWarFact: { damaged: "NBWarFact_D", rubble: "NBWarFact_E", squash: 0.4, heaps: true },
+  // vehicles: only REALLYDAMAGED swaps the model (a wreck, no heaps)
+  AVLeopard: { rubble: "AVLeopard_D", squash: 0.75, heaps: false },
+  NVBtMstr: { rubble: "NVBtMstr_D", squash: 0.75, heaps: false },
+  AVHUMMER: { rubble: "AVHUMMER_D", squash: 0.7, heaps: false },
+  AVCONSTDOZ_A: { rubble: "AVCONSTDOZ_AD", squash: 0.75, heaps: false },
+  NVCONSTDOZ_A: { rubble: "NVCONSTDOZ_AD", squash: 0.75, heaps: false },
+};
 
 // --- models ----------------------------------------------------------------------------------
 const PICKABLE = MESH_FLAG.COLLISION_TYPE_PHYSICAL | MESH_FLAG.COLLISION_TYPE_VIS;
@@ -261,10 +365,16 @@ export function buildFreeModels(): Record<string, Mesh> {
     dozer("AVCONSTDOZ_A", TEX.yellow), dozer("NVCONSTDOZ_A", TEX.redConcrete),
     infantry("AIRngr_SKN", TEX.olive, TEX.olive), infantry("NICNSC_SKN", TEX.khaki, TEX.khaki),
   ];
+  for (const m of [...models]) {
+    const d = DAMAGE_STATES[m.name];
+    if (!d) continue;
+    if (d.damaged) models.push(retextured(m, d.damaged, UNIT_TEXTURE_DAMAGED));
+    if (d.rubble) models.push(collapsed(m, d.rubble, UNIT_TEXTURE_RUBBLE, d.squash, d.heaps));
+  }
   return Object.fromEntries(models.map((m) => [m.name, m]));
 }
 
-/** Writes Art/W3D/<model>.w3d under `w3dDir` and Art/Textures/ZHCAGxUnits.tga under `texDir`. */
+/** Writes Art/W3D/<model>.w3d under `w3dDir` and the three Art/Textures/ZHCAGxUnits*.tga atlases under `texDir`. */
 export function writeFreeModels(w3dDir: string, texDir: string): string[] {
   const out: string[] = [];
   const dir = join(w3dDir, "Art", "W3D");
@@ -276,8 +386,11 @@ export function writeFreeModels(w3dDir: string, texDir: string): string[] {
   }
   const tdir = join(texDir, "Art", "Textures");
   mkdirSync(tdir, { recursive: true });
-  writeFileSync(join(tdir, UNIT_TEXTURE), encodeTga(buildUnitAtlas(), true));
-  out.push(UNIT_TEXTURE);
+  const atlas = buildUnitAtlas();
+  writeFileSync(join(tdir, UNIT_TEXTURE), encodeTga(atlas, true));
+  writeFileSync(join(tdir, UNIT_TEXTURE_DAMAGED), encodeTga(scorchAtlas(atlas, 0.45, 21), true));
+  writeFileSync(join(tdir, UNIT_TEXTURE_RUBBLE), encodeTga(scorchAtlas(atlas, 1, 22), true));
+  out.push(UNIT_TEXTURE, UNIT_TEXTURE_DAMAGED, UNIT_TEXTURE_RUBBLE);
   return out;
 }
 

@@ -33,7 +33,7 @@
  *   ],
  *   "camera": [32, 32],             // InitialCameraPosition waypoint, playable cells
  *   "waypoints": [ { "name": "Foo", "at": [10, 10] } ],
- *   "objects": [ { "template": "AmericaCommandCenter", "at": [30, 30], "angle": 0, "owner": "GxPlayer" } ]
+ *   "objects": [ { "template": "AmericaCommandCenter", "at": [30, 30], "angle": 0, "owner": "GxPlayer", "health": 50 } ]
  * }
  *
  * Usage:
@@ -58,6 +58,8 @@ export interface MapObjectSpec {
   z?: number;
   angle?: number;
   owner?: string;
+  /** initial health in percent (objectInitialHealth); below 70 the DAMAGED model shows, below 35 REALLYDAMAGED */
+  health?: number;
 }
 export interface MapSpec {
   name: string;
@@ -283,7 +285,9 @@ export function buildMap(spec: MapSpec): Buffer {
     w.real(x); w.real(y); w.real(o.z ?? 0); w.real(o.angle ?? 0);
     w.int(0);
     w.ascii(o.template);
-    w.dict({ originalOwner: D.str(`team${o.owner ?? ""}`) });
+    const props: Dict = { originalOwner: D.str(`team${o.owner ?? ""}`) };
+    if (o.health !== undefined) props.objectInitialHealth = D.int(o.health);
+    w.dict(props);
     w.close();
   }
   w.close();

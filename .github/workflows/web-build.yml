@@ -109,6 +109,7 @@ jobs:
           # one line in the check-run annotations, so the hit rate is visible without the logs
           echo "::notice title=ccache (${{ matrix.build_type }})::$(ccache --show-stats | grep -E 'Hits|Misses|Cache size|Uncacheable' | tr -s ' ' | paste -sd ';' -)"
           # why misses happen (temporary diagnostics while the cache is being tuned)
+          echo "::notice title=pch hashes::$(find build-web -name '*.pch' -o -name '*.gch' | head -6 | xargs -r sha256sum | sed 's#build-web/##' | cut -c1-16,65- | paste -sd ';' -)"
           if [ -f "$RUNNER_TEMP/ccache.log" ]; then
             echo "::notice title=ccache results::$(grep -oE 'Result: .*' "$RUNNER_TEMP/ccache.log" | sort | uniq -c | sort -rn | head -8 | tr -s ' ' | paste -sd ';' -)"
             echo "::notice title=ccache first miss::$(grep -m1 -B30 'Result: .*miss' "$RUNNER_TEMP/ccache.log" | grep -vE 'Hash|^\s*$' | tail -12 | cut -c1-120 | paste -sd ';' -)"

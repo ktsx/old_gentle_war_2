@@ -17,7 +17,7 @@ to a live, clickable main menu **without them**, so that
 | `overlay/Data/English/CommandMap.ini` | ours | Empty per-language hotkey override (optional, silences an INI ERROR). |
 | `overlay/Data/INI/MappedImages/HandCreated/FreeAssets.ini` + `tools/asset-pipeline/tga.ts` | ours | Placeholder button plates and a "logo" that is really a colour-order probe (red / green / blue stripes): `check-menu-shot.py` reads the stripes back from the screenshot, so a channel-order bug in the texture path (as the WebGL2 no-swizzle one was) fails CI. |
 | `maps/gxtest.map.json` + `tools/asset-pipeline/map.ts` | ours | A 64×64 flat map (USA human player vs. a China rival, start waypoints, afternoon lighting) written straight into the engine's DataChunk `.map` format — no WorldBuilder involved. `?args=-file+Maps/gxtest.map` launches it at boot. |
-| `overlay/Data/INI/Default/GameData.ini` | ours | `ShroudOn = No` (plus the corpus `MapName` line): the free map carries no vision-giving objects yet, so with the shroud on the whole tactical view is unexplored, i.e. black. Goes away once the map has units. |
+| `overlay/Data/INI/Default/GameData.ini` | ours | `ShroudOn = Yes` (plus the corpus `MapName` line). It was off while the map had no vision-giving objects and while the shim could not project the shroud texture: texture transforms never reached it because `emscripten_compat/d3d8types.h` had made-up `D3DTSS_*` ids (fixed 2026-10-22). |
 | `Art/Textures/TSCloudMed.tga`, `TSNoiseUrb.tga` | ours | The terrain's cloud and "lightmap" noise maps. `TerrainShader2Stage` multiplies the frame by them (`DESTCOLOR * ZERO`), so when they are missing the terrain goes black; the free set generates bright, soft versions. |
 | `overlay/Data/INI/Default/Terrain.ini` + `Art/Terrain/gxgrass.tga` | ours | The map's one terrain type. `Default\Terrain.ini` is loaded before the corpus `Terrain.ini`, so it is where the free set adds types without replacing the corpus file; the texture is a procedural 2×2-tile sheet. |
 | `windows/ShellGameLoadScreen.wnd.json`, `windows/BlankWindow.wnd.json` | ours | Load screen (`ProgressLoad`, `StaticTextLegal`) and the black backdrop `prepareNewGame` puts behind a loading game. |
@@ -70,4 +70,4 @@ Boot order and what each step needs, as discovered by iterating on the
 
 - `OptionsMenu.wnd`, campaign/challenge screens, ... — each menu the main menu can open (`MessageBox`, `QuitMessageBox`, the skirmish screens are done); a map preview image for `gxtest`; real combo-box/list-box art.
 - HUD polish: cameo images for command buttons (`W3DCommandBarGridDraw`), `W3DPowerDraw` needs `PowerPoint{Y,R,G}` images, a drawn control-bar skin instead of the flat atlases.
-- More models (power plant, barracks, supply center, a tank) and construction/damaged states; `ShroudOn = Yes` once every map object gives vision.
+- More models (power plant, barracks, supply center, a tank) and construction/damaged states.

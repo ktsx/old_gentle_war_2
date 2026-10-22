@@ -586,15 +586,19 @@ struct Emscripten_IDirect3DTexture8 : public IDirect3DTexture8 {
     virtual DWORD GetLOD()        override { return 0; }
 
     virtual HRESULT LockRect(UINT Level, D3DLOCKED_RECT *pLockedRect,
-                             const RECT *, DWORD) override {
+                             const RECT *pRect, DWORD) override {
         if (!pLockedRect) return 0;
         if (Level >= LevelCount || levels[Level].pixels.empty()) {
             pLockedRect->pBits = nullptr;
             pLockedRect->Pitch = 0;
             return 0;
         }
-        pLockedRect->pBits  = levels[Level].pixels.data();
+        uint8_t *bits = levels[Level].pixels.data();
         pLockedRect->Pitch  = (int)(levels[Level].w * BPP);
+        // sub-rectangle lock: pBits points at the rectangle's top-left pixel (DX8 semantics)
+        if (pRect && pRect->top >= 0 && pRect->left >= 0 && (UINT)pRect->top < levels[Level].h && (UINT)pRect->left < levels[Level].w)
+            bits += (size_t)pRect->top * pLockedRect->Pitch + (size_t)pRect->left * BPP;
+        pLockedRect->pBits  = bits;
         return 0;
     }
 
@@ -648,19 +652,23 @@ inline ULONG Emscripten_IDirect3DSurface8::Release() {
     return r;
 }
 
-inline HRESULT Emscripten_IDirect3DSurface8::LockRect(D3DLOCKED_RECT *pLockedRect, const RECT *, DWORD) {
+// A sub-rectangle lock (pRect) returns pBits pointing at the rectangle's top-left pixel, as DX8
+// does: SurfaceClass::Lock(pitch, min, max) callers (W3DShroud writes the visible cells at (1,1))
+// write relative to that pointer with the full-surface pitch.
+inline HRESULT Emscripten_IDirect3DSurface8::LockRect(D3DLOCKED_RECT *pLockedRect, const RECT *pRect, DWORD) {
     if (pLockedRect) {
+        uint8_t *bits = nullptr;
         if (ParentTexture) {
-            if (ParentLevel < ParentTexture->LevelCount && !ParentTexture->levels[ParentLevel].pixels.empty()) {
-                pLockedRect->Pitch = (int)(Width * BytesPerPixel);
-                pLockedRect->pBits = ParentTexture->levels[ParentLevel].pixels.data();
-            } else {
-                pLockedRect->Pitch = 0;
-                pLockedRect->pBits = nullptr;
-            }
+            if (ParentLevel < ParentTexture->LevelCount && !ParentTexture->levels[ParentLevel].pixels.empty())
+                bits = ParentTexture->levels[ParentLevel].pixels.data();
         } else if (!Pixels.empty()) {
+            bits = Pixels.data();
+        }
+        if (bits) {
             pLockedRect->Pitch = (int)(Width * BytesPerPixel);
-            pLockedRect->pBits = Pixels.data();
+            if (pRect && pRect->top >= 0 && pRect->left >= 0 && (UINT)pRect->top < Height && (UINT)pRect->left < Width)
+                bits += (size_t)pRect->top * pLockedRect->Pitch + (size_t)pRect->left * BytesPerPixel;
+            pLockedRect->pBits = bits;
         } else {
             pLockedRect->Pitch = 0;
             pLockedRect->pBits = nullptr;

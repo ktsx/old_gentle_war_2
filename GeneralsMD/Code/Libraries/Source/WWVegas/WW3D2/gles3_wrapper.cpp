@@ -99,6 +99,9 @@ struct GLES3_CachedUniformState {
     int s0_cop, s1_cop, s0_aop, s1_aop;
     int color_vertex;
     float texture_factor[4];
+    int tex_source[4];
+    int tex_transform[4];
+    float tex_matrix[4][16];
 };
 
 static GLES3_CachedUniformState cached_uniform_states[256] = {};
@@ -1366,6 +1369,13 @@ void GLES3_ShaderManager::Populate_Locations(GLuint program, unsigned int hash) 
     locs.u_ColorVertex = glGetUniformLocation(program, "u_ColorVertex");
     locs.u_TextureFactor = glGetUniformLocation(program, "u_TextureFactor");
     locs.u_InstancingEnabled = glGetUniformLocation(program, "u_InstancingEnabled");
+    locs.u_TexSource = glGetUniformLocation(program, "u_TexSource");
+    locs.u_TexTransform = glGetUniformLocation(program, "u_TexTransform");
+    for (int i = 0; i < 4; i++) {
+        char name[64];
+        snprintf(name, sizeof(name), "u_TexMatrix[%d]", i);
+        locs.u_TexMatrix[i] = glGetUniformLocation(program, name);
+    }
 }
 
 
@@ -1601,6 +1611,31 @@ void GLES3_ShaderManager::Apply_Uniforms(GLuint program,
     if (locs.u_ColorVertex != -1 && (!cache.initialized || cache.color_vertex != c_vertex)) {
         glUniform1i(locs.u_ColorVertex, c_vertex);
         cache.color_vertex = c_vertex;
+    }
+
+    // Texture coordinate sources / transforms (see the vertex shader)
+    {
+        int src[4], ttf[4];
+        for (int i = 0; i < 4; i++) {
+            src[i] = (int)state.texture_stage_state[i][GLES3_TSS_TEXCOORDINDEX];
+            ttf[i] = (int)state.texture_stage_state[i][GLES3_TSS_TEXTURETRANSFORMFLAGS];
+        }
+        if (locs.u_TexSource != -1 && (!cache.initialized || memcmp(cache.tex_source, src, sizeof(src)) != 0)) {
+            glUniform4iv(locs.u_TexSource, 1, src);
+            memcpy(cache.tex_source, src, sizeof(src));
+        }
+        if (locs.u_TexTransform != -1 && (!cache.initialized || memcmp(cache.tex_transform, ttf, sizeof(ttf)) != 0)) {
+            glUniform4iv(locs.u_TexTransform, 1, ttf);
+            memcpy(cache.tex_transform, ttf, sizeof(ttf));
+        }
+        for (int i = 0; i < 4; i++) {
+            if (locs.u_TexMatrix[i] == -1 || (ttf[i] & 0xff) == 0) continue;
+            GLES3_Helpers::Matrix4x4_To_GL(state.texture_matrices[i], gl_matrix);
+            if (!cache.initialized || memcmp(cache.tex_matrix[i], gl_matrix, sizeof(gl_matrix)) != 0) {
+                glUniformMatrix4fv(locs.u_TexMatrix[i], 1, GL_FALSE, gl_matrix);
+                memcpy(cache.tex_matrix[i], gl_matrix, sizeof(gl_matrix));
+            }
+        }
     }
 
     if (locs.u_TextureFactor != -1 && (!cache.initialized || memcmp(cache.texture_factor, state.texture_factor, sizeof(state.texture_factor)) != 0)) {

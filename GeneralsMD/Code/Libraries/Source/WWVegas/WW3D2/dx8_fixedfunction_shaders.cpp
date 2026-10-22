@@ -58,8 +58,15 @@ layout(location = 7) in mat4 a_InstanceWorld; // Instanced matrix layout locatio
 uniform mat4 u_World;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
-uniform mat4 u_TexMatrix0;
 uniform bool u_InstancingEnabled;
+
+// Texture coordinate generation per stage (DX8 D3DTSS_TEXCOORDINDEX / TEXTURETRANSFORMFLAGS /
+// D3DTS_TEXTUREn): u_TexSource = TEXCOORDINDEX (low 16 bits = input UV set, 0x10000 = camera-space
+// normal, 0x20000 = camera-space position), u_TexTransform = TEXTURETRANSFORMFLAGS (low byte = how
+// many components, 0x100 = projected), u_TexMatrix = the stage's texture matrix.
+uniform ivec4 u_TexSource;
+uniform ivec4 u_TexTransform;
+uniform mat4 u_TexMatrix[4];
 
 // Material
 uniform vec4 u_MatDiffuse;
@@ -121,11 +128,37 @@ void main() {
     // We need to swap R and B channels.
     vec4 vertexColor = a_Color.bgra;
 
-    // Pass texture coordinates (with optional texture matrix transform)
-    v_TexCoord0 = a_TexCoord0;
-    v_TexCoord1 = a_TexCoord1;
-    v_TexCoord2 = a_TexCoord2;
-    v_TexCoord3 = a_TexCoord3;
+    // Texture coordinates: pick the input set or generate them (camera-space position is what the
+    // terrain's cloud/noise pass and the shroud use, with a texture matrix mapping view space back
+    // to a map-aligned lookup), then apply the stage's texture matrix when transforms are enabled.
+    vec3 viewNormal = normalize(mat3(u_View) * mat3(worldMat) * a_Normal);
+    vec2 texOut[4];
+    for (int s = 0; s < 4; s++) {
+        int src = u_TexSource[s];
+        int gen = src & 0x70000;
+        int idx = src & 0xffff;
+        vec4 tc;
+        if (gen == 0x20000)      tc = vec4(viewPos.xyz, 1.0);
+        else if (gen == 0x10000) tc = vec4(viewNormal, 1.0);
+        else {
+            vec2 uv = idx == 1 ? a_TexCoord1 : idx == 2 ? a_TexCoord2 : idx == 3 ? a_TexCoord3 : a_TexCoord0;
+            tc = vec4(uv, 0.0, 1.0);
+        }
+        int ttf = u_TexTransform[s];
+        int count = ttf & 0xff;
+        if (count != 0) {
+            tc = u_TexMatrix[s] * tc;
+            if ((ttf & 0x100) != 0) {
+                float w = count == 3 ? tc.z : count == 4 ? tc.w : 1.0;
+                if (abs(w) > 1e-6) tc.xy /= w;
+            }
+        }
+        texOut[s] = tc.xy;
+    }
+    v_TexCoord0 = texOut[0];
+    v_TexCoord1 = texOut[1];
+    v_TexCoord2 = texOut[2];
+    v_TexCoord3 = texOut[3];
 
     // Compute lighting
     if (u_LightingEnabled) {

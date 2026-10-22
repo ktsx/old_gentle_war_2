@@ -31,7 +31,7 @@ import { join } from "node:path";
 import { Image32, encodeTga, type RGBA } from "./tga.ts";
 import { MeshBuilder, MESH_FLAG, encodeW3D, type Mesh, type Region, type Vec3 } from "./w3d.ts";
 
-export const UNIT_TEXTURE = "GxUnits.tga";
+export const UNIT_TEXTURE = "ZHCAGxUnits.tga";
 /** The same atlas scorched (DAMAGED states) and charred (REALLYDAMAGED / RUBBLE states). */
 export const UNIT_TEXTURE_DAMAGED = "ZHCAGxUnitsD.tga";
 export const UNIT_TEXTURE_RUBBLE = "ZHCAGxUnitsE.tga";
@@ -54,7 +54,7 @@ function noise(img: Image32, x0: number, y0: number, w: number, h: number, base:
   let s = seed >>> 0;
   const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 2 ** 32; };
   for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) {
-    const d = 0; // EXPERIMENT
+    const d = Math.round((rnd() - 0.5) * 2 * amp);
     img.set(x, y, [clamp(base[0] + d), clamp(base[1] + d), clamp(base[2] + d), base[3]]);
   }
 }
@@ -152,7 +152,7 @@ export function scorchAtlas(src: Image32, level: number, seed: number): Image32 
   const img = new Image32(ATLAS, ATLAS, [0, 0, 0, 0]);
   let s = seed >>> 0;
   const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 2 ** 32; };
-  const dark = 1 - 0.3 - 0.15 * level;                                   // 0.7 damaged, 0.55 rubble
+  const dark = 1 - 0.2 - 0.2 * level;                                    // 0.8 damaged, 0.6 rubble
   const splats: [number, number, number][] = [];
   for (let i = 0; i < 10 + 26 * level; i++) splats.push([rnd() * ATLAS, rnd() * ATLAS, 6 + rnd() * (10 + 12 * level)]);
   for (let y = 0; y < ATLAS; y++) for (let x = 0; x < ATLAS; x++) {
@@ -162,7 +162,7 @@ export function scorchAtlas(src: Image32, level: number, seed: number): Image32 
       // wrap within the 64-px cell so a splat never crosses into a neighbouring material
       const dx = ((x - cx) % CELL + CELL * 1.5) % CELL - CELL / 2, dy = ((y - cy) % CELL + CELL * 1.5) % CELL - CELL / 2;
       const d = Math.hypot(dx, dy) / rad;
-      if (d < 1) soot = Math.max(soot, Math.pow(1 - d, 1.4) * (0.6 + 0.4 * level));
+      if (d < 1) soot = Math.max(soot, Math.pow(1 - d, 1.4) * (0.45 + 0.4 * level));
     }
     const k = dark * (1 - 0.9 * soot);
     img.set(x, y, [clamp(Math.round(r * k)), clamp(Math.round(g * k)), clamp(Math.round(b * k)), clamp(Math.round(a + (255 - a) * soot))]);

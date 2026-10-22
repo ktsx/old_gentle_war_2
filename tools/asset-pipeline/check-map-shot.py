@@ -3,7 +3,7 @@
 
 Viewport is 1024x768. The tactical view covers the top 480 of the 600 engine rows (y < 614
 after the 1.28 scale); with gxtest.map's single GxGrass terrain (tga.ts: green noise) the
-centre of the view must be grass: in the sampled region (200..824, 160..560) at least 60 % of
+centre of the view must be grass: in the sampled region (200..824, 160..560) at least 45 % of
 the pixels must be green-dominant (G > R + 15, G > B + 15, G >= 70), the rest being the map's
 models, which must be lit (not black). A black region means the
 terrain pass drew nothing (or the shroud covered it); a grey or uniform one means the texture
@@ -19,7 +19,7 @@ green = sum(1 for r, g, b in px if g >= 70 and g > r + 15 and g > b + 15)
 black = sum(1 for r, g, b in px if max(r, g, b) < 16)
 ratio = green / len(px)
 print(f"map region: {len(px)} px, green-dominant {ratio:.1%}, near-black {black / len(px):.1%}")
-ok = ratio >= 0.6
+ok = ratio >= 0.45  # bases cover a good part of the view now
 if not ok:
     print("FAIL: terrain not visible in the tactical view")
 # gxtest.map places the first models (free-models.ts) in the middle of the view: they cover part of

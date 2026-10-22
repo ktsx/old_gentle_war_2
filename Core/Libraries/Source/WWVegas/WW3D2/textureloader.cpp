@@ -1201,7 +1201,7 @@ bool TextureLoadTaskClass::Begin_Load()
 
 	// if not loaded, abort.
 	if (!loaded) {
-		GX_DIAG_LOG("TEXLOAD: '%s' begin failed (no dds, tga open/format failed)\n", Texture ? Texture->Get_Full_Path().str() : "?");
+		GX_DIAG_LOG("TEXLOAD: '%s' not loadable (no dds, tga open/format failed)\n", Texture ? Texture->Get_Full_Path().str() : "?");
 		return false;
 	}
 

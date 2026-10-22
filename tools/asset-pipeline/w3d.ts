@@ -206,8 +206,15 @@ export class MeshBuilder {
   name: string; texture: string; atlas: number; flags: number;
   constructor(name: string, texture: string, atlas: number, flags = 0) { this.name = name; this.texture = texture; this.atlas = atlas; this.flags = flags; }
 
+  /**
+   * Atlas pixels → W3D texcoords. V runs bottom-up: the engine's TGA loader lands images with
+   * the origin at the bottom-left (Targa::Load's "IML" mod) and the Max exporter writes
+   * V = 1 − y accordingly, so v = 0 is the image's bottom row. (Found the hard way: with the
+   * 512-px atlas every mesh sampled the empty lower half; at 256 px the flip merely swapped
+   * rows 0..3 for 3..0 and still looked like a texture.)
+   */
   private uv(r: Region, s: number, t: number): UV {
-    return [(r.x + s * r.w) / this.atlas, (r.y + t * r.h) / this.atlas];
+    return [(r.x + s * r.w) / this.atlas, 1 - (r.y + t * r.h) / this.atlas];
   }
   /**
    * A flat-shaded quad. a,b,c,d are the top-left, top-right, bottom-right and bottom-left corners

@@ -68,9 +68,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.ccache
-          key: ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
           restore-keys: |
-            ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
+            ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
 
       - name: Configure ccache
         run: |
@@ -89,10 +89,14 @@ jobs:
         # -G Ninja must be explicit, and CMAKE_PROJECT_INCLUDE must be an
         # absolute path — both are load-bearing (see BUILDING.md).
         run: |
+          # No precompiled headers in CI: clang's PCH files come out different on
+          # every run (even with -fno-pch-timestamp), and every TU hashes its PCH,
+          # so with PCH on ccache never hits. Without PCH a warm cache wins by far.
           emcmake cmake -G Ninja -B build-web \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DRTS_GAME=GeneralsMD \
             -DRTS_PLATFORM=web \
+            -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON \
             -DCMAKE_PROJECT_INCLUDE=$PWD/cmake/web.cmake
 
       - name: Build z_generals
@@ -120,7 +124,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.ccache
-          key: ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
 
       - name: Surface compiler errors as annotations
         if: failure()

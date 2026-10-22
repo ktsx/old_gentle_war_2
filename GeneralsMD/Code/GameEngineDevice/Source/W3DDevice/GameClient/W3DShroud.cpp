@@ -39,6 +39,9 @@
 #include "W3DDevice/GameClient/W3DShaderManager.h"
 #include "WW3D2/assetmgr.h"
 #include "W3DDevice/GameClient/W3DShroud.h"
+#ifdef __EMSCRIPTEN__
+#include <Utility/gx_trace.h>
+#endif
 #include "WW3D2/textureloader.h"
 #include "Common/GlobalData.h"
 #include "GameLogic/PartitionManager.h"
@@ -642,6 +645,31 @@ void W3DShroud::render(CameraClass *cam)
 			}
 			pDestSurface->Unlock();
 		}
+#ifdef __EMSCRIPTEN__
+		// Web diag (?diag=1): the shroud grid and one row of cell levels / destination texels, once a
+		// second or so — tells a wrong texture upload from a wrong projection when the shroud looks odd.
+		{
+			static int s_shroudDiag = 0;
+			if (++s_shroudDiag >= 60)
+			{
+				s_shroudDiag = 0;
+				const Int row = m_numCellsY / 2;
+				char cells[160], texels[160];
+				int nc = 0, nt = 0;
+				Int px = 0;
+				char *dstRow = (char *)pDestSurface->Lock(&px);
+				for (Int cx = 0; cx < 24 && cx < copyWidth; ++cx)
+				{
+					nc += snprintf(cells + nc, sizeof(cells) - nc, " %04x", m_shroudData[cx + row * m_numCellsX]);
+					if (dstRow) nt += snprintf(texels + nt, sizeof(texels) - nt, " %04x", ((UnsignedShort *)(dstRow + (row + dstPoint.y) * px))[cx + dstPoint.x]);
+				}
+				if (dstRow) pDestSurface->Unlock();
+				GX_DIAG_LOG("SHROUD: cells=%dx%d tex=%dx%d cell=%.1fx%.1f origin=(%.1f,%.1f) copy=%dx%d pitch=%d filter=%d row%d cells:%s\n", m_numCellsX, m_numCellsY,
+							m_dstTextureWidth, m_dstTextureHeight, m_cellWidth, m_cellHeight, m_drawOriginX, m_drawOriginY, copyWidth, copyHeight, px, (int)m_shroudFilter, row, cells);
+				GX_DIAG_LOG("SHROUD: texels(y=%d):%s\n", row + dstPoint.y, dstRow ? texels : " (lock failed)");
+			}
+		}
+#endif
 	}
 
 	REF_PTR_RELEASE (pDestSurface);

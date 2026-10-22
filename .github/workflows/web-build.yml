@@ -320,7 +320,8 @@ jobs:
         run: |
           f=map-smoke.log; [ -f "$f" ] || exit 0
           # draws with generated texture coordinates (shroud / cloud pass): matrix and the first vertex's uv
-          grep -E "DRAW-DIAG   stage[0-9]" "$f" | cut -c1-900 | head -10 | sed "s/^/::notice title=texgen draws::/"
+          grep -E "DRAW-DIAG   stage[0-9]" "$f" | cut -c1-900 | head -8 | sed "s/^/::notice title=texgen draws::/"
+          grep -E "SHROUD:" "$f" | cut -c1-900 | tail -2 | sed "s/^/::notice title=texgen draws::/"
 
       - name: Upload screenshot and log
         if: always()

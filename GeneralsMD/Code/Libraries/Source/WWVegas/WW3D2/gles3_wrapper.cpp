@@ -759,6 +759,30 @@ void GLES3_Diag_Dump_Draw(const char* kind, unsigned int fvf, unsigned int strid
                     l.direction[0], l.direction[1], l.direction[2], l.position[0], l.position[1], l.position[2]);
         }
     }
+    // texture coordinate generation / transforms per stage (shroud, cloud pass), with the first
+    // vertex's generated coordinate computed on the CPU the same way the vertex shader does it
+    for (int s = 0; s < 2; s++) {
+        unsigned int tci = g_State.texture_stage_state[s][GLES3_TSS_TEXCOORDINDEX];
+        unsigned int ttf = g_State.texture_stage_state[s][GLES3_TSS_TEXTURETRANSFORMFLAGS];
+        if (!(tci & 0x70000) && !(ttf & 0xff)) continue;
+        const float* M = g_State.texture_matrices[s];
+        char line[640]; int n = snprintf(line, sizeof(line), "DRAW-DIAG   stage%d tci=0x%x ttf=0x%x mat=[%.4f %.4f %.4f %.4f | %.4f %.4f %.4f %.4f | %.4f %.4f %.4f %.4f | %.3f %.3f %.3f %.3f]",
+                                         s, tci, ttf, M[0], M[1], M[2], M[3], M[4], M[5], M[6], M[7], M[8], M[9], M[10], M[11], M[12], M[13], M[14], M[15]);
+        if (vb && ib && stride >= 12 && prim_count > 0 && (tci & 0x70000) == 0x20000) {
+            const unsigned short* idx = (const unsigned short*)ib;
+            if ((size_t)start_index < ib_bytes / 2) {
+                size_t off = (size_t)(idx[start_index] + base_vtx) * stride;
+                if (off + 12 <= vb_bytes) {
+                    const float* pos = (const float*)(vb + off);
+                    float v[4] = {pos[0], pos[1], pos[2], 1.0f}, a[4], b[4], t[4];
+                    Mul_Row_Vec(g_State.world_matrix, v, a); Mul_Row_Vec(g_State.view_matrix, a, b);
+                    b[3] = 1.0f; Mul_Row_Vec(M, b, t);
+                    n += snprintf(line + n, sizeof(line) - n, " v0=(%.1f,%.1f,%.1f) cam=(%.1f,%.1f,%.1f) -> uv=(%.4f,%.4f)", pos[0], pos[1], pos[2], b[0], b[1], b[2], t[0], t[1]);
+                }
+            }
+        }
+        fprintf(stderr, "%s\n", line);
+    }
     // first triangle through W*V*P (D3D row-vector convention: v * W * V * P)
     if (vb && ib && stride >= 12 && prim_count > 0) {
         const unsigned short* idx = (const unsigned short*)ib;

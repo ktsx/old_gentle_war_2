@@ -667,6 +667,12 @@ void W3DShroud::render(CameraClass *cam)
 				GX_DIAG_LOG("SHROUD: cells=%dx%d tex=%dx%d cell=%.1fx%.1f origin=(%.1f,%.1f) copy=%dx%d pitch=%d filter=%d row%d cells:%s\n", m_numCellsX, m_numCellsY,
 							m_dstTextureWidth, m_dstTextureHeight, m_cellWidth, m_cellHeight, m_drawOriginX, m_drawOriginY, copyWidth, copyHeight, px, (int)m_shroudFilter, row, cells);
 				GX_DIAG_LOG("SHROUD: texels(y=%d):%s\n", row + dstPoint.y, dstRow ? texels : " (lock failed)");
+				{
+					// the GL texture the shim will bind for this texture (compare with DRAW-DIAG tex0 of the shroud pass)
+					Emscripten_IDirect3DTexture8 *d3dtex = static_cast<Emscripten_IDirect3DTexture8 *>(m_pDstTexture->Peek_D3D_Base_Texture());
+					GX_DIAG_LOG("SHROUD: d3dtex=%p gl=%u fmt=%d levels=%u bpp=%u dirty=%d\n", (void *)d3dtex, d3dtex ? d3dtex->gl_tex_id : 0,
+								d3dtex ? (int)d3dtex->Fmt : -1, d3dtex ? d3dtex->LevelCount : 0, d3dtex ? d3dtex->BPP : 0, d3dtex ? (int)d3dtex->dirty : -1);
+				}
 			}
 		}
 #endif

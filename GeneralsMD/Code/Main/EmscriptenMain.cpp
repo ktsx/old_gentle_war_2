@@ -454,7 +454,7 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
         s_armedDrawDump = true;
         // ?gxdraws=N widens the dump (the terrain alone is ~24 draws; models come after it)
         int nDraws = EM_ASM_INT({
-          try { var m = /[?&#]gxdraws=(\d+)/.exec(location.search + location.hash); if (m) return parseInt(m[1], 10); } catch (e) {}
+          try { var m = /[?&#]gxdraws=([0-9]+)/.exec(location.search + location.hash); if (m) return parseInt(m[1], 10); } catch (e) {}
           return 24;
         });
         GLES3_Dump_Next_Draws(nDraws);

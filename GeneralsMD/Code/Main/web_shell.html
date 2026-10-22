@@ -297,7 +297,7 @@
   <body>
 
     <div id="gx-canvas-wrap">
-      <canvas id="canvas" width="800" height="600"
+      <canvas id="canvas" width="800" height="600" 
               oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     </div>
 
@@ -794,8 +794,26 @@
         // intercepting the ccall — it has no business resizing us when
         // the engine resolution is fixed.
         // ------------------------------------------------------------------
-        const GX_FIXED_W = 800;
-        const GX_FIXED_H = 600;
+        // Engine resolution. The engine renders at TheGlobalData->m_xResolution x m_yResolution
+        // (800x600 unless told otherwise) and the canvas is CSS-scaled to the viewport, so on a
+        // large or HiDPI screen the 12 px UI fonts turned into a blurry upscale. Default: the
+        // canvas's displayed 4:3 size in device pixels (capped), passed to the engine as
+        // -xres/-yres (layouts, the control-bar scheme and the fonts all scale from 800x600).
+        // ?res=800x600 pins the classic size, ?res=1600x1200 any other one.
+        const gxPickResolution = function () {
+          const m = /^(\d+)x(\d+)$/.exec(new URLSearchParams(location.search).get('res') || '');
+          if (m) return [Math.max(800, +m[1]), Math.max(600, +m[2])];
+          const wrap = document.getElementById('gx-canvas-wrap');
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const vw = (wrap ? wrap.clientWidth : window.innerWidth) * dpr;
+          const vh = (wrap ? wrap.clientHeight : window.innerHeight) * dpr;
+          // the 4:3 box that fits the viewport, in device pixels, at most 2560 wide, at least 800x600
+          let h = Math.min(vh, vw * 3 / 4, 1920), w = Math.round(h * 4 / 3);
+          if (w < 800) { w = 800; h = 600; }
+          return [w & ~1, Math.round(h) & ~1];
+        };
+        const [GX_FIXED_W, GX_FIXED_H] = gxPickResolution();
+        console.log('[GeneralsX] engine resolution ' + GX_FIXED_W + 'x' + GX_FIXED_H);
         const gxLockCanvasBacking = function () {
           const canvasEl = document.getElementById('canvas');
           if (!canvasEl) return;
@@ -1011,6 +1029,7 @@
         // what boot-smoke uses to launch a map without clicking through menus.
         const engineArgs = (new URLSearchParams(location.search).get('args') || '')
           .split(/\s+/).filter(Boolean);
+        if (!engineArgs.includes('-xres')) engineArgs.push('-xres', String(GX_FIXED_W), '-yres', String(GX_FIXED_H));
         window.Module = {
           canvas: document.getElementById('canvas'),
           arguments: engineArgs,

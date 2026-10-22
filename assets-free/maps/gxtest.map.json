@@ -59,12 +59,48 @@
       "owner": "GxPlayer"
     },
     {
+      "template": "AmericaPowerPlant",
+      "at": [
+        8,
+        26
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaBarracks",
+      "at": [
+        22,
+        6
+      ],
+      "angle": 1.5708,
+      "owner": "GxPlayer"
+    },
+    {
       "template": "AmericaVehicleDozer",
       "at": [
         30,
         16
       ],
       "angle": 0.4,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaTankCrusader",
+      "at": [
+        33,
+        27
+      ],
+      "angle": 0.2,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaVehicleHumvee",
+      "at": [
+        36,
+        24
+      ],
+      "angle": -0.3,
       "owner": "GxPlayer"
     },
     {
@@ -95,12 +131,39 @@
       "owner": "GxRival"
     },
     {
+      "template": "ChinaPowerPlant",
+      "at": [
+        56,
+        38
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaBarracks",
+      "at": [
+        42,
+        58
+      ],
+      "angle": -1.5708,
+      "owner": "GxRival"
+    },
+    {
       "template": "ChinaVehicleDozer",
       "at": [
         36,
         42
       ],
       "angle": 3.0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaTankBattleMaster",
+      "at": [
+        33,
+        46
+      ],
+      "angle": 3.1416,
       "owner": "GxRival"
     },
     {

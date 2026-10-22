@@ -13,7 +13,8 @@
  *   INIZH.big     Data/INI/**, Data/English/{Language,HeaderTemplate,CommandMap}.ini, Data/English/generals.csf
  *   WindowZH.big  Window/Menus/*.wnd, Window/*.wnd (in-game HUD)
  *   TexturesZH.big Art/Textures/*.tga (tga.ts placeholders, hud-skin.ts atlases, mapped-images.ts labelled
- *                 placeholder atlases for every corpus MappedImage texture), Art/Terrain/*.tga
+ *                 placeholder atlases for every corpus MappedImage texture, fx-textures.ts particle/shadow/
+ *                 track/beam sprites, free-models.ts unit atlas), Art/Terrain/*.tga
  *   MapsZH.big    Maps/<name>/<name>.map
  *   W3DZH.big     Art/W3D/*.w3d (free-models.ts: procedural models named after the corpus' retail model names)
  *
@@ -33,6 +34,7 @@ import { packDir } from "./big.ts";
 import { writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
+import { writeFxTextures } from "./fx-textures.ts";
 import { buildMap, mapCacheEntry, buildMapCacheIni } from "./map.ts";
 import { writeFreeModels } from "./free-models.ts";
 
@@ -112,6 +114,10 @@ function main() {
   // every texture the corpus MappedImages reference, as labelled placeholder atlases (mapped-images.ts)
   const ph = writePlaceholderAtlases(patchData, texStage);
   console.log(`placeholder atlases: ${ph.textures} textures, ${(ph.bytes / 1e6).toFixed(1)} MB`);
+  // particles, shadow decals, track marks, beams (fx-textures.ts) — anything already written wins
+  const have = new Set(readdirSync(join(texStage, "Art", "Textures")).map((n) => n.toLowerCase()));
+  const fx = writeFxTextures(patchData, texStage, have);
+  console.log(`fx textures: ${fx.textures} textures, ${(fx.bytes / 1e6).toFixed(2)} MB`);
 
   // 6. models (their shared texture goes into TexturesZH.big)
   console.log(`models: ${writeFreeModels(w3dStage, texStage).join(", ")}`);

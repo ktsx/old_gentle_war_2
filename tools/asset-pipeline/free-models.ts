@@ -8,6 +8,12 @@
  *   AmericaCommandCenter   ABBtCmdHQ        NBConYard      ChinaCommandCenter
  *   AmericaVehicleDozer    AVCONSTDOZ_A     NVCONSTDOZ_A   ChinaVehicleDozer
  *   AmericaInfantryRanger  AIRngr_SKN       NICNSC_SKN     ChinaInfantryRedguard
+ *   AmericaPowerPlant      ABPWRPLANT       NBPwrPlant     ChinaPowerPlant
+ *   AmericaBarracks        ABBARRACKS       NBBarracks     ChinaBarracks
+ *   AmericaSupplyCenter    ABSupplyCT       NBSupCent      ChinaSupplyCenter
+ *   AmericaWarFactory      ABWarFact        NBWarFact      ChinaWarFactory
+ *   AmericaTankCrusader    AVLeopard        NVBtMstr       ChinaTankBattleMaster
+ *   AmericaVehicleHumvee   AVHUMMER
  *
  * Units are world units (1 map cell = 10), Z up, X forward (object angle 0 faces +X). Sizes follow
  * the templates' Geometry (command centre 120×140×49, dozer 30×20×15, infantry r7 h13).
@@ -159,9 +165,99 @@ function infantry(name: string, uniform: Region, helmet: Region): Mesh {
   return b.mesh();
 }
 
+// --- the rest of a starting base ------------------------------------------------------------
+// Sizes follow each template's Geometry (major/minor radius, height); USA = concrete + flat roofs,
+// China = red-brown walls + tiled hip roofs. Model names are the templates' day/undamaged state.
+type Style = { wall: Region; roof: Region; hip: boolean };
+const USA: Style = { wall: TEX.concrete, roof: TEX.roof, hip: false };
+const CHINA: Style = { wall: TEX.redConcrete, roof: TEX.tileRoof, hip: true };
+
+/** A building body: slab, walls, roof (flat or hipped), a house-colour band and a door on +X. */
+function body(b: MeshBuilder, hx: number, hy: number, h: number, st: Style, door = true) {
+  b.box([-hx - 4, -hy - 4, 0], [hx + 4, hy + 4, 2], { side: TEX.metal, top: TEX.roof });
+  b.box([-hx, -hy, 2], [hx, hy, h], { side: st.wall, top: st.roof, front: TEX.housePanel });
+  if (st.hip) b.frustum([-hx - 3, -hy - 3, h], [hx + 3, hy + 3, h + 7], 9, { side: st.roof, top: st.roof });
+  b.box([hx - 1, -hy + 4, h - 4], [hx + 1, hy - 4, h - 1], { side: TEX.houseStripe, top: TEX.metal });
+  if (door) b.box([hx - 1, -8, 2], [hx + 1, 8, Math.min(14, h - 4)], { side: TEX.metal, top: TEX.metal });
+}
+function flagpole(b: MeshBuilder, x: number, y: number, z0: number) {
+  b.cylinder(x, y, z0, z0 + 26, 0.8, 6, { side: TEX.metal, top: TEX.metal });
+  b.box([x, y - 0.3, z0 + 19], [x + 9, y + 0.3, z0 + 25], { side: TEX.houseStripe, top: TEX.houseStripe });
+}
+
+function powerPlant(name: string, st: Style, hx: number, hy: number, h: number): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  body(b, hx, hy - 10, h * 0.45, st, false);
+  if (st.hip) {                                               // China: three chimney stacks
+    for (const y of [-hy + 12, 0, hy - 12]) b.cylinder(-hx * 0.3, y, 2, h, 4.5, 10, { side: TEX.metal, top: TEX.black });
+  } else {                                                    // USA: two cooling towers
+    for (const y of [-hy * 0.45, hy * 0.45]) {
+      b.cylinder(-hx * 0.2, y, 2, h * 0.6, hx * 0.55, 12, { side: TEX.concrete, top: TEX.metal });
+      b.cylinder(-hx * 0.2, y, h * 0.6, h, hx * 0.42, 12, { side: TEX.concrete, top: TEX.black });
+    }
+  }
+  b.box([hx - 14, -hy + 2, 2], [hx - 2, -hy + 12, 10], { side: TEX.hazard, top: TEX.metal });   // transformer
+  b.box([hx - 14, hy - 12, 2], [hx - 2, hy - 2, 10], { side: TEX.hazard, top: TEX.metal });
+  return b.mesh();
+}
+
+function barracks(name: string, st: Style, hx: number, hy: number, h: number): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  body(b, hx, hy, h, st);
+  for (const y of [-hy * 0.6, 0, hy * 0.6]) b.box([-hx - 1, y - 5, 6], [-hx + 1, y + 5, 12], { side: TEX.glass, top: TEX.metal });  // windows
+  flagpole(b, hx - 6, hy - 6, st.hip ? h + 7 : h);
+  return b.mesh();
+}
+
+function supplyCenter(name: string, st: Style, hx: number, hy: number, h: number): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  body(b, hx * 0.55, hy, h, st);
+  b.box([-hx - 4, -hy - 4, 0], [hx + 4, hy + 4, 1.5], { side: TEX.metal, top: TEX.roof });     // yard
+  for (const y of [-hy * 0.5, hy * 0.5]) b.cylinder(hx * 0.7, y, 1.5, h + 8, hx * 0.2, 12, { side: TEX.metal, top: TEX.steel }); // silos
+  b.box([hx * 0.55, -6, 1.5], [hx * 0.9, 6, 4], { side: TEX.hazard, top: TEX.steel });          // conveyor
+  return b.mesh();
+}
+
+function warFactory(name: string, st: Style, hx: number, hy: number, h: number): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  body(b, hx, hy, h, st, false);
+  b.box([hx - 1, -hy * 0.5, 2], [hx + 1, hy * 0.5, h - 6], { side: TEX.metal, top: TEX.metal });   // bay door
+  b.box([hx - 10, -hy * 0.5 - 2, h - 6], [hx + 2, hy * 0.5 + 2, h - 3], { side: TEX.hazard, top: TEX.metal });
+  b.box([-hx * 0.6, -hy * 0.4, (st.hip ? h + 7 : h)], [hx * 0.2, hy * 0.4, (st.hip ? h + 7 : h) + 6], { side: TEX.metal, top: TEX.roof }); // crane housing
+  b.cylinder(-hx * 0.7, hy * 0.6, 2, h + 18, 2, 8, { side: TEX.metal, top: TEX.black });          // stack
+  return b.mesh();
+}
+
+function tank(name: string, paint: Region, hx: number, hy: number, h: number, turret: number): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.box([-hx, -hy, 0], [hx, -hy + 4, h * 0.5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread });   // tracks
+  b.box([-hx, hy - 4, 0], [hx, hy, h * 0.5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread });
+  b.box([-hx + 1, -hy + 3, 2], [hx - 1, hy - 3, h * 0.65], { side: paint, top: paint });                 // hull
+  b.box([-hx + 1, -hy + 3.2, h * 0.35], [hx - 1, hy - 2.8, h * 0.5], { side: TEX.houseStripe, top: paint }); // house band
+  b.frustum([-turret, -turret, h * 0.65], [turret * 0.6, turret, h], 1.5, { side: paint, top: paint });  // turret
+  b.box([turret * 0.6, -0.8, h * 0.78], [hx + 10, 0.8, h * 0.9], { side: TEX.metal, top: TEX.metal, bottom: TEX.metal }); // barrel
+  return b.mesh();
+}
+
+function humvee(name: string): Mesh {
+  const b = new MeshBuilder(name, UNIT_TEXTURE, ATLAS, PICKABLE);
+  for (const x of [-9, 8]) for (const y of [-7, 4]) b.box([x, y, 0], [x + 5, y + 3, 5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread }); // wheels
+  b.box([-13, -6, 3], [13, 6, 7.5], { side: TEX.olive, top: TEX.olive, front: TEX.metal });            // body
+  b.box([-6, -5.5, 7.5], [7, 5.5, 11.5], { side: TEX.glass, top: TEX.olive, back: TEX.olive });        // cab
+  b.box([-12, -6.2, 5], [12, 6.2, 6.5], { side: TEX.houseStripe, top: TEX.olive });                    // house band
+  b.cylinder(-2, 0, 11.5, 13.5, 1.2, 6, { side: TEX.black, top: TEX.black });                          // gun mount
+  return b.mesh();
+}
+
 export function buildFreeModels(): Record<string, Mesh> {
   const models = [
     commandCenterUSA(), commandCenterChina(),
+    powerPlant("ABPWRPLANT", USA, 22, 30, 46), powerPlant("NBPwrPlant", CHINA, 27, 34, 40),
+    barracks("ABBARRACKS", USA, 55, 45, 20), barracks("NBBarracks", CHINA, 36, 44, 30),
+    supplyCenter("ABSupplyCT", USA, 44, 45, 24), supplyCenter("NBSupCent", CHINA, 52, 47, 30),
+    warFactory("ABWarFact", USA, 53, 60, 40), warFactory("NBWarFact", CHINA, 57, 61, 30),
+    tank("AVLeopard", TEX.olive, 15, 10, 10, 6), tank("NVBtMstr", TEX.khaki, 13, 9, 10, 7),
+    humvee("AVHUMMER"),
     dozer("AVCONSTDOZ_A", TEX.yellow), dozer("NVCONSTDOZ_A", TEX.redConcrete),
     infantry("AIRngr_SKN", TEX.olive, TEX.olive), infantry("NICNSC_SKN", TEX.khaki, TEX.khaki),
   ];

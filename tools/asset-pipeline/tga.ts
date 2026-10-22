@@ -94,9 +94,16 @@ export function generateFreeImages(): Record<string, Image32> {
     const v = Math.round(225 + 30 * noise(x, y, 11));
     lightNoise.set(x, y, [v, v, v, 255]);
   }
+  // The in-game control bar skins are 512x512 atlases (MappedImages/TextureSize_512/
+  // S{A,N,U}ControlBar512.INI: 45 images each, USA/China/GLA). A missing atlas draws every
+  // HUD image magenta; a flat dark one makes all of them dark panel pieces.
+  const atlas = new Image32(512, 512, [30, 34, 44, 255]);
+  for (let i = 0; i < 512; i += 16) { atlas.fillRect(i, 0, 1, 512, [36, 40, 52, 255]); atlas.fillRect(0, i, 512, 1, [36, 40, 52, 255]); }
+
   return {
     "gxlogo.tga": logo, "gxbutton.tga": btn, "gxbutton_hi.tga": btnHi, "gxbutton_dis.tga": btnDis,
     "TSCloudMed.tga": cloud, "TSNoiseUrb.tga": lightNoise,
+    "SAControlBar512_001.tga": atlas, "SNControlBar512_001.tga": atlas, "SUControlBar512_001.tga": atlas,
   };
 }
 

@@ -1,0 +1,1781 @@
+{
+ "file": "ControlBar.wnd",
+ "dir": "",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   11,
+   1
+  ],
+  "headerTemplate": "Small"
+ },
+ "windows": [
+  {
+   "name": "ControlBarParent",
+   "type": "USER",
+   "rect": [
+    0,
+    432,
+    800,
+    168
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "children": [
+    {
+     "name": "BackgroundMarker",
+     "type": "USER",
+     "rect": [
+      0,
+      432,
+      1,
+      1
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ]
+    },
+    {
+     "name": "GxBarBody",
+     "type": "USER",
+     "rect": [
+      0,
+      470,
+      800,
+      130
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ]
+     }
+    },
+    {
+     "name": "MoneyDisplay",
+     "type": "STATICTEXT",
+     "rect": [
+      360,
+      438,
+      80,
+      19
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       160
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "name": "ButtonGeneral",
+     "type": "PUSHBUTTON",
+     "rect": [
+      719,
+      432,
+      80,
+      31
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonLarge",
+     "type": "PUSHBUTTON",
+     "rect": [
+      646,
+      432,
+      72,
+      31
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonMedium",
+     "type": "PUSHBUTTON",
+     "rect": [
+      646,
+      432,
+      72,
+      31
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonSmall",
+     "type": "PUSHBUTTON",
+     "rect": [
+      646,
+      432,
+      72,
+      31
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "WinUAttack",
+     "type": "USER",
+     "rect": [
+      140,
+      412,
+      35,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "LeftHUD",
+     "type": "USER",
+     "rect": [
+      6,
+      476,
+      150,
+      118
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "input": "LeftHUDInput",
+     "draw": "W3DLeftHUDDraw",
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "PowerWindow",
+     "type": "USER",
+     "rect": [
+      260,
+      470,
+      278,
+      6
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "GeneralsExp",
+     "type": "USER",
+     "rect": [
+      160,
+      476,
+      20,
+      118
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ExpBarForeground",
+       "type": "USER",
+       "rect": [
+        160,
+        592,
+        20,
+        1
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         200,
+         170,
+         60,
+         255
+        ],
+        "enabledBorder": [
+         200,
+         170,
+         60,
+         255
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonOptions",
+     "type": "PUSHBUTTON",
+     "rect": [
+      184,
+      490,
+      36,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "text": "GUI:Options"
+    },
+    {
+     "name": "ButtonIdleWorker",
+     "type": "PUSHBUTTON",
+     "rect": [
+      184,
+      516,
+      36,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "text": "GUI:Units"
+    },
+    {
+     "name": "PopupCommunicator",
+     "type": "PUSHBUTTON",
+     "rect": [
+      184,
+      568,
+      36,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "WinGeneralPortrait",
+     "type": "USER",
+     "rect": [
+      600,
+      478,
+      60,
+      30
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ]
+    },
+    {
+     "name": "TextEntryGeneralName",
+     "type": "ENTRYFIELD",
+     "rect": [
+      664,
+      478,
+      120,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ]
+    },
+    {
+     "name": "CommandWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand01",
+       "type": "PUSHBUTTON",
+       "rect": [
+        234,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand02",
+       "type": "PUSHBUTTON",
+       "rect": [
+        292,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand03",
+       "type": "PUSHBUTTON",
+       "rect": [
+        350,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand04",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand05",
+       "type": "PUSHBUTTON",
+       "rect": [
+        466,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand06",
+       "type": "PUSHBUTTON",
+       "rect": [
+        524,
+        482,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand07",
+       "type": "PUSHBUTTON",
+       "rect": [
+        234,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand08",
+       "type": "PUSHBUTTON",
+       "rect": [
+        292,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand09",
+       "type": "PUSHBUTTON",
+       "rect": [
+        350,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand10",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand11",
+       "type": "PUSHBUTTON",
+       "rect": [
+        466,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand12",
+       "type": "PUSHBUTTON",
+       "rect": [
+        524,
+        520,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand13",
+       "type": "PUSHBUTTON",
+       "rect": [
+        234,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand14",
+       "type": "PUSHBUTTON",
+       "rect": [
+        292,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand15",
+       "type": "PUSHBUTTON",
+       "rect": [
+        350,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand16",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand17",
+       "type": "PUSHBUTTON",
+       "rect": [
+        466,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonCommand18",
+       "type": "PUSHBUTTON",
+       "rect": [
+        524,
+        558,
+        56,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ProductionQueueWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "ButtonQueue01",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue02",
+       "type": "PUSHBUTTON",
+       "rect": [
+        274,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue03",
+       "type": "PUSHBUTTON",
+       "rect": [
+        312,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue04",
+       "type": "PUSHBUTTON",
+       "rect": [
+        350,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue05",
+       "type": "PUSHBUTTON",
+       "rect": [
+        388,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue06",
+       "type": "PUSHBUTTON",
+       "rect": [
+        426,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue07",
+       "type": "PUSHBUTTON",
+       "rect": [
+        464,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue08",
+       "type": "PUSHBUTTON",
+       "rect": [
+        502,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonQueue09",
+       "type": "PUSHBUTTON",
+       "rect": [
+        540,
+        520,
+        36,
+        36
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "UnderConstructionWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "UnderConstructionDesc",
+       "type": "STATICTEXT",
+       "rect": [
+        236,
+        484,
+        344,
+        40
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonCancelConstruction",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        540,
+        120,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "text": "GUI:Cancel"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "OCLTimerWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "OCLTimerStaticText",
+       "type": "STATICTEXT",
+       "rect": [
+        236,
+        484,
+        344,
+        20
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "OCLTimerProgressBar",
+       "type": "PROGRESSBAR",
+       "rect": [
+        236,
+        510,
+        344,
+        16
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ],
+        "hilite": [
+         80,
+         140,
+         230,
+         255
+        ],
+        "hiliteBorder": [
+         80,
+         140,
+         230,
+         255
+        ]
+       }
+      },
+      {
+       "name": "OCLTimerSellButton",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        540,
+        120,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "BeaconWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "StaticTextBeaconLabel",
+       "type": "STATICTEXT",
+       "rect": [
+        236,
+        484,
+        344,
+        16
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "text": "GUI:BeaconLabel"
+      },
+      {
+       "name": "EditBeaconText",
+       "type": "ENTRYFIELD",
+       "rect": [
+        236,
+        504,
+        344,
+        20
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonClearBeaconText",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        540,
+        100,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "text": "GUI:BeaconClear"
+      },
+      {
+       "name": "ButtonDeleteBeacon",
+       "type": "PUSHBUTTON",
+       "rect": [
+        346,
+        540,
+        100,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "text": "GUI:DeleteBeacon"
+      },
+      {
+       "name": "ButtonPlaceBeacon",
+       "type": "PUSHBUTTON",
+       "rect": [
+        456,
+        540,
+        100,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "text": "GUI:Beacon"
+      }
+     ],
+     "input": "BeaconWindowInput",
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ObserverPlayerListWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "ButtonPlayer0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        486,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer0",
+       "type": "STATICTEXT",
+       "rect": [
+        262,
+        486,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        486,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer1",
+       "type": "STATICTEXT",
+       "rect": [
+        348,
+        486,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        486,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer2",
+       "type": "STATICTEXT",
+       "rect": [
+        434,
+        486,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        494,
+        486,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer3",
+       "type": "STATICTEXT",
+       "rect": [
+        520,
+        486,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        236,
+        540,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer4",
+       "type": "STATICTEXT",
+       "rect": [
+        262,
+        540,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        540,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer5",
+       "type": "STATICTEXT",
+       "rect": [
+        348,
+        540,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        540,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer6",
+       "type": "STATICTEXT",
+       "rect": [
+        434,
+        540,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "ButtonPlayer7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        494,
+        540,
+        24,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "StaticTextPlayer7",
+       "type": "STATICTEXT",
+       "rect": [
+        520,
+        540,
+        58,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ObserverPlayerInfoWindow",
+     "type": "USER",
+     "rect": [
+      230,
+      478,
+      356,
+      118
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [
+      {
+       "name": "StaticTextPlayerName",
+       "type": "STATICTEXT",
+       "rect": [
+        236,
+        484,
+        344,
+        16
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "WinFlag",
+       "type": "USER",
+       "rect": [
+        236,
+        504,
+        32,
+        24
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextNumberOfUnits",
+       "type": "STATICTEXT",
+       "rect": [
+        276,
+        504,
+        300,
+        14
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "StaticTextNumberOfBuildings",
+       "type": "STATICTEXT",
+       "rect": [
+        276,
+        520,
+        300,
+        14
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "StaticTextNumberOfUnitsKilled",
+       "type": "STATICTEXT",
+       "rect": [
+        276,
+        536,
+        300,
+        14
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      },
+      {
+       "name": "StaticTextNumberOfUnitsLost",
+       "type": "STATICTEXT",
+       "rect": [
+        276,
+        552,
+        300,
+        14
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    },
+    {
+     "name": "RightHUD",
+     "type": "USER",
+     "rect": [
+      590,
+      474,
+      206,
+      122
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "WinUnitSelected",
+       "type": "USER",
+       "rect": [
+        598,
+        480,
+        120,
+        84
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CameoWindow",
+       "type": "USER",
+       "rect": [
+        598,
+        480,
+        120,
+        84
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CameoMovieWindow",
+       "type": "USER",
+       "rect": [
+        598,
+        480,
+        120,
+        84
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "UnitUpgrade1",
+       "type": "USER",
+       "rect": [
+        598,
+        568,
+        22,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "UnitUpgrade2",
+       "type": "USER",
+       "rect": [
+        622,
+        568,
+        22,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "UnitUpgrade3",
+       "type": "USER",
+       "rect": [
+        646,
+        568,
+        22,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "UnitUpgrade4",
+       "type": "USER",
+       "rect": [
+        670,
+        568,
+        22,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "UnitUpgrade5",
+       "type": "USER",
+       "rect": [
+        694,
+        568,
+        22,
+        22
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         18,
+         20,
+         26,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       255
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     }
+    }
+   ],
+   "system": "ControlBarSystem",
+   "input": "ControlBarInput",
+   "colors": {
+    "enabled": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "enabledBorder": [
+     0,
+     0,
+     0,
+     0
+    ]
+   }
+  }
+ ]
+}

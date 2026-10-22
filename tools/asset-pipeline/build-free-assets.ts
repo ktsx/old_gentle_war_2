@@ -11,7 +11,7 @@
  *
  * Output (<outDir>/assets/):
  *   INIZH.big     Data/INI/**, Data/English/{Language,HeaderTemplate,CommandMap}.ini, Data/English/generals.csf
- *   WindowZH.big  Window/Menus/*.wnd
+ *   WindowZH.big  Window/Menus/*.wnd, Window/*.wnd (in-game HUD)
  *   TexturesZH.big Art/Textures/*.tga, Art/Terrain/*.tga (generated placeholders, see tga.ts)
  *   MapsZH.big    Maps/<name>/<name>.map
  *
@@ -90,8 +90,10 @@ function main() {
   const wndDir = join(freeRoot, "windows");
   for (const f of readdirSync(wndDir).filter((n) => n.endsWith(".wnd.json"))) {
     const spec = JSON.parse(readFileSync(join(wndDir, f), "utf8"));
-    writeFileSync(join(wndStage, "Window", "Menus", spec.file), buildWnd(spec));
-    console.log(`${spec.file}: built`);
+    const dir = join(wndStage, "Window", spec.dir ?? "Menus");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, spec.file), buildWnd(spec));
+    console.log(`${spec.dir ?? "Menus"}/${spec.file}: built`);
   }
 
   // 5. placeholder images

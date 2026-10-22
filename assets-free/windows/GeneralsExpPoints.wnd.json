@@ -1,0 +1,480 @@
+{
+ "file": "GeneralsExpPoints.wnd",
+ "dir": "",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   11,
+   1
+  ],
+  "headerTemplate": "Small"
+ },
+ "windows": [
+  {
+   "name": "GenExpParent",
+   "type": "USER",
+   "rect": [
+    250,
+    120,
+    300,
+    360
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      260,
+      126,
+      280,
+      20
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:Generals",
+     "headerTemplate": "Subtitle"
+    },
+    {
+     "name": "StaticTextLevel",
+     "type": "STATICTEXT",
+     "rect": [
+      260,
+      150,
+      280,
+      16
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Level"
+    },
+    {
+     "name": "StaticTextRankPointsAvailable",
+     "type": "STATICTEXT",
+     "rect": [
+      260,
+      168,
+      280,
+      16
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Rank"
+    },
+    {
+     "name": "ProgressBarExperience",
+     "type": "PROGRESSBAR",
+     "rect": [
+      260,
+      188,
+      280,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       200,
+       170,
+       60,
+       255
+      ],
+      "hiliteBorder": [
+       200,
+       170,
+       60,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonRank1Number0",
+     "type": "PUSHBUTTON",
+     "rect": [
+      262,
+      212,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank1Number1",
+     "type": "PUSHBUTTON",
+     "rect": [
+      332,
+      212,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank1Number2",
+     "type": "PUSHBUTTON",
+     "rect": [
+      402,
+      212,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank1Number3",
+     "type": "PUSHBUTTON",
+     "rect": [
+      472,
+      212,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number0",
+     "type": "PUSHBUTTON",
+     "rect": [
+      262,
+      260,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number1",
+     "type": "PUSHBUTTON",
+     "rect": [
+      318,
+      260,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number2",
+     "type": "PUSHBUTTON",
+     "rect": [
+      374,
+      260,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number3",
+     "type": "PUSHBUTTON",
+     "rect": [
+      430,
+      260,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number4",
+     "type": "PUSHBUTTON",
+     "rect": [
+      486,
+      260,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number5",
+     "type": "PUSHBUTTON",
+     "rect": [
+      262,
+      304,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number6",
+     "type": "PUSHBUTTON",
+     "rect": [
+      318,
+      304,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number7",
+     "type": "PUSHBUTTON",
+     "rect": [
+      374,
+      304,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number8",
+     "type": "PUSHBUTTON",
+     "rect": [
+      430,
+      304,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number9",
+     "type": "PUSHBUTTON",
+     "rect": [
+      486,
+      304,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number10",
+     "type": "PUSHBUTTON",
+     "rect": [
+      262,
+      348,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number11",
+     "type": "PUSHBUTTON",
+     "rect": [
+      318,
+      348,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number12",
+     "type": "PUSHBUTTON",
+     "rect": [
+      374,
+      348,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number13",
+     "type": "PUSHBUTTON",
+     "rect": [
+      430,
+      348,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank3Number14",
+     "type": "PUSHBUTTON",
+     "rect": [
+      486,
+      348,
+      52,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank8Number0",
+     "type": "PUSHBUTTON",
+     "rect": [
+      262,
+      394,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank8Number1",
+     "type": "PUSHBUTTON",
+     "rect": [
+      332,
+      394,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank8Number2",
+     "type": "PUSHBUTTON",
+     "rect": [
+      402,
+      394,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonRank8Number3",
+     "type": "PUSHBUTTON",
+     "rect": [
+      472,
+      394,
+      64,
+      40
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonExit",
+     "type": "PUSHBUTTON",
+     "rect": [
+      420,
+      446,
+      120,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "text": "GUI:Close"
+    }
+   ],
+   "system": "GeneralsExpPointsSystem",
+   "input": "GeneralsExpPointsInput",
+   "style": [
+    "MOUSETRACK"
+   ],
+   "colors": {
+    "enabled": [
+     24,
+     26,
+     34,
+     255
+    ],
+    "enabledBorder": [
+     120,
+     130,
+     150,
+     255
+    ]
+   }
+  }
+ ]
+}

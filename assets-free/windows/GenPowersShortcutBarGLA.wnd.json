@@ -1,0 +1,524 @@
+{
+ "file": "GenPowersShortcutBarGLA.wnd",
+ "dir": "",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   10,
+   1
+  ],
+  "headerTemplate": "Small"
+ },
+ "windows": [
+  {
+   "name": "GenPowersShortcutBarParent",
+   "type": "USER",
+   "rect": [
+    0,
+    120,
+    60,
+    356
+   ],
+   "status": [
+    "ENABLED",
+    "HIDDEN"
+   ],
+   "children": [
+    {
+     "name": "ButtonParent1",
+     "type": "USER",
+     "rect": [
+      2,
+      124,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        126,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent2",
+     "type": "USER",
+     "rect": [
+      2,
+      156,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        158,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent3",
+     "type": "USER",
+     "rect": [
+      2,
+      188,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        190,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent4",
+     "type": "USER",
+     "rect": [
+      2,
+      220,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        222,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent5",
+     "type": "USER",
+     "rect": [
+      2,
+      252,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        254,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent6",
+     "type": "USER",
+     "rect": [
+      2,
+      284,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        286,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent7",
+     "type": "USER",
+     "rect": [
+      2,
+      316,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        318,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent8",
+     "type": "USER",
+     "rect": [
+      2,
+      348,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand8",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        350,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent9",
+     "type": "USER",
+     "rect": [
+      2,
+      380,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand9",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        382,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent10",
+     "type": "USER",
+     "rect": [
+      2,
+      412,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand10",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        414,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonParent11",
+     "type": "USER",
+     "rect": [
+      2,
+      444,
+      56,
+      30
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonCommand11",
+       "type": "PUSHBUTTON",
+       "rect": [
+        4,
+        446,
+        52,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "headerTemplate": "Small"
+      }
+     ],
+     "colors": {
+      "enabled": [
+       18,
+       20,
+       26,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    }
+   ],
+   "system": "ControlBarSystem",
+   "input": "ControlBarInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     200
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   }
+  }
+ ]
+}

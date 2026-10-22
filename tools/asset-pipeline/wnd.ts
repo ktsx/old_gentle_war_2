@@ -63,11 +63,14 @@ export interface WindowSpec {
   /** MappedImage names for draw-data entry 0 of each state (add "IMAGE" to status to use them). */
   images?: { enabled?: string; disabled?: string; hilite?: string };
   staticText?: { centered?: boolean };
+  entry?: { maxLen?: number };
   tooltipDelay?: number;
   children?: WindowSpec[];
 }
 export interface LayoutSpec {
   file: string;
+  /** Subdirectory under Window/ the engine loads this layout from: menus live in "Menus", the in-game HUD at the root (""). Default "Menus". */
+  dir?: string;
   version?: number;
   layout?: { init?: string; update?: string; shutdown?: string };
   creationResolution?: [number, number];
@@ -138,6 +141,7 @@ function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: stri
   L(`              DISABLED: ${rgba(text.disabled)}, DISABLEDBORDER: ${rgba(text.disabledBorder)},`);
   L(`              HILITE: ${rgba(text.hilite)}, HILITEBORDER: ${rgba(text.hiliteBorder)};`);
   if (w.type === "STATICTEXT") L(`  STATICTEXTDATA = CENTERED: ${w.staticText?.centered === false ? 0 : 1};`);
+  if (w.type === "ENTRYFIELD") L(`  TEXTENTRYDATA = MAXLEN: ${w.entry?.maxLen ?? 64}, SECRETTEXT: 0, NUMERICALONLY: 0, ALPHANUMERICALONLY: 0, ASCIIONLY: 0;`);
   for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled", w.images?.enabled).split("\n")) L(line);
   for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled", w.images?.disabled).split("\n")) L(line);
   for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite).split("\n")) L(line);

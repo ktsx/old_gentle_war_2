@@ -91,15 +91,18 @@ jobs:
         # -G Ninja must be explicit, and CMAKE_PROJECT_INCLUDE must be an
         # absolute path — both are load-bearing (see BUILDING.md).
         run: |
-          # The launcher writes <pch>.sum next to each precompiled header (hash of
-          # the preprocessed PCH source) for CCACHE_PCH_EXTSUM: clang PCH files are
-          # not reproducible between runs, so hashing them meant no cache hits.
+          # The top-level CMakeLists.txt installs ccache as the compiler launcher
+          # when it finds one (CCACHE_PROGRAM); point it at our launcher instead,
+          # which runs em++ (whose inner clang is wrapped by ccache through
+          # EM_COMPILER_WRAPPER) and writes <pch>.sum next to each precompiled
+          # header (hash of the preprocessed PCH source) for CCACHE_PCH_EXTSUM:
+          # clang PCH files are not reproducible between runs, so hashing them
+          # meant no cache hits.
           emcmake cmake -G Ninja -B build-web \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DRTS_GAME=GeneralsMD \
             -DRTS_PLATFORM=web \
-            -DCMAKE_C_COMPILER_LAUNCHER=$PWD/scripts/ci/ccache-pch-launcher.sh \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=$PWD/scripts/ci/ccache-pch-launcher.sh \
+            -DCCACHE_PROGRAM=$PWD/scripts/ci/ccache-pch-launcher.sh \
             -DCMAKE_PROJECT_INCLUDE=$PWD/cmake/web.cmake
 
       - name: Build z_generals

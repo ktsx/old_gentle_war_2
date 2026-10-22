@@ -31,7 +31,7 @@ import { join } from "node:path";
 import { Image32, encodeTga, type RGBA } from "./tga.ts";
 import { MeshBuilder, MESH_FLAG, encodeW3D, type Mesh, type Region, type Vec3 } from "./w3d.ts";
 
-export const UNIT_TEXTURE = "ZHCAGxUnits.tga";
+export const UNIT_TEXTURE = "GxUnits.tga";
 /** The same atlas scorched (DAMAGED states) and charred (REALLYDAMAGED / RUBBLE states). */
 export const UNIT_TEXTURE_DAMAGED = "ZHCAGxUnitsD.tga";
 export const UNIT_TEXTURE_RUBBLE = "ZHCAGxUnitsE.tga";
@@ -54,7 +54,7 @@ function noise(img: Image32, x0: number, y0: number, w: number, h: number, base:
   let s = seed >>> 0;
   const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 2 ** 32; };
   for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) {
-    const d = Math.round((rnd() - 0.5) * 2 * amp);
+    const d = 0; // EXPERIMENT
     img.set(x, y, [clamp(base[0] + d), clamp(base[1] + d), clamp(base[2] + d), base[3]]);
   }
 }

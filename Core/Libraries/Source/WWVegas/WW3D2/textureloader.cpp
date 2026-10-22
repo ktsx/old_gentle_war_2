@@ -60,6 +60,7 @@
 #include "texturethumbnail.h"
 #include "ddsfile.h"
 #include "bitmaphandler.h"
+#include <Utility/gx_trace.h>
 #include "WWDebug/wwprofile.h"
 
 bool TextureLoader::TextureLoadSuspended;
@@ -1200,6 +1201,7 @@ bool TextureLoadTaskClass::Begin_Load()
 
 	// if not loaded, abort.
 	if (!loaded) {
+		GX_DIAG_LOG("TEXLOAD: '%s' begin failed (no dds, tga open/format failed)\n", Texture ? Texture->Get_Full_Path().str() : "?");
 		return false;
 	}
 
@@ -1237,6 +1239,7 @@ bool TextureLoadTaskClass::Load()
 	}
 
 	State = STATE_LOAD_MIPMAP;
+	if (!loaded) GX_DIAG_LOG("TEXLOAD: '%s' mipmap load failed\n", Texture ? Texture->Get_Full_Path().str() : "?");
 
 	return loaded;
 }
@@ -1247,6 +1250,8 @@ void TextureLoadTaskClass::End_Load()
 	WWASSERT(TextureLoader::Is_DX8_Thread());
 
 	Unlock_Surfaces();
+	GX_DIAG_LOG("TEXLOAD: '%s' %ux%u mips=%u fmt=%d reduction=%u dds=%d state=%d\n",
+		Texture ? Texture->Get_Full_Path().str() : "?", Width, Height, MipLevelCount, (int)Format, Reduction, (int)IsDDSLoad, (int)State);
 	Apply(true);
 
 	State = STATE_LOAD_COMPLETE;

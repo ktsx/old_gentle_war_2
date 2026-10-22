@@ -40,6 +40,7 @@ extern SDL_Window *TheSDL3Window;
 // Static state
 // ============================================================================
 #include <unordered_map>
+extern "C" int GX_DiagEnabled(void);
 
 static GLES3_PipelineState g_State;
 static bool g_Initialized = false;
@@ -1218,6 +1219,8 @@ GLuint GLES3_TextureConverter::Create_Texture(unsigned int width,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     GLES3_Register_Texture(tex, mip_levels > 1);
+    if (GX_DiagEnabled() && (width >= 512 || height >= 512))
+        fprintf(stderr, "TEXGL: %ux%u fmt=%u mips=%u gl=%u err=0x%x\n", width, height, dx8_format, mip_levels, tex, glGetError());
     return tex;
 }
 

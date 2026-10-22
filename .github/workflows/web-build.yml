@@ -49,16 +49,40 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Ninja
+      - name: Install Ninja and ccache
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build
+          sudo apt-get install -y ninja-build ccache
 
       - name: Set up Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{ env.EMSDK_VERSION }}
           actions-cache-folder: emsdk-cache
+
+      # ccache wraps the clang that emcc runs (EM_COMPILER_WRAPPER), so object
+      # compiles are cached across runs; links are not. The cache is restored by
+      # build type with a prefix match and saved on every run (also failed ones),
+      # so a warm cache turns a ~7 min compile into ~2 min.
+      - name: Restore ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
+
+      - name: Configure ccache
+        run: |
+          echo "EM_COMPILER_WRAPPER=ccache" >> "$GITHUB_ENV"
+          echo "CCACHE_DIR=$HOME/.ccache" >> "$GITHUB_ENV"
+          echo "CCACHE_MAXSIZE=1G" >> "$GITHUB_ENV"
+          # emsdk is reinstalled every run (new mtimes): identify the compiler by its version string
+          echo "CCACHE_COMPILERCHECK=%compiler% --version" >> "$GITHUB_ENV"
+          # precompiled headers need these to be cacheable
+          echo "CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime,include_file_ctime" >> "$GITHUB_ENV"
+          echo "CCACHE_NOHASHDIR=1" >> "$GITHUB_ENV"
+          ccache --zero-stats
 
       - name: Configure (emcmake + web.cmake)
         # -G Ninja must be explicit, and CMAKE_PROJECT_INCLUDE must be an
@@ -76,6 +100,20 @@ jobs:
         run: |
           set -o pipefail
           ninja -k 0 -C build-web z_generals 2>&1 | tee build-web/build.log
+
+      - name: ccache statistics
+        if: always()
+        run: |
+          ccache --show-stats | tee ccache-stats.txt
+          # one line in the check-run annotations, so the hit rate is visible without the logs
+          echo "::notice title=ccache (${{ matrix.build_type }})::$(ccache --show-stats | grep -E 'Hits|Misses|Cache size' | tr -s ' ' | paste -sd ';' -)"
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
 
       - name: Surface compiler errors as annotations
         if: failure()

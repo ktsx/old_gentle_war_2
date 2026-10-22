@@ -248,8 +248,10 @@ jobs:
 
       - name: Check the menu is lit
         run: |
+          set -o pipefail
           python3 -m pip install --quiet pillow
-          python3 tools/asset-pipeline/check-menu-shot.py menu.png
+          python3 tools/asset-pipeline/check-menu-shot.py menu.png | tee menu-check.log || { sed "s/^/::error title=menu-check::/" menu-check.log; exit 1; }
+          sed "s/^/::notice title=menu-check::/" menu-check.log
 
       - name: Launch a map
         if: always()
@@ -259,13 +261,16 @@ jobs:
           # `-file` (CommandLine.cpp, enabled for the web build) starts the free map straight after boot;
           # the game must reach a running logic loop (TICK-DIAG inGame=1).
           SMOKE_EXPECT="GAMELOGIC: startNewGame:ENTER;inGame=1 isPaused=0" \
-          node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
+          # gxdraws=40: the first-frame draw dump reaches past the terrain's ~24 draws into the models'
+          node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&gxdraws=40&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
 
       - name: Check the terrain is visible
         if: always()
         run: |
+          set -o pipefail
           python3 -m pip install --quiet pillow
-          python3 tools/asset-pipeline/check-map-shot.py map.png
+          python3 tools/asset-pipeline/check-map-shot.py map.png | tee map-check.log || { sed "s/^/::error title=map-check::/" map-check.log; exit 1; }
+          sed "s/^/::notice title=map-check::/" map-check.log
 
       # Surface the interesting console lines as check-run annotations (readable through the API without
       # downloading artifacts): failures as errors, load/tick progress as notices. One step per log, since
@@ -284,6 +289,13 @@ jobs:
           grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
           grep -E "LOAD: progress|GAMELOGIC:" "$f" | cut -c1-900 | tail -6 | sed "s/^/::notice title=$f::/"
           grep -E "TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
+
+      - name: Annotate model draws
+        if: always()
+        run: |
+          f=map-smoke.log; [ -f "$f" ] || exit 0
+          # the lit draws of the first in-game frame (models): GL state, material and lights
+          grep -E "DRAW-DIAG\[DIP\].*light=1|DRAW-DIAG   (material|light[0-9])" "$f" | cut -c1-900 | head -10 | sed "s/^/::notice title=model draws::/"
 
       - name: Upload screenshot and log
         if: always()

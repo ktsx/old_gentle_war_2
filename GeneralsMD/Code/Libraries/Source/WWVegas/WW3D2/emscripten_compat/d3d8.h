@@ -18,6 +18,7 @@
 #include <vector>
 #include <cstdint>
 #include <cstring>
+#include <cstdio>
 // Forward declaration — defined in gles3_wrapper.cpp (which has SDL access)
 void GLES3_Swap_Buffers();
 
@@ -1320,11 +1321,44 @@ inline HRESULT D3DXCreateTextureFromFileExA(
   return 0;
 }
 
+// Whole-surface copy between CPU-backed surfaces (rects, palettes and filters ignored). Used by
+// DX8Wrapper::_Create_DX8_Texture(surface) — e.g. W3DAssetManager's house-colour recolouring builds
+// a new texture from a modified copy of the loaded surface; a no-op here left those textures black.
+// Same format: rows are copied (nearest-neighbour when the sizes differ); a different pixel size
+// cannot be converted here and the destination is left as it was.
 inline HRESULT
 D3DXLoadSurfaceFromSurface(void *pDestSurface, const void *pDestPalette,
                            const RECT *pDestRect, void *pSrcSurface,
                            const void *pSrcPalette, const RECT *pSrcRect,
                            DWORD Filter, D3DCOLOR ColorKey) {
+  if (!pDestSurface || !pSrcSurface) return 0;
+  Emscripten_IDirect3DSurface8 *dst = static_cast<Emscripten_IDirect3DSurface8 *>(pDestSurface);
+  Emscripten_IDirect3DSurface8 *src = static_cast<Emscripten_IDirect3DSurface8 *>(pSrcSurface);
+  if (dst->BytesPerPixel != src->BytesPerPixel || dst->Width == 0 || dst->Height == 0 ||
+      src->Width == 0 || src->Height == 0) {
+    fprintf(stderr, "WARN: D3DXLoadSurfaceFromSurface: unsupported %ux%u bpp%u -> %ux%u bpp%u\n",
+            src->Width, src->Height, src->BytesPerPixel, dst->Width, dst->Height, dst->BytesPerPixel);
+    return 0;
+  }
+  D3DLOCKED_RECT sl, dl;
+  if (src->LockRect(&sl, nullptr, 0) != 0 || !sl.pBits) return 0;
+  if (dst->LockRect(&dl, nullptr, 0) != 0 || !dl.pBits) { src->UnlockRect(); return 0; }
+  const uint8_t *sb = static_cast<const uint8_t *>(sl.pBits);
+  uint8_t *db = static_cast<uint8_t *>(dl.pBits);
+  const UINT bpp = dst->BytesPerPixel;
+  if (src->Width == dst->Width && src->Height == dst->Height) {
+    for (UINT y = 0; y < dst->Height; ++y)
+      memcpy(db + y * dl.Pitch, sb + y * sl.Pitch, (size_t)dst->Width * bpp);
+  } else {
+    for (UINT y = 0; y < dst->Height; ++y) {
+      const uint8_t *srow = sb + (size_t)(y * src->Height / dst->Height) * sl.Pitch;
+      uint8_t *drow = db + (size_t)y * dl.Pitch;
+      for (UINT x = 0; x < dst->Width; ++x)
+        memcpy(drow + x * bpp, srow + (size_t)(x * src->Width / dst->Width) * bpp, bpp);
+    }
+  }
+  dst->UnlockRect();
+  src->UnlockRect();
   return 0;
 }
 

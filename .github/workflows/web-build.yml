@@ -68,9 +68,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.ccache
-          key: ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
           restore-keys: |
-            ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
+            ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
 
       - name: Configure ccache
         run: |
@@ -82,6 +82,7 @@ jobs:
           # precompiled headers need these to be cacheable
           echo "CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime,include_file_ctime" >> "$GITHUB_ENV"
           echo "CCACHE_NOHASHDIR=1" >> "$GITHUB_ENV"
+          echo "CCACHE_PCH_EXTSUM=1" >> "$GITHUB_ENV"
           echo "CCACHE_LOGFILE=$RUNNER_TEMP/ccache.log" >> "$GITHUB_ENV"
           ccache --zero-stats
 
@@ -89,14 +90,15 @@ jobs:
         # -G Ninja must be explicit, and CMAKE_PROJECT_INCLUDE must be an
         # absolute path — both are load-bearing (see BUILDING.md).
         run: |
-          # No precompiled headers in CI: clang's PCH files come out different on
-          # every run (even with -fno-pch-timestamp), and every TU hashes its PCH,
-          # so with PCH on ccache never hits. Without PCH a warm cache wins by far.
+          # The launcher writes <pch>.sum next to each precompiled header (hash of
+          # the preprocessed PCH source) for CCACHE_PCH_EXTSUM: clang PCH files are
+          # not reproducible between runs, so hashing them meant no cache hits.
           emcmake cmake -G Ninja -B build-web \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DRTS_GAME=GeneralsMD \
             -DRTS_PLATFORM=web \
-            -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON \
+            -DCMAKE_C_COMPILER_LAUNCHER=$PWD/scripts/ci/ccache-pch-launcher.sh \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=$PWD/scripts/ci/ccache-pch-launcher.sh \
             -DCMAKE_PROJECT_INCLUDE=$PWD/cmake/web.cmake
 
       - name: Build z_generals
@@ -113,7 +115,7 @@ jobs:
           # one line in the check-run annotations, so the hit rate is visible without the logs
           echo "::notice title=ccache (${{ matrix.build_type }})::$(ccache --show-stats | grep -E 'Hits|Misses|Cache size|Uncacheable' | tr -s ' ' | paste -sd ';' -)"
           # why misses happen (temporary diagnostics while the cache is being tuned)
-          echo "::notice title=pch hashes::$(find build-web -name '*.pch' -o -name '*.gch' | head -6 | xargs -r sha256sum | sed 's#build-web/##' | cut -c1-16,65- | paste -sd ';' -)"
+          echo "::notice title=pch sums::$(find build-web -name '*.pch.sum' | head -6 | xargs -r -I{} sh -c 'printf "%s %s\n" "$(cut -c1-12 {})" "{}"' | sed 's#build-web/##' | paste -sd ';' -)"
           if [ -f "$RUNNER_TEMP/ccache.log" ]; then
             echo "::notice title=ccache results::$(grep -oE 'Result: .*' "$RUNNER_TEMP/ccache.log" | sort | uniq -c | sort -rn | head -8 | tr -s ' ' | paste -sd ';' -)"
             echo "::notice title=ccache first miss::$(grep -m1 -B30 'Result: .*miss' "$RUNNER_TEMP/ccache.log" | grep -vE 'Hash|^\s*$' | tail -12 | cut -c1-120 | paste -sd ';' -)"
@@ -124,7 +126,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.ccache
-          key: ccache-nopch-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
 
       - name: Surface compiler errors as annotations
         if: failure()

@@ -204,6 +204,78 @@
       "angle": 2.2,
       "owner": "GxPlayer",
       "health": 20
+    },
+    {
+      "template": "GLACommandCenter",
+      "at": [
+        8,
+        10
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLABarracks",
+      "at": [
+        6,
+        52
+      ],
+      "angle": 0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLASupplyStash",
+      "at": [
+        18,
+        50
+      ],
+      "angle": 0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLAArmsDealer",
+      "at": [
+        14,
+        60
+      ],
+      "angle": 1.5708,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLATankScorpion",
+      "at": [
+        17,
+        12
+      ],
+      "angle": 0.3,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAVehicleTechnical",
+      "at": [
+        17,
+        8
+      ],
+      "angle": -0.4,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAInfantryWorker",
+      "at": [
+        15,
+        15
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAInfantryRebel",
+      "at": [
+        16,
+        16
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
     }
   ]
 }

@@ -14,11 +14,15 @@
  *   AmericaWarFactory      ABWarFact        NBWarFact      ChinaWarFactory
  *   AmericaTankCrusader    AVLeopard        NVBtMstr       ChinaTankBattleMaster
  *   AmericaVehicleHumvee   AVHUMMER
+ *   GLACommandCenter UBCmdHQ, GLABarracks UBBARRACKS, GLASupplyStash UBSupply, GLAArmsDealer UBArmDeal,
+ *   GLAHole UBHole, GLATankScorpion UVLiteTank, GLAVehicleTechnical UVTechTrck,
+ *   GLAInfantryWorker UIWRKR_SKN, GLAInfantryRebel UIRGrd_SKN
+ *   plus the damage states each template names (_D scorched, _E/_AD rubble and wrecks).
  *
  * Units are world units (1 map cell = 10), Z up, X forward (object angle 0 faces +X). Sizes follow
  * the templates' Geometry (command centre 120×140×49, dozer 30×20×15, infantry r7 h13).
  *
- * All models share one 256×256 atlas, Art/Textures/ZHCAGxUnits.tga: the ZHCA prefix makes
+ * All models share one 512×512 atlas (64-px material cells), Art/Textures/ZHCAGxUnits.tga: the ZHCA prefix makes
  * W3DAssetManager blend the owner's house colour into pixels by (255 − alpha), so the panels drawn
  * with low alpha take the player colour and everything else stays as painted.
  */
@@ -31,7 +35,7 @@ export const UNIT_TEXTURE = "ZHCAGxUnits.tga";
 /** The same atlas scorched (DAMAGED states) and charred (REALLYDAMAGED / RUBBLE states). */
 export const UNIT_TEXTURE_DAMAGED = "ZHCAGxUnitsD.tga";
 export const UNIT_TEXTURE_RUBBLE = "ZHCAGxUnitsE.tga";
-const ATLAS = 256, CELL = 64;
+const ATLAS = 512, CELL = 64;
 
 /** Atlas cells (column, row) → inset region, so bilinear filtering never bleeds into a neighbour. */
 function R(col: number, row: number): Region { return { x: col * CELL + 3, y: row * CELL + 3, w: CELL - 6, h: CELL - 6 }; }
@@ -40,6 +44,9 @@ const TEX = {
   yellow: R(0, 1), tread: R(1, 1), glass: R(2, 1), redConcrete: R(3, 1),
   olive: R(0, 2), skin: R(1, 2), black: R(2, 2), khaki: R(3, 2),
   houseStripe: R(0, 3), tileRoof: R(1, 3), steel: R(2, 3), hazard: R(3, 3),
+  // GLA
+  mudBrick: R(4, 0), tarp: R(5, 0), rust: R(6, 0), planks: R(7, 0),
+  robe: R(4, 1), scarf: R(5, 1), crate: R(6, 1), crater: R(7, 1),
 };
 
 // --- texture -------------------------------------------------------------------------------
@@ -104,6 +111,35 @@ export function buildUnitAtlas(): Image32 {
   [x, y] = cell(3, 3);                                         // hazard stripes
   img.fillRect(x, y, CELL, CELL, [220, 180, 40, 255]);
   for (let i = -CELL; i < CELL; i += 16) for (let r = 0; r < CELL; r++) img.fillRect(x + ((i + r) % CELL + CELL) % CELL, y + r, 1, 1, [30, 30, 30, 255]);
+  // --- GLA ---
+  [x, y] = cell(4, 0);                                         // mud brick: sandy wall with brick courses and a slit window
+  noise(img, x, y, CELL, CELL, [196, 168, 118, 255], 9, 13);
+  for (let i = 0; i < CELL; i += 10) img.fillRect(x, y + i, CELL, 1, [150, 124, 84, 255]);
+  for (let i = 0; i < CELL; i += 10) for (let j = (i / 10) % 2 ? 0 : 14; j < CELL; j += 28) img.fillRect(x + j, y + i, 1, 10, [150, 124, 84, 255]);
+  img.fillRect(x + 26, y + 20, 12, 18, [40, 32, 24, 255]);
+  [x, y] = cell(5, 0);                                         // tarp: faded canvas with stitched seams
+  noise(img, x, y, CELL, CELL, [122, 118, 84, 255], 7, 14);
+  for (let i = 8; i < CELL; i += 16) img.fillRect(x, y + i, CELL, 2, [96, 92, 64, 255]);
+  img.fillRect(x + 20, y + 30, 18, 12, [104, 100, 70, 255]);  // patch
+  [x, y] = cell(6, 0);                                         // rust: brown-orange corrugated metal
+  noise(img, x, y, CELL, CELL, [128, 78, 48, 255], 14, 15);
+  for (let i = 0; i < CELL; i += 6) img.fillRect(x + i, y, 2, CELL, [92, 56, 34, 255]);
+  [x, y] = cell(7, 0);                                         // planks
+  noise(img, x, y, CELL, CELL, [150, 112, 70, 255], 8, 16);
+  for (let i = 0; i < CELL; i += 12) img.fillRect(x, y + i, CELL, 2, [80, 56, 32, 255]);
+  [x, y] = cell(4, 1);                                         // robe: light cloth, a house-colour sash (alpha 96)
+  noise(img, x, y, CELL, CELL, [214, 206, 186, 255], 6, 17);
+  img.fillRect(x, y + 20, CELL, 10, [200, 200, 200, 96]);
+  [x, y] = cell(5, 1);                                         // headscarf: dark red check
+  noise(img, x, y, CELL, CELL, [128, 36, 36, 255], 6, 18);
+  for (let i = 0; i < CELL; i += 8) { img.fillRect(x + i, y, 1, CELL, [200, 190, 180, 255]); img.fillRect(x, y + i, CELL, 1, [200, 190, 180, 255]); }
+  [x, y] = cell(6, 1);                                         // crate: planks with a dark stencil
+  noise(img, x, y, CELL, CELL, [160, 126, 80, 255], 7, 19);
+  img.strokeRect(x + 2, y + 2, CELL - 4, CELL - 4, [90, 64, 36, 255]);
+  img.fillRect(x + 18, y + 24, 28, 14, [60, 44, 30, 255]);
+  [x, y] = cell(7, 1);                                         // crater: scorched earth
+  noise(img, x, y, CELL, CELL, [70, 58, 46, 255], 10, 20);
+  img.disc(x + 32, y + 32, 20, [34, 28, 24, 255]);
   return img;
 }
 
@@ -206,6 +242,14 @@ const DAMAGE_STATES: Record<string, { damaged?: string; rubble?: string; squash:
   AVHUMMER: { rubble: "AVHUMMER_D", squash: 0.7, heaps: false },
   AVCONSTDOZ_A: { rubble: "AVCONSTDOZ_AD", squash: 0.75, heaps: false },
   NVCONSTDOZ_A: { rubble: "NVCONSTDOZ_AD", squash: 0.75, heaps: false },
+  // GLA
+  UBCmdHQ: { damaged: "UBCmdHQ_D", rubble: "UBCmdHQ_E", squash: 0.4, heaps: true },
+  UBBARRACKS: { damaged: "UBBarracks_D", rubble: "UBBarracks_E", squash: 0.45, heaps: true },
+  UBSupply: { damaged: "UBSupply_D", rubble: "UBSupply_E", squash: 0.45, heaps: true },
+  UBArmDeal: { damaged: "UBArmDeal_D", rubble: "UBArmDeal_E", squash: 0.4, heaps: true },
+  UBHole: { damaged: "UBHole_D", rubble: "UBHole_E", squash: 1, heaps: false },
+  UVLiteTank: { rubble: "UVLiteTank_D", squash: 0.75, heaps: false },
+  UVTechTrck: { rubble: "UVTechTrck_D", squash: 0.7, heaps: false },
 };
 
 // --- models ----------------------------------------------------------------------------------
@@ -353,6 +397,96 @@ function humvee(name: string): Mesh {
   return b.mesh();
 }
 
+// --- GLA ---------------------------------------------------------------------------------------
+// Mud-brick walls, tarp roofs, rusty metal; the templates' names: GLACommandCenter UBCmdHQ,
+// GLABarracks UBBARRACKS, GLASupplyStash UBSupply, GLAArmsDealer UBArmDeal, GLAHole UBHole,
+// GLATankScorpion UVLiteTank, GLAVehicleTechnical UVTechTrck, GLAInfantryWorker UIWRKR_SKN,
+// GLAInfantryRebel UIRGrd_SKN.
+
+/** UBCmdHQ (130×130×54): a walled compound — corner towers, a domed hall, a radio mast. */
+function commandCenterGLA(): Mesh {
+  const b = new MeshBuilder("UBCmdHQ", UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.box([-64, -64, 0], [64, 64, 2], { side: TEX.mudBrick, top: TEX.planks });                       // yard
+  for (const [x0, y0, x1, y1] of [[-64, -64, -60, 64], [60, -64, 64, 64], [-64, -64, 64, -60], [-64, 60, 64, 64]])
+    b.box([x0, y0, 2], [x1, y1, 14], { side: TEX.mudBrick, top: TEX.mudBrick });                   // perimeter wall
+  for (const x of [-60, 60]) for (const y of [-60, 60]) b.cylinder(x, y, 2, 26, 7, 8, { side: TEX.mudBrick, top: TEX.planks }); // towers
+  b.box([60, -10, 2], [64, 10, 12], { side: TEX.planks, top: TEX.planks });                          // gate
+  b.box([-36, -30, 2], [28, 30, 34], { side: TEX.mudBrick, top: TEX.tarp, front: TEX.housePanel }); // hall
+  b.frustum([-30, -24, 34], [22, 24, 46], 14, { side: TEX.tarp, top: TEX.tarp });                    // dome
+  b.box([26, -26, 26], [28, 26, 31], { side: TEX.houseStripe, top: TEX.mudBrick });                  // house-colour band
+  b.cylinder(44, 40, 2, 54, 2.2, 6, { side: TEX.rust, top: TEX.rust });                               // mast
+  b.box([38, 34, 40], [50, 46, 42], { side: TEX.rust, top: TEX.rust });                               // mast platform
+  b.box([-56, 30, 2], [-40, 50, 10], { side: TEX.crate, top: TEX.crate });                            // stores
+  b.box([-56, -52, 2], [-44, -40, 8], { side: TEX.hazard, top: TEX.rust });                           // generator
+  return b.mesh();
+}
+
+/** UBBARRACKS (84×104×20): a long mud block with a tarp roof and two tents in front. */
+function barracksGLA(): Mesh {
+  const b = new MeshBuilder("UBBARRACKS", UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.box([-46, -56, 0], [46, 56, 2], { side: TEX.mudBrick, top: TEX.planks });
+  b.box([-40, -50, 2], [14, 50, 16], { side: TEX.mudBrick, top: TEX.tarp, front: TEX.housePanel });
+  b.frustum([-42, -52, 16], [16, 52, 22], 12, { side: TEX.tarp, top: TEX.tarp });
+  b.box([12, -44, 10], [14, 44, 14], { side: TEX.houseStripe, top: TEX.mudBrick });
+  for (const y of [-30, 30]) b.frustum([20, y - 16, 2], [42, y + 16, 14], 9, { side: TEX.tarp, top: TEX.tarp }); // tents
+  b.box([12, -8, 2], [14, 8, 12], { side: TEX.planks, top: TEX.planks });                             // door
+  flagpole(b, 38, 0, 2);
+  return b.mesh();
+}
+
+/** UBSupply (72×70×30): crate stacks under a tarp canopy on rusty poles. */
+function supplyStashGLA(): Mesh {
+  const b = new MeshBuilder("UBSupply", UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.box([-40, -39, 0], [40, 39, 2], { side: TEX.mudBrick, top: TEX.planks });
+  b.box([-40, -39, 2], [-34, 39, 12], { side: TEX.mudBrick, top: TEX.mudBrick });                   // back wall
+  for (const x of [-26, -6, 14]) for (const y of [-26, -4, 18]) {
+    b.box([x, y, 2], [x + 14, y + 14, 12], { side: TEX.crate, top: TEX.crate });
+    if ((x + y) % 3 === 0) b.box([x + 2, y + 2, 12], [x + 12, y + 12, 20], { side: TEX.crate, top: TEX.crate });
+  }
+  for (const x of [-30, 30]) for (const y of [-34, 34]) b.cylinder(x, y, 2, 28, 1, 6, { side: TEX.rust, top: TEX.rust }); // poles
+  b.box([-34, -38, 27], [34, 38, 29], { side: TEX.tarp, top: TEX.tarp, bottom: TEX.tarp });        // canopy
+  b.box([-34, -38, 24], [34, -36, 27], { side: TEX.houseStripe, top: TEX.tarp });                    // house-colour valance
+  return b.mesh();
+}
+
+/** UBArmDeal (80×124×25): an open workshop — rust roof on posts, a mud back wall, a hoist. */
+function armsDealerGLA(): Mesh {
+  const b = new MeshBuilder("UBArmDeal", UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.box([-44, -66, 0], [44, 66, 2], { side: TEX.mudBrick, top: TEX.planks });
+  b.box([-40, -62, 2], [-30, 62, 20], { side: TEX.mudBrick, top: TEX.mudBrick, front: TEX.housePanel }); // back wall
+  for (const x of [-10, 36]) for (const y of [-58, 0, 58]) b.cylinder(x, y, 2, 22, 1.4, 6, { side: TEX.rust, top: TEX.rust }); // posts
+  b.box([-40, -62, 22], [40, 62, 25], { side: TEX.rust, top: TEX.rust, bottom: TEX.rust });        // roof
+  b.box([38, -50, 18], [40, 50, 22], { side: TEX.houseStripe, top: TEX.rust });                      // house-colour band
+  b.box([-26, -40, 2], [10, -20, 8], { side: TEX.crate, top: TEX.planks });                          // workbench
+  b.box([-28, 10, 2], [6, 34, 6], { side: TEX.metal, top: TEX.steel });                              // vehicle pit plate
+  b.box([-30, 46, 2], [-26, 50, 34], { side: TEX.rust, top: TEX.rust });                             // hoist mast
+  b.box([-30, 47, 32], [14, 49, 34], { side: TEX.rust, top: TEX.rust, bottom: TEX.rust });          // boom
+  b.box([-8, -60, 2], [8, -52, 12], { side: TEX.hazard, top: TEX.rust });                            // fuel drums
+  return b.mesh();
+}
+
+/** UBHole (r25, h5): what a GLA building leaves behind — a scorched dish with a rim. */
+function holeGLA(): Mesh {
+  const b = new MeshBuilder("UBHole", UNIT_TEXTURE, ATLAS, PICKABLE);
+  b.frustum([-25, -25, 0], [25, 25, 3], 8, { side: TEX.mudBrick, top: TEX.crater });
+  b.box([-8, 18, 3], [8, 22, 5], { side: TEX.planks, top: TEX.planks });                             // debris
+  b.box([14, -16, 3], [20, -6, 6], { side: TEX.crate, top: TEX.crate });
+  return b.mesh();
+}
+
+/** UVTechTrck (36×18×7.5): a pickup with a gun on the bed. */
+function technicalGLA(): Mesh {
+  const b = new MeshBuilder("UVTechTrck", UNIT_TEXTURE, ATLAS, PICKABLE);
+  for (const x of [-13, 7]) for (const y of [-9, 6]) b.box([x, y, 0], [x + 5, y + 3, 5], { side: TEX.tread, top: TEX.tread, bottom: TEX.tread }); // wheels
+  b.box([-17, -7, 2.5], [17, 7, 7.5], { side: TEX.rust, top: TEX.rust, front: TEX.metal });          // chassis
+  b.box([-8, -6.5, 7.5], [4, 6.5, 13], { side: TEX.glass, top: TEX.rust, back: TEX.rust });          // cab (engine ahead at +X)
+  b.box([4, -6.5, 7.5], [17, 6.5, 9.5], { side: TEX.rust, top: TEX.rust });                          // hood
+  b.box([-17, -7.2, 7.5], [-8, 7.2, 8.5], { side: TEX.houseStripe, top: TEX.planks });               // bed rail in house colour
+  b.cylinder(-12, 0, 8.5, 11.5, 1.2, 6, { side: TEX.black, top: TEX.black });                         // gun pintle
+  b.box([-13, -0.6, 11], [-2, 0.6, 12], { side: TEX.black, top: TEX.black, bottom: TEX.black });     // gun
+  return b.mesh();
+}
+
 export function buildFreeModels(): Record<string, Mesh> {
   const models = [
     commandCenterUSA(), commandCenterChina(),
@@ -364,6 +498,9 @@ export function buildFreeModels(): Record<string, Mesh> {
     humvee("AVHUMMER"),
     dozer("AVCONSTDOZ_A", TEX.yellow), dozer("NVCONSTDOZ_A", TEX.redConcrete),
     infantry("AIRngr_SKN", TEX.olive, TEX.olive), infantry("NICNSC_SKN", TEX.khaki, TEX.khaki),
+    commandCenterGLA(), barracksGLA(), supplyStashGLA(), armsDealerGLA(), holeGLA(),
+    tank("UVLiteTank", TEX.rust, 14, 9, 10.5, 5), technicalGLA(),
+    infantry("UIWRKR_SKN", TEX.robe, TEX.scarf), infantry("UIRGrd_SKN", TEX.olive, TEX.scarf),
   ];
   for (const m of [...models]) {
     const d = DAMAGE_STATES[m.name];

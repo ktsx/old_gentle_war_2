@@ -3,8 +3,9 @@
 
 Viewport is 1024x768. The tactical view covers the top 480 of the 600 engine rows (y < 614
 after the 1.28 scale); with gxtest.map's single GxGrass terrain (tga.ts: green noise) the
-centre of the view must be grass: in the sampled region (200..824, 160..560) at least 70 % of
-the pixels must be green-dominant (G > R + 15, G > B + 15, G >= 70). A black region means the
+centre of the view must be grass: in the sampled region (200..824, 160..560) at least 60 % of
+the pixels must be green-dominant (G > R + 15, G > B + 15, G >= 70), the rest being the map's
+models, which must be lit (not black). A black region means the
 terrain pass drew nothing (or the shroud covered it); a grey or uniform one means the texture
 did not make it onto the mesh. The control bar must be drawn with the money display lit.
 """
@@ -18,9 +19,18 @@ green = sum(1 for r, g, b in px if g >= 70 and g > r + 15 and g > b + 15)
 black = sum(1 for r, g, b in px if max(r, g, b) < 16)
 ratio = green / len(px)
 print(f"map region: {len(px)} px, green-dominant {ratio:.1%}, near-black {black / len(px):.1%}")
-ok = ratio >= 0.7
+ok = ratio >= 0.6
 if not ok:
     print("FAIL: terrain not visible in the tactical view")
+# gxtest.map places the first models (free-models.ts) in the middle of the view: they cover part of
+# the grass, and must not be black — an unlit model (material/vertex-colour source mix-up in the
+# fixed-function emulation) rendered as a pure black silhouette.
+nongreen = 1 - ratio
+print(f"objects: non-green {nongreen:.1%} (must be >= 5%), near-black {black / len(px):.1%} (must be < 3%)")
+if nongreen < 0.05:
+    print("FAIL: no objects drawn over the terrain"); ok = False
+if black / len(px) >= 0.03:
+    print("FAIL: objects drawn black (unlit)"); ok = False
 
 # The control bar (assets-free/windows/ControlBar.wnd.json, body from y=470 of 600 -> 602 of 768)
 # must cover the bottom of the screen (dark, not grass) and show the money display:

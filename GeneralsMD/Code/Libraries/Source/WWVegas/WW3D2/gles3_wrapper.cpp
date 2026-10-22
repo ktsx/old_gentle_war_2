@@ -740,6 +740,22 @@ void GLES3_Diag_Dump_Draw(const char* kind, unsigned int fvf, unsigned int strid
             g_State.texture_stage_state[0][GLES3_TSS_COLOROP], g_State.texture_stage_state[0][GLES3_TSS_ALPHAOP],
             g_State.texture_stage_state[1][GLES3_TSS_COLOROP], g_State.texture_stage_state[1][GLES3_TSS_ALPHAOP],
             (int)g_State.alpha_test_enabled);
+    if (g_State.lighting_enabled) {
+        // what the fixed-function emulation will light the vertices with (black models = look here first)
+        const GLES3_Material& m = g_State.material;
+        fprintf(stderr, "DRAW-DIAG   material diff=(%.2f,%.2f,%.2f,%.2f) amb=(%.2f,%.2f,%.2f) emis=(%.2f,%.2f,%.2f) globalAmb=(%.2f,%.2f,%.2f) colorVertex=%d src(d/a/e)=%u/%u/%u\n",
+                m.diffuse[0], m.diffuse[1], m.diffuse[2], m.diffuse[3], m.ambient[0], m.ambient[1], m.ambient[2],
+                m.emissive[0], m.emissive[1], m.emissive[2], g_State.global_ambient[0], g_State.global_ambient[1], g_State.global_ambient[2],
+                g_State.render_states[GLES3_RS_COLORVERTEX] ? 1 : 0, g_State.render_states[GLES3_RS_DIFFUSEMATERIALSOURCE],
+                g_State.render_states[GLES3_RS_AMBIENTMATERIALSOURCE], g_State.render_states[GLES3_RS_EMISSIVEMATERIALSOURCE]);
+        for (int i = 0; i < 4; i++) {
+            if (!g_State.light_enabled[i]) continue;
+            const GLES3_Light& l = g_State.lights[i];
+            fprintf(stderr, "DRAW-DIAG   light%d type=%u diff=(%.2f,%.2f,%.2f) amb=(%.2f,%.2f,%.2f) dir=(%.2f,%.2f,%.2f) pos=(%.0f,%.0f,%.0f)\n",
+                    i, l.type, l.diffuse[0], l.diffuse[1], l.diffuse[2], l.ambient[0], l.ambient[1], l.ambient[2],
+                    l.direction[0], l.direction[1], l.direction[2], l.position[0], l.position[1], l.position[2]);
+        }
+    }
     // first triangle through W*V*P (D3D row-vector convention: v * W * V * P)
     if (vb && ib && stride >= 12 && prim_count > 0) {
         const unsigned short* idx = (const unsigned short*)ib;
@@ -1570,8 +1586,18 @@ void GLES3_ShaderManager::Apply_Uniforms(GLuint program,
         }
     }
 
-    // Color vertex mode
-    int c_vertex = state.render_states[GLES3_RS_COLORVERTEX] ? 1 : 0;
+    // Material colour sources. DX8 semantics: with COLORVERTEX on, each of
+    // DIFFUSE/AMBIENT/EMISSIVEMATERIALSOURCE picks the vertex colour (D3DMCS_COLOR1) or the
+    // material (D3DMCS_MATERIAL). W3D leaves COLORVERTEX on for everything and routes meshes
+    // without a per-vertex colour to the material through those states (their vertex diffuse
+    // is written as 0 — dx8renderer.cpp), so taking the vertex colour whenever COLORVERTEX is
+    // on lit every model black. Bit 0 = diffuse, 1 = ambient, 2 = emissive from the vertex.
+    int c_vertex = 0;
+    if (state.render_states[GLES3_RS_COLORVERTEX]) {
+        if (state.render_states[GLES3_RS_DIFFUSEMATERIALSOURCE] == 1) c_vertex |= 1;
+        if (state.render_states[GLES3_RS_AMBIENTMATERIALSOURCE] == 1) c_vertex |= 2;
+        if (state.render_states[GLES3_RS_EMISSIVEMATERIALSOURCE] == 1) c_vertex |= 4;
+    }
     if (locs.u_ColorVertex != -1 && (!cache.initialized || cache.color_vertex != c_vertex)) {
         glUniform1i(locs.u_ColorVertex, c_vertex);
         cache.color_vertex = c_vertex;

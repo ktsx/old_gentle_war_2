@@ -15,6 +15,7 @@
  *   TexturesZH.big Art/Textures/*.tga (tga.ts placeholders, hud-skin.ts atlases, mapped-images.ts labelled
  *                 placeholder atlases for every corpus MappedImage texture), Art/Terrain/*.tga
  *   MapsZH.big    Maps/<name>/<name>.map
+ *   W3DZH.big     Art/W3D/*.w3d (free-models.ts: procedural models named after the corpus' retail model names)
  *
  * Usage:
  *   node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts <outDir> [--patch <dir>] [--cache <dir>]
@@ -33,6 +34,7 @@ import { writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
 import { buildMap } from "./map.ts";
+import { writeFreeModels } from "./free-models.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
 const PATCH_COMMIT = "6c7f40d6af6a4babb77a33a4502ec7656446c13e"; // 2026-09-18
@@ -75,6 +77,7 @@ function main() {
   const wndStage = join(stage, "wnd");
   const texStage = join(stage, "tex");
   const mapStage = join(stage, "maps");
+  const w3dStage = join(stage, "w3d");
   mkdirSync(join(iniStage, "Data", "English"), { recursive: true });
   mkdirSync(join(wndStage, "Window", "Menus"), { recursive: true });
 
@@ -107,7 +110,10 @@ function main() {
   const ph = writePlaceholderAtlases(patchData, texStage);
   console.log(`placeholder atlases: ${ph.textures} textures, ${(ph.bytes / 1e6).toFixed(1)} MB`);
 
-  // 6. maps
+  // 6. models (their shared texture goes into TexturesZH.big)
+  console.log(`models: ${writeFreeModels(w3dStage, texStage).join(", ")}`);
+
+  // 7. maps
   const mapDir = join(freeRoot, "maps");
   for (const f of readdirSync(mapDir).filter((n) => n.endsWith(".map.json"))) {
     const spec = JSON.parse(readFileSync(join(mapDir, f), "utf8"));
@@ -118,17 +124,19 @@ function main() {
     console.log(`Maps/${spec.name}/${spec.name}.map: ${buf.length} bytes`);
   }
 
-  // 7. archives
+  // 8. archives
   const assets = join(outDir, "assets");
   mkdirSync(assets, { recursive: true });
   const n1 = packDir(iniStage, join(assets, "INIZH.big"));
   const n2 = packDir(wndStage, join(assets, "WindowZH.big"));
   const n3 = packDir(texStage, join(assets, "TexturesZH.big"));
   const n4 = packDir(mapStage, join(assets, "MapsZH.big"));
+  const n5 = packDir(w3dStage, join(assets, "W3DZH.big"));
   console.log(`INIZH.big: ${n1} files (${statSync(join(assets, "INIZH.big")).size} bytes)`);
   console.log(`WindowZH.big: ${n2} files`);
   console.log(`TexturesZH.big: ${n3} files`);
   console.log(`MapsZH.big: ${n4} files`);
+  console.log(`W3DZH.big: ${n5} files`);
   rmSync(stage, { recursive: true, force: true });
 }
 

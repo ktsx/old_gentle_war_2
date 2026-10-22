@@ -1,14 +1,116 @@
 {
   "name": "gxtest",
-  "playable": [64, 64],
+  "playable": [
+    64,
+    64
+  ],
   "border": 8,
   "height": 20,
   "heightNoise": 1,
-  "terrain": { "name": "GxGrass", "tiles": 2 },
+  "terrain": {
+    "name": "GxGrass",
+    "tiles": 2
+  },
   "timeOfDay": "afternoon",
   "players": [
-    { "name": "GxPlayer", "faction": "FactionAmerica", "human": true, "displayName": "Player", "color": [0, 80, 255], "start": [20, 20] },
-    { "name": "GxRival", "faction": "FactionChina", "human": false, "displayName": "Rival", "color": [220, 40, 40], "start": [44, 44] }
+    {
+      "name": "GxPlayer",
+      "faction": "FactionAmerica",
+      "human": true,
+      "displayName": "Player",
+      "color": [
+        0,
+        80,
+        255
+      ],
+      "start": [
+        20,
+        20
+      ]
+    },
+    {
+      "name": "GxRival",
+      "faction": "FactionChina",
+      "human": false,
+      "displayName": "Rival",
+      "color": [
+        220,
+        40,
+        40
+      ],
+      "start": [
+        44,
+        44
+      ]
+    }
   ],
-  "camera": [20, 20]
+  "camera": [
+    26,
+    20
+  ],
+  "objects": [
+    {
+      "template": "AmericaCommandCenter",
+      "at": [
+        20,
+        20
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaVehicleDozer",
+      "at": [
+        30,
+        16
+      ],
+      "angle": 0.4,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaInfantryRanger",
+      "at": [
+        30,
+        22
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaInfantryRanger",
+      "at": [
+        31,
+        24
+      ],
+      "angle": 0.3,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "ChinaCommandCenter",
+      "at": [
+        44,
+        44
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaVehicleDozer",
+      "at": [
+        36,
+        42
+      ],
+      "angle": 3.0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaInfantryRedguard",
+      "at": [
+        36,
+        46
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    }
+  ]
 }

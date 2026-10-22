@@ -452,7 +452,12 @@ static bool GameWebFrameCallback(float /*delta_time_ms*/) {
       static bool s_armedDrawDump = false;
       if (!s_armedDrawDump && TheGameLogic->isInGame()) {
         s_armedDrawDump = true;
-        GLES3_Dump_Next_Draws(24);
+        // ?gxdraws=N widens the dump (the terrain alone is ~24 draws; models come after it)
+        int nDraws = EM_ASM_INT({
+          try { var m = /[?&#]gxdraws=(\d+)/.exec(location.search + location.hash); if (m) return parseInt(m[1], 10); } catch (e) {}
+          return 24;
+        });
+        GLES3_Dump_Next_Draws(nDraws);
       }
       fprintf(stderr,
               "TICK-DIAG: logicFrame=%u inGame=%d isPaused=%d "

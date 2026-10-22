@@ -29,6 +29,12 @@ add_compile_options(-sUSE_WEBGL2=1 -sFULL_ES3=1)
 
 # Enable C++ exception catching so init failures surface as messages.
 add_compile_options(-fexceptions -g)
+
+# Precompiled headers must be byte-identical between builds for ccache to hit:
+# by default clang records the mtime of every header in the PCH, and a fresh CI
+# checkout has fresh mtimes, so every PCH user missed the cache. (ccache in CI:
+# .github/workflows/web-build.yml.)
+add_compile_options(-Xclang -fno-pch-timestamp)
 add_link_options(-fexceptions -sDISABLE_EXCEPTION_CATCHING=0)
 
 # ----------------------------------------------------------------------------

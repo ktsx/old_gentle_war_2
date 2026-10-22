@@ -54,11 +54,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build ccache
 
-      - name: Set up Emscripten
-        uses: mymindstorm/setup-emsdk@v14
+      # emsdk at a fixed path (~/emsdk), cached by version. setup-emsdk put it under
+      # a per-run random directory, which ends up in every compile command line
+      # (-isystem …/sysroot/include) and so in every ccache hash — no hits across runs.
+      - name: Cache emsdk
+        id: emsdk-cache
+        uses: actions/cache@v4
         with:
-          version: ${{ env.EMSDK_VERSION }}
-          actions-cache-folder: emsdk-cache
+          path: ~/emsdk
+          key: emsdk-${{ env.EMSDK_VERSION }}-v1
+
+      - name: Set up Emscripten
+        run: |
+          set -e
+          if [ ! -x "$HOME/emsdk/emsdk" ]; then
+            git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
+          fi
+          cd "$HOME/emsdk"
+          ./emsdk install "$EMSDK_VERSION"
+          ./emsdk activate "$EMSDK_VERSION"
+          source ./emsdk_env.sh
+          env | grep -E '^(EMSDK|EMSDK_NODE|EMSDK_PYTHON|EM_CONFIG)=' >> "$GITHUB_ENV" || true
+          echo "$HOME/emsdk" >> "$GITHUB_PATH"
+          echo "$HOME/emsdk/upstream/emscripten" >> "$GITHUB_PATH"
+          emcc --version | head -1
 
       # ccache wraps the clang that emcc runs (EM_COMPILER_WRAPPER), so object
       # compiles are cached across runs; links are not. The cache is restored by
@@ -68,9 +87,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.ccache
-          key: ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-v2-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
           restore-keys: |
-            ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
+            ccache-v2-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-
 
       - name: Configure ccache
         run: |
@@ -131,7 +150,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.ccache
-          key: ccache-pchsum-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
+          key: ccache-v2-${{ matrix.build_type }}-emsdk${{ env.EMSDK_VERSION }}-${{ github.sha }}
 
       - name: Surface compiler errors as annotations
         if: failure()

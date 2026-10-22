@@ -28,13 +28,8 @@ if [ $rc -eq 0 ] && [[ "$out" == *.pch ]]; then
     if [ ${#pp[@]} -gt 0 ] && [ "${pp[-1]}" = "-Xclang" ] && [ "$a" = "-emit-pch" ]; then unset 'pp[-1]'; continue; fi
     pp+=("$a")
   done
-  if "${pp[@]}" -E -P 2>"${out}.pp.err" | sha256sum | cut -d' ' -f1 > "$out.sum"; then
-    [ -n "$CCACHE_LAUNCHER_LOG" ] && echo "pch ok $out $(cat "$out.sum")" >> "$CCACHE_LAUNCHER_LOG"
-  else
-    rm -f "$out.sum"
-    [ -n "$CCACHE_LAUNCHER_LOG" ] && { echo "pch FAILED $out: ${pp[*]}"; head -5 "${out}.pp.err"; } >> "$CCACHE_LAUNCHER_LOG"
+  if ! "${pp[@]}" -E -P 2>/dev/null | sha256sum | cut -d' ' -f1 > "$out.sum"; then
+    rm -f "$out.sum"   # no .sum: ccache falls back to hashing the .pch itself (misses, but correct)
   fi
-elif [ -n "$CCACHE_LAUNCHER_LOG" ] && [ -z "$CCACHE_LAUNCHER_SEEN" ]; then
-  echo "first cmd: $*" >> "$CCACHE_LAUNCHER_LOG"; export CCACHE_LAUNCHER_SEEN=1
 fi
 exit $rc

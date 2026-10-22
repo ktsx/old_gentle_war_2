@@ -1,0 +1,1368 @@
+{
+ "file": "MultiplayerLoadScreen.wnd",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "MultiplayerLoadScreenParent",
+   "type": "USER",
+   "rect": [
+    0,
+    0,
+    800,
+    600
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      40,
+      400,
+      40
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Title",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:LoadingMap",
+     "font": [
+      "Arial",
+      20,
+      1
+     ]
+    },
+    {
+     "name": "StaticTextPlayer0",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      110,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide0",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      110,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam0",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      110,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad0",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      130,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer1",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      150,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide1",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      150,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam1",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      150,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad1",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      170,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer2",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      190,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide2",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      190,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam2",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      190,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad2",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      210,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer3",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      230,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide3",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      230,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam3",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      230,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad3",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      250,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer4",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      270,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide4",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      270,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam4",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      270,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad4",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      290,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer5",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      310,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide5",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      310,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam5",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      310,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad5",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      330,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer6",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      350,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide6",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      350,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam6",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      350,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad6",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      370,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextPlayer7",
+     "type": "STATICTEXT",
+     "rect": [
+      40,
+      390,
+      170,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextSide7",
+     "type": "STATICTEXT",
+     "rect": [
+      214,
+      390,
+      130,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextTeam7",
+     "type": "STATICTEXT",
+     "rect": [
+      348,
+      390,
+      90,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ProgressLoad7",
+     "type": "PROGRESSBAR",
+     "rect": [
+      40,
+      410,
+      398,
+      12
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       30,
+       34,
+       44,
+       255
+      ],
+      "enabledBorder": [
+       120,
+       130,
+       150,
+       255
+      ],
+      "hilite": [
+       80,
+       140,
+       230,
+       255
+      ],
+      "hiliteBorder": [
+       80,
+       140,
+       230,
+       255
+      ]
+     }
+    },
+    {
+     "name": "WinMapPreview",
+     "type": "USER",
+     "rect": [
+      480,
+      100,
+      280,
+      280
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonMapStartPosition0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        488,
+        108,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "1",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        512,
+        108,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "2",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        536,
+        108,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "3",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        560,
+        108,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "4",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        488,
+        132,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "5",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        512,
+        132,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "6",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        536,
+        132,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "7",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        560,
+        132,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "8",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     }
+    },
+    {
+     "name": "LocalGeneralPortrait",
+     "type": "USER",
+     "rect": [
+      480,
+      400,
+      120,
+      120
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     }
+    },
+    {
+     "name": "LocalGeneralName",
+     "type": "STATICTEXT",
+     "rect": [
+      610,
+      400,
+      150,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "font": [
+      "Arial",
+      14,
+      1
+     ]
+    },
+    {
+     "name": "LocalGeneralFeatures",
+     "type": "STATICTEXT",
+     "rect": [
+      610,
+      424,
+      150,
+      96
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    }
+   ],
+   "colors": {
+    "enabled": [
+     12,
+     14,
+     20,
+     255
+    ],
+    "enabledBorder": [
+     12,
+     14,
+     20,
+     255
+    ]
+   }
+  }
+ ]
+}

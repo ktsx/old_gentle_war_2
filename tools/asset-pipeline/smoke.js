@@ -3,6 +3,7 @@
 //   --begin            press the shell's Begin button once the engine is Ready, then wait afterBeginMs
 //   SMOKE_KEYS=Space;Escape    keys to press after Begin
 //   SMOKE_CLICKS=512,282;...   canvas clicks after Begin (viewport is 1024x768)
+//   SMOKE_SETTLE_MS=60000      wait after the last click before the screenshot (e.g. a click that starts a game)
 //   SMOKE_EXPECT=a;b            console substrings that must appear (pair with ?diag=1)
 //   SMOKE_FULL=1               print the whole console instead of head/tail
 // exit 2 on FATAL C++ CRASH / page error / Begin never reached.
@@ -46,6 +47,8 @@ const { chromium } = require('playwright');
         lines.push(`${stamp()} [SMOKE] clicked canvas ${cx},${cy}`);
         await page.waitForTimeout(2000);
       }
+      // SMOKE_SETTLE_MS — keep sampling after the last click (a click that starts a game needs the load + first ticks)
+      if (process.env.SMOKE_SETTLE_MS) await page.waitForTimeout(Number(process.env.SMOKE_SETTLE_MS));
     } catch (e) { lines.push(`${stamp()} [SMOKE] begin failed: ${String(e).slice(0, 200)}`); }
   } else {
     await page.waitForTimeout(waitMs);

@@ -1,0 +1,22 @@
+// Labels of our own, merged over the GeneralsGamePatch generals.str by build-free-assets.ts
+// (same multi-language format; US only is enough — strings.ts picks the language).
+
+GX:Losses
+US: "Losses"
+END
+
+GX:StartingCash
+US: "Starting Cash"
+END
+
+GX:Faction
+US: "Side"
+END
+
+GX:MapPreview
+US: "Map"
+END
+
+GX:Maps
+US: "Maps"
+END

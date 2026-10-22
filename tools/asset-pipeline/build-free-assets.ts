@@ -33,7 +33,7 @@ import { packDir } from "./big.ts";
 import { writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
-import { buildMap } from "./map.ts";
+import { buildMap, mapCacheEntry, buildMapCacheIni } from "./map.ts";
 import { writeFreeModels } from "./free-models.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
@@ -88,7 +88,10 @@ function main() {
   cpSync(join(freeRoot, "overlay"), iniStage, { recursive: true });
 
   // 3. strings: multi-language generals.str -> Data/English/generals.csf
-  const entries = parseStr(readFileSync(join(patchData, "generals.str"), "utf8"), "US");
+  const entries = [
+    ...parseStr(readFileSync(join(patchData, "generals.str"), "utf8"), "US"),
+    ...parseStr(readFileSync(join(freeRoot, "strings.str"), "utf8"), "US"),   // our own labels (GX:*)
+  ];
   writeFileSync(join(iniStage, "Data", "English", "generals.csf"), buildCsf(entries, "US"));
   console.log(`generals.csf: ${entries.length} labels`);
 
@@ -115,6 +118,7 @@ function main() {
 
   // 7. maps
   const mapDir = join(freeRoot, "maps");
+  const mapCache: string[] = [];
   for (const f of readdirSync(mapDir).filter((n) => n.endsWith(".map.json"))) {
     const spec = JSON.parse(readFileSync(join(mapDir, f), "utf8"));
     const dir = join(mapStage, "Maps", spec.name);
@@ -122,7 +126,11 @@ function main() {
     const buf = buildMap(spec);
     writeFileSync(join(dir, `${spec.name}.map`), buf);
     console.log(`Maps/${spec.name}/${spec.name}.map: ${buf.length} bytes`);
+    mapCache.push(mapCacheEntry(spec, buf));
   }
+  // the standard-map list the skirmish/map-select menus read (MapCache::updateCache)
+  writeFileSync(join(mapStage, "Maps", "MapCache.ini"), buildMapCacheIni(mapCache));
+  console.log(`Maps/MapCache.ini: ${mapCache.length} maps`);
 
   // 8. archives
   const assets = join(outDir, "assets");

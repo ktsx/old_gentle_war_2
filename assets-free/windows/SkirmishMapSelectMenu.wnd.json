@@ -1,0 +1,769 @@
+{
+ "file": "SkirmishMapSelectMenu.wnd",
+ "version": 2,
+ "layout": {
+  "init": "SkirmishMapSelectMenuInit",
+  "update": "SkirmishMapSelectMenuUpdate",
+  "shutdown": "SkirmishMapSelectMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "SkrimishMapSelectMenuParent",
+   "type": "USER",
+   "rect": [
+    40,
+    60,
+    720,
+    480
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      64,
+      72,
+      300,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Title",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:Maps",
+     "font": [
+      "Arial",
+      20,
+      1
+     ]
+    },
+    {
+     "name": "RadioButtonSystemMaps",
+     "type": "RADIOBUTTON",
+     "rect": [
+      64,
+      110,
+      160,
+      22
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:SystemMaps",
+     "radio": {
+      "group": 1
+     },
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "RadioButtonUserMaps",
+     "type": "RADIOBUTTON",
+     "rect": [
+      234,
+      110,
+      160,
+      22
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:UserMaps",
+     "radio": {
+      "group": 1
+     },
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ListboxMap",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      64,
+      140,
+      350,
+      340
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "listbox": {
+      "length": 200,
+      "scrollBar": true,
+      "forceSelect": true
+     },
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "StaticTextMapPreview",
+     "type": "STATICTEXT",
+     "rect": [
+      430,
+      84,
+      200,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:MapPreview"
+    },
+    {
+     "name": "WinMapPreview",
+     "type": "USER",
+     "rect": [
+      430,
+      110,
+      300,
+      300
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonMapStartPosition0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        438,
+        118,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "1",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        462,
+        118,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "2",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        486,
+        118,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "3",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        510,
+        118,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "4",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        438,
+        142,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "5",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        462,
+        142,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "6",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        486,
+        142,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "7",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        510,
+        142,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "8",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonBack",
+     "type": "PUSHBUTTON",
+     "rect": [
+      64,
+      494,
+      160,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Back",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonOK",
+     "type": "PUSHBUTTON",
+     "rect": [
+      570,
+      494,
+      160,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Accept",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    }
+   ],
+   "system": "SkirmishMapSelectMenuSystem",
+   "input": "SkirmishMapSelectMenuInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     235
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   }
+  }
+ ]
+}

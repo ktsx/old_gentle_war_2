@@ -264,6 +264,17 @@ jobs:
           # gxdraws=40: the first-frame draw dump reaches past the terrain's ~24 draws into the models'
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&gxdraws=40&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
 
+      - name: Start a skirmish from the menu
+        if: always()
+        run: |
+          set -o pipefail
+          curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
+          # SOLO PLAY -> SKIRMISH -> PLAY GAME: the skirmish menu (our layouts + Maps/MapCache.ini) must start
+          # gxtest.map as GAME_SKIRMISH (mode=2) and reach a running logic loop.
+          SMOKE_KEYS=Space SMOKE_CLICKS="512,274;512,412;891,722" SMOKE_SETTLE_MS=90000 \
+          SMOKE_EXPECT="GAMELOGIC: startNewGame:ENTER mode=2;inGame=1 isPaused=0" \
+          node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1" 120000 skirmish.png 8000 --begin | tee skirmish-smoke.log
+
       - name: Check the terrain is visible
         if: always()
         run: |
@@ -290,6 +301,13 @@ jobs:
           grep -E "LOAD: progress|GAMELOGIC:" "$f" | cut -c1-900 | tail -6 | sed "s/^/::notice title=$f::/"
           grep -E "TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
 
+      - name: Annotate skirmish smoke
+        if: always()
+        run: |
+          f=skirmish-smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "GBM_SELECTED|GAMELOGIC: startNewGame:ENTER|TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -10 | sed "s/^/::notice title=$f::/"
+
       - name: Annotate model draws
         if: always()
         run: |
@@ -312,6 +330,8 @@ jobs:
           path: |
             menu.png
             map.png
+            skirmish.png
             smoke.log
             map-smoke.log
+            skirmish-smoke.log
             serve.log

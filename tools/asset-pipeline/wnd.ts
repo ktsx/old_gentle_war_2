@@ -64,6 +64,14 @@ export interface WindowSpec {
   images?: { enabled?: string; disabled?: string; hilite?: string };
   staticText?: { centered?: boolean };
   entry?: { maxLen?: number };
+  /** SCROLLLISTBOX: LISTBOXDATA (length = max rows kept; columns > 1 needs columnWidths in percent). */
+  listbox?: { length?: number; autoScroll?: boolean; autoPurge?: boolean; scrollBar?: boolean; multiSelect?: boolean; columns?: number; columnWidths?: number[]; forceSelect?: boolean };
+  /** COMBOBOX: COMBOBOXDATA (maxDisplay = rows shown when dropped down). */
+  combo?: { editable?: boolean; maxChars?: number; maxDisplay?: number; asciiOnly?: boolean; lettersAndNumbers?: boolean };
+  /** HORZSLIDER / VERTSLIDER: SLIDERDATA. */
+  slider?: { min?: number; max?: number };
+  /** RADIOBUTTON: RADIOBUTTONDATA group id. */
+  radio?: { group?: number };
   tooltipDelay?: number;
   children?: WindowSpec[];
 }
@@ -142,6 +150,21 @@ function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: stri
   L(`              HILITE: ${rgba(text.hilite)}, HILITEBORDER: ${rgba(text.hiliteBorder)};`);
   if (w.type === "STATICTEXT") L(`  STATICTEXTDATA = CENTERED: ${w.staticText?.centered === false ? 0 : 1};`);
   if (w.type === "ENTRYFIELD") L(`  TEXTENTRYDATA = MAXLEN: ${w.entry?.maxLen ?? 64}, SECRETTEXT: 0, NUMERICALONLY: 0, ALPHANUMERICALONLY: 0, ASCIIONLY: 0;`);
+  const b = (v: boolean | undefined, dflt: boolean) => ((v ?? dflt) ? 1 : 0);
+  if (w.type === "SCROLLLISTBOX") {
+    const lb = w.listbox ?? {};
+    const columns = lb.columns ?? 1;
+    const widths = columns > 1 ? (lb.columnWidths ?? Array.from({ length: columns }, () => Math.floor(100 / columns))).map((p) => `, COLUMNSWIDTH%: ${p}`).join("") : "";
+    // SCROLLIFATEND is left out: the parser compares the token "SCROLLIFATEND:" (colon included) with
+    // "ScrollIfAtEnd", never matches, and would read the whole block one field off.
+    L(`  LISTBOXDATA = LENGTH: ${lb.length ?? 100}, AUTOSCROLL: ${b(lb.autoScroll, false)}, AUTOPURGE: ${b(lb.autoPurge, false)}, SCROLLBAR: ${b(lb.scrollBar, true)}, MULTISELECT: ${b(lb.multiSelect, false)}, COLUMNS: ${columns}${widths}, FORCESELECT: ${b(lb.forceSelect, false)};`);
+  }
+  if (w.type === "COMBOBOX") {
+    const cb = w.combo ?? {};
+    L(`  COMBOBOXDATA = ISEDITABLE: ${b(cb.editable, false)}, MAXCHARS: ${cb.maxChars ?? 16}, MAXDISPLAY: ${cb.maxDisplay ?? 8}, ASCIIONLY: ${b(cb.asciiOnly, false)}, LETTERSANDNUMBERS: ${b(cb.lettersAndNumbers, false)};`);
+  }
+  if (w.type === "HORZSLIDER" || w.type === "VERTSLIDER") L(`  SLIDERDATA = MINVALUE: ${w.slider?.min ?? 0}, MAXVALUE: ${w.slider?.max ?? 100};`);
+  if (w.type === "RADIOBUTTON") L(`  RADIOBUTTONDATA = GROUP: ${w.radio?.group ?? 1};`);
   for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled", w.images?.enabled).split("\n")) L(line);
   for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled", w.images?.disabled).split("\n")) L(line);
   for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite).split("\n")) L(line);

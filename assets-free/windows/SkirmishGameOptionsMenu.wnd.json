@@ -1,0 +1,3221 @@
+{
+ "file": "SkirmishGameOptionsMenu.wnd",
+ "version": 2,
+ "layout": {
+  "init": "SkirmishGameOptionsMenuInit",
+  "update": "SkirmishGameOptionsMenuUpdate",
+  "shutdown": "SkirmishGameOptionsMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "SkirmishGameOptionsMenuParent",
+   "type": "USER",
+   "rect": [
+    0,
+    0,
+    800,
+    600
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      24,
+      24,
+      400,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Title",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Skirmish",
+     "font": [
+      "Arial",
+      20,
+      1
+     ]
+    },
+    {
+     "name": "StaticTextPlayer",
+     "type": "STATICTEXT",
+     "rect": [
+      24,
+      72,
+      150,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Player"
+    },
+    {
+     "name": "StaticTextColor",
+     "type": "STATICTEXT",
+     "rect": [
+      184,
+      72,
+      90,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Color"
+    },
+    {
+     "name": "StaticTextFaction",
+     "type": "STATICTEXT",
+     "rect": [
+      284,
+      72,
+      130,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:Faction"
+    },
+    {
+     "name": "StaticTextTeam",
+     "type": "STATICTEXT",
+     "rect": [
+      428,
+      72,
+      60,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Team"
+    },
+    {
+     "name": "ComboBoxPlayer0",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      96,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": true,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor0",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      96,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate0",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      96,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam0",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      96,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition0",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      96,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer1",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      126,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor1",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      126,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate1",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      126,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam1",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      126,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition1",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      126,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer2",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      156,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor2",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      156,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate2",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      156,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam2",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      156,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition2",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      156,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer3",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      186,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor3",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      186,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate3",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      186,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam3",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      186,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition3",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      186,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer4",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      216,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor4",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      216,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate4",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      216,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam4",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      216,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition4",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      216,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer5",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      246,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor5",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      246,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate5",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      246,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam5",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      246,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition5",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      246,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer6",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      276,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor6",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      276,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate6",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      276,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam6",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      276,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition6",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      276,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ComboBoxPlayer7",
+     "type": "COMBOBOX",
+     "rect": [
+      24,
+      306,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "editable": false,
+      "maxChars": 20,
+      "maxDisplay": 8
+     }
+    },
+    {
+     "name": "ComboBoxColor7",
+     "type": "COMBOBOX",
+     "rect": [
+      184,
+      306,
+      92,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxPlayerTemplate7",
+     "type": "COMBOBOX",
+     "rect": [
+      284,
+      306,
+      136,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ComboBoxTeam7",
+     "type": "COMBOBOX",
+     "rect": [
+      428,
+      306,
+      64,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonStartPosition7",
+     "type": "PUSHBUTTON",
+     "rect": [
+      500,
+      306,
+      24,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "",
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "TextEntryPlayerName",
+     "type": "ENTRYFIELD",
+     "rect": [
+      24,
+      96,
+      152,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "entry": {
+      "maxLen": 20
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextMapPreview",
+     "type": "STATICTEXT",
+     "rect": [
+      552,
+      72,
+      220,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:MapPreview"
+    },
+    {
+     "name": "MapWindow",
+     "type": "USER",
+     "rect": [
+      552,
+      96,
+      224,
+      224
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "children": [
+      {
+       "name": "ButtonMapStartPosition0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        560,
+        104,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "1",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        584,
+        104,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "2",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        608,
+        104,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "3",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        632,
+        104,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "4",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        560,
+        128,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "5",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        584,
+        128,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "6",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        608,
+        128,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "7",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "ButtonMapStartPosition7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        632,
+        128,
+        20,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "HIDDEN"
+       ],
+       "text": "8",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     }
+    },
+    {
+     "name": "TextEntryMapDisplay",
+     "type": "STATICTEXT",
+     "rect": [
+      552,
+      326,
+      224,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": true
+     },
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonSelectMap",
+     "type": "PUSHBUTTON",
+     "rect": [
+      552,
+      354,
+      224,
+      28
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:SelectMap",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "StaticTextStartingCash",
+     "type": "STATICTEXT",
+     "rect": [
+      552,
+      392,
+      110,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:StartingCash"
+    },
+    {
+     "name": "ComboBoxStartingCash",
+     "type": "COMBOBOX",
+     "rect": [
+      664,
+      392,
+      112,
+      22
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 6,
+      "maxChars": 12
+     }
+    },
+    {
+     "name": "CheckboxLimitSuperweapons",
+     "type": "CHECKBOX",
+     "rect": [
+      552,
+      420,
+      224,
+      22
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:LimitSuperweapons",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextGameSpeedLabel",
+     "type": "STATICTEXT",
+     "rect": [
+      552,
+      448,
+      110,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:GameSpeed"
+    },
+    {
+     "name": "StaticTextGameSpeed",
+     "type": "STATICTEXT",
+     "rect": [
+      732,
+      448,
+      44,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": true
+     }
+    },
+    {
+     "name": "SliderGameSpeed",
+     "type": "HORZSLIDER",
+     "rect": [
+      552,
+      470,
+      172,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 15,
+      "max": 61
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonResetFPS",
+     "type": "PUSHBUTTON",
+     "rect": [
+      732,
+      468,
+      44,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Reset",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ListboxInfo",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      24,
+      340,
+      504,
+      150
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "listbox": {
+      "length": 100,
+      "autoScroll": true,
+      "scrollBar": true,
+      "forceSelect": false
+     },
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ],
+      "hilite": [
+       40,
+       60,
+       100,
+       255
+      ],
+      "hiliteBorder": [
+       140,
+       170,
+       220,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "StaticTextWins",
+     "type": "STATICTEXT",
+     "rect": [
+      24,
+      498,
+      60,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:Wins"
+    },
+    {
+     "name": "StaticTextWinsValue",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      498,
+      50,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextLosses",
+     "type": "STATICTEXT",
+     "rect": [
+      144,
+      498,
+      60,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GX:Losses"
+    },
+    {
+     "name": "StaticTextLossesValue",
+     "type": "STATICTEXT",
+     "rect": [
+      204,
+      498,
+      50,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextStreak",
+     "type": "STATICTEXT",
+     "rect": [
+      264,
+      498,
+      90,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:WinStreak"
+    },
+    {
+     "name": "StaticTextStreakValue",
+     "type": "STATICTEXT",
+     "rect": [
+      354,
+      498,
+      40,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "StaticTextBestStreak",
+     "type": "STATICTEXT",
+     "rect": [
+      404,
+      498,
+      110,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "text": "GUI:BestWinStreak"
+    },
+    {
+     "name": "StaticTextBestStreakValue",
+     "type": "STATICTEXT",
+     "rect": [
+      514,
+      498,
+      40,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     }
+    },
+    {
+     "name": "ButtonBack",
+     "type": "PUSHBUTTON",
+     "rect": [
+      24,
+      548,
+      160,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Back",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonReset",
+     "type": "PUSHBUTTON",
+     "rect": [
+      200,
+      548,
+      160,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Reset",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonStart",
+     "type": "PUSHBUTTON",
+     "rect": [
+      616,
+      548,
+      160,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Start",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "SubParent",
+     "type": "USER",
+     "rect": [
+      0,
+      0,
+      1,
+      1
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "children": [],
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    }
+   ],
+   "system": "SkirmishGameOptionsMenuSystem",
+   "input": "SkirmishGameOptionsMenuInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     235
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   }
+  }
+ ]
+}

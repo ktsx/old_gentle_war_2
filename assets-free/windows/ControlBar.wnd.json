@@ -20,9 +20,9 @@
    "type": "USER",
    "rect": [
     0,
-    432,
+    440,
     800,
-    168
+    160
    ],
    "status": [
     "ENABLED"
@@ -33,7 +33,7 @@
      "type": "USER",
      "rect": [
       0,
-      432,
+      440,
       1,
       1
      ],
@@ -43,54 +43,25 @@
      ]
     },
     {
-     "name": "GxBarBody",
+     "name": "LeftHUD",
      "type": "USER",
      "rect": [
-      0,
-      470,
-      800,
-      130
+      8,
+      448,
+      158,
+      142
      ],
      "status": [
       "ENABLED"
      ],
-     "colors": {
-      "enabled": [
-       34,
-       38,
-       48,
-       255
-      ],
-      "enabledBorder": [
-       110,
-       120,
-       140,
-       255
-      ]
-     }
-    },
-    {
-     "name": "MoneyDisplay",
-     "type": "STATICTEXT",
-     "rect": [
-      360,
-      438,
-      80,
-      19
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "headerTemplate": "Label",
-     "staticText": {
-      "centered": false
-     },
+     "input": "LeftHUDInput",
+     "draw": "W3DLeftHUDDraw",
      "colors": {
       "enabled": [
        0,
        0,
        0,
-       160
+       0
       ],
       "enabledBorder": [
        0,
@@ -101,27 +72,150 @@
      }
     },
     {
-     "name": "ButtonGeneral",
-     "type": "PUSHBUTTON",
+     "name": "GeneralsExp",
+     "type": "USER",
      "rect": [
-      719,
-      432,
-      80,
-      31
+      172,
+      448,
+      10,
+      142
      ],
      "status": [
       "ENABLED"
      ],
-     "headerTemplate": "Small"
+     "children": [
+      {
+       "name": "ExpBarForeground",
+       "type": "USER",
+       "rect": [
+        172,
+        589,
+        10,
+        1
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       }
+      }
+     ],
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "name": "ButtonOptions",
+     "type": "PUSHBUTTON",
+     "rect": [
+      188,
+      448,
+      38,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "headerTemplate": "Small",
+     "images": {
+      "enabled": "GxUSA_Options",
+      "hilite": "GxUSA_OptionsH",
+      "disabled": "GxUSA_OptionsI"
+     }
+    },
+    {
+     "name": "ButtonIdleWorker",
+     "type": "PUSHBUTTON",
+     "rect": [
+      188,
+      478,
+      38,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "headerTemplate": "Small",
+     "images": {
+      "enabled": "GxUSA_Worker",
+      "hilite": "GxUSA_WorkerH",
+      "disabled": "GxUSA_WorkerI"
+     }
+    },
+    {
+     "name": "PopupCommunicator",
+     "type": "PUSHBUTTON",
+     "rect": [
+      188,
+      538,
+      38,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small",
+     "images": {
+      "enabled": "GxUSA_Chat",
+      "hilite": "GxUSA_ChatH",
+      "disabled": "GxUSA_ChatI"
+     }
+    },
+    {
+     "name": "ButtonGeneral",
+     "type": "PUSHBUTTON",
+     "rect": [
+      188,
+      568,
+      38,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "headerTemplate": "Small",
+     "images": {
+      "enabled": "GxUSA_General",
+      "hilite": "GxUSA_GeneralH",
+      "disabled": "GxUSA_GeneralI"
+     }
     },
     {
      "name": "ButtonLarge",
      "type": "PUSHBUTTON",
      "rect": [
-      646,
-      432,
-      72,
-      31
+      188,
+      594,
+      38,
+      5
      ],
      "status": [
       "ENABLED",
@@ -133,10 +227,10 @@
      "name": "ButtonMedium",
      "type": "PUSHBUTTON",
      "rect": [
-      646,
-      432,
-      72,
-      31
+      188,
+      594,
+      38,
+      5
      ],
      "status": [
       "ENABLED",
@@ -148,10 +242,10 @@
      "name": "ButtonSmall",
      "type": "PUSHBUTTON",
      "rect": [
-      646,
-      432,
-      72,
-      31
+      188,
+      594,
+      38,
+      5
      ],
      "status": [
       "ENABLED",
@@ -165,7 +259,7 @@
      "rect": [
       140,
       412,
-      35,
+      36,
       18
      ],
      "status": [
@@ -174,182 +268,25 @@
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
-    },
-    {
-     "name": "LeftHUD",
-     "type": "USER",
-     "rect": [
-      6,
-      476,
-      150,
-      118
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "input": "LeftHUDInput",
-     "draw": "W3DLeftHUDDraw",
-     "colors": {
-      "enabled": [
-       18,
-       20,
-       26,
-       255
-      ],
-      "enabledBorder": [
-       70,
-       78,
-       94,
-       255
-      ]
-     }
-    },
-    {
-     "name": "PowerWindow",
-     "type": "USER",
-     "rect": [
-      260,
-      470,
-      278,
-      6
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "colors": {
-      "enabled": [
-       18,
-       20,
-       26,
-       255
-      ],
-      "enabledBorder": [
-       70,
-       78,
-       94,
-       255
-      ]
-     }
-    },
-    {
-     "name": "GeneralsExp",
-     "type": "USER",
-     "rect": [
-      160,
-      476,
-      20,
-      118
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "children": [
-      {
-       "name": "ExpBarForeground",
-       "type": "USER",
-       "rect": [
-        160,
-        592,
-        20,
-        1
-       ],
-       "status": [
-        "ENABLED"
-       ],
-       "colors": {
-        "enabled": [
-         200,
-         170,
-         60,
-         255
-        ],
-        "enabledBorder": [
-         200,
-         170,
-         60,
-         255
-        ]
-       }
-      }
-     ],
-     "colors": {
-      "enabled": [
-       18,
-       20,
-       26,
-       255
-      ],
-      "enabledBorder": [
-       70,
-       78,
-       94,
-       255
-      ]
-     }
-    },
-    {
-     "name": "ButtonOptions",
-     "type": "PUSHBUTTON",
-     "rect": [
-      184,
-      490,
-      36,
-      24
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "headerTemplate": "Small",
-     "text": "GUI:Options"
-    },
-    {
-     "name": "ButtonIdleWorker",
-     "type": "PUSHBUTTON",
-     "rect": [
-      184,
-      516,
-      36,
-      24
-     ],
-     "status": [
-      "ENABLED"
-     ],
-     "headerTemplate": "Small",
-     "text": "GUI:Units"
-    },
-    {
-     "name": "PopupCommunicator",
-     "type": "PUSHBUTTON",
-     "rect": [
-      184,
-      568,
-      36,
-      24
-     ],
-     "status": [
-      "ENABLED",
-      "HIDDEN"
-     ],
-     "headerTemplate": "Small"
     },
     {
      "name": "WinGeneralPortrait",
      "type": "USER",
      "rect": [
-      600,
-      478,
+      608,
+      452,
       60,
       30
      ],
@@ -362,9 +299,9 @@
      "name": "TextEntryGeneralName",
      "type": "ENTRYFIELD",
      "rect": [
-      664,
-      478,
-      120,
+      672,
+      452,
+      56,
       20
      ],
      "status": [
@@ -373,13 +310,72 @@
      ]
     },
     {
+     "name": "MoneyDisplay",
+     "type": "STATICTEXT",
+     "rect": [
+      232,
+      446,
+      100,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "name": "PowerWindow",
+     "type": "USER",
+     "rect": [
+      340,
+      450,
+      254,
+      10
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "draw": "W3DPowerDraw",
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
      "name": "CommandWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED"
@@ -390,266 +386,374 @@
        "type": "PUSHBUTTON",
        "rect": [
         234,
-        482,
-        56,
-        36
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand02",
        "type": "PUSHBUTTON",
        "rect": [
-        292,
-        482,
-        56,
-        36
+        294,
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand03",
        "type": "PUSHBUTTON",
        "rect": [
-        350,
-        482,
-        56,
-        36
+        354,
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand04",
        "type": "PUSHBUTTON",
        "rect": [
-        408,
-        482,
-        56,
-        36
+        414,
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand05",
        "type": "PUSHBUTTON",
        "rect": [
-        466,
-        482,
-        56,
-        36
+        474,
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand06",
        "type": "PUSHBUTTON",
        "rect": [
-        524,
-        482,
-        56,
-        36
+        534,
+        470,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand07",
        "type": "PUSHBUTTON",
        "rect": [
         234,
-        520,
-        56,
-        36
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand08",
        "type": "PUSHBUTTON",
        "rect": [
-        292,
-        520,
-        56,
-        36
+        294,
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand09",
        "type": "PUSHBUTTON",
        "rect": [
-        350,
-        520,
-        56,
-        36
+        354,
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand10",
        "type": "PUSHBUTTON",
        "rect": [
-        408,
-        520,
-        56,
-        36
+        414,
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand11",
        "type": "PUSHBUTTON",
        "rect": [
-        466,
-        520,
-        56,
-        36
+        474,
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand12",
        "type": "PUSHBUTTON",
        "rect": [
-        524,
-        520,
-        56,
-        36
+        534,
+        512,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand13",
        "type": "PUSHBUTTON",
        "rect": [
         234,
-        558,
-        56,
-        36
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand14",
        "type": "PUSHBUTTON",
        "rect": [
-        292,
-        558,
-        56,
-        36
+        294,
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand15",
        "type": "PUSHBUTTON",
        "rect": [
-        350,
-        558,
-        56,
-        36
+        354,
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand16",
        "type": "PUSHBUTTON",
        "rect": [
-        408,
-        558,
-        56,
-        36
+        414,
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand17",
        "type": "PUSHBUTTON",
        "rect": [
-        466,
-        558,
-        56,
-        36
+        474,
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       },
       {
        "name": "ButtonCommand18",
        "type": "PUSHBUTTON",
        "rect": [
-        524,
-        558,
-        56,
-        36
+        534,
+        554,
+        58,
+        40
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -657,10 +761,10 @@
      "name": "ProductionQueueWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -672,140 +776,194 @@
        "type": "PUSHBUTTON",
        "rect": [
         236,
-        520,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue02",
        "type": "PUSHBUTTON",
        "rect": [
-        274,
-        520,
+        276,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue03",
        "type": "PUSHBUTTON",
        "rect": [
-        312,
-        520,
+        316,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue04",
        "type": "PUSHBUTTON",
        "rect": [
-        350,
-        520,
+        356,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue05",
        "type": "PUSHBUTTON",
        "rect": [
-        388,
-        520,
+        396,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue06",
        "type": "PUSHBUTTON",
        "rect": [
-        426,
-        520,
+        436,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue07",
        "type": "PUSHBUTTON",
        "rect": [
-        464,
-        520,
+        476,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue08",
        "type": "PUSHBUTTON",
        "rect": [
-        502,
-        520,
+        516,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       },
       {
        "name": "ButtonQueue09",
        "type": "PUSHBUTTON",
        "rect": [
-        540,
-        520,
+        556,
+        514,
         36,
         36
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Queue",
+        "hilite": "GxUSA_Queue",
+        "disabled": "GxUSA_Queue"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -813,10 +971,10 @@
      "name": "UnderConstructionWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -827,9 +985,9 @@
        "name": "UnderConstructionDesc",
        "type": "STATICTEXT",
        "rect": [
-        236,
-        484,
-        344,
+        238,
+        474,
+        350,
         40
        ],
        "status": [
@@ -844,8 +1002,8 @@
        "name": "ButtonCancelConstruction",
        "type": "PUSHBUTTON",
        "rect": [
-        236,
-        540,
+        238,
+        530,
         120,
         24
        ],
@@ -858,16 +1016,16 @@
      ],
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -875,10 +1033,10 @@
      "name": "OCLTimerWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -889,9 +1047,9 @@
        "name": "OCLTimerStaticText",
        "type": "STATICTEXT",
        "rect": [
-        236,
-        484,
-        344,
+        238,
+        474,
+        350,
         20
        ],
        "status": [
@@ -906,9 +1064,9 @@
        "name": "OCLTimerProgressBar",
        "type": "PROGRESSBAR",
        "rect": [
-        236,
-        510,
-        344,
+        238,
+        500,
+        350,
         16
        ],
        "status": [
@@ -945,8 +1103,8 @@
        "name": "OCLTimerSellButton",
        "type": "PUSHBUTTON",
        "rect": [
-        236,
-        540,
+        238,
+        530,
         120,
         24
        ],
@@ -958,16 +1116,16 @@
      ],
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -975,10 +1133,10 @@
      "name": "BeaconWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -989,9 +1147,9 @@
        "name": "StaticTextBeaconLabel",
        "type": "STATICTEXT",
        "rect": [
-        236,
-        484,
-        344,
+        238,
+        474,
+        350,
         16
        ],
        "status": [
@@ -1007,9 +1165,9 @@
        "name": "EditBeaconText",
        "type": "ENTRYFIELD",
        "rect": [
-        236,
-        504,
-        344,
+        238,
+        494,
+        350,
         20
        ],
        "status": [
@@ -1034,8 +1192,8 @@
        "name": "ButtonClearBeaconText",
        "type": "PUSHBUTTON",
        "rect": [
-        236,
-        540,
+        238,
+        530,
         100,
         22
        ],
@@ -1049,8 +1207,8 @@
        "name": "ButtonDeleteBeacon",
        "type": "PUSHBUTTON",
        "rect": [
-        346,
-        540,
+        348,
+        530,
         100,
         22
        ],
@@ -1064,8 +1222,8 @@
        "name": "ButtonPlaceBeacon",
        "type": "PUSHBUTTON",
        "rect": [
-        456,
-        540,
+        458,
+        530,
         100,
         22
        ],
@@ -1079,16 +1237,16 @@
      "input": "BeaconWindowInput",
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -1096,10 +1254,10 @@
      "name": "ObserverPlayerListWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -1110,8 +1268,8 @@
        "name": "ButtonPlayer0",
        "type": "PUSHBUTTON",
        "rect": [
-        236,
-        486,
+        238,
+        476,
         24,
         24
        ],
@@ -1124,9 +1282,9 @@
        "name": "StaticTextPlayer0",
        "type": "STATICTEXT",
        "rect": [
-        262,
-        486,
-        58,
+        264,
+        476,
+        60,
         24
        ],
        "status": [
@@ -1141,8 +1299,8 @@
        "name": "ButtonPlayer1",
        "type": "PUSHBUTTON",
        "rect": [
-        322,
-        486,
+        326,
+        476,
         24,
         24
        ],
@@ -1155,9 +1313,9 @@
        "name": "StaticTextPlayer1",
        "type": "STATICTEXT",
        "rect": [
-        348,
-        486,
-        58,
+        352,
+        476,
+        60,
         24
        ],
        "status": [
@@ -1172,8 +1330,8 @@
        "name": "ButtonPlayer2",
        "type": "PUSHBUTTON",
        "rect": [
-        408,
-        486,
+        414,
+        476,
         24,
         24
        ],
@@ -1186,9 +1344,9 @@
        "name": "StaticTextPlayer2",
        "type": "STATICTEXT",
        "rect": [
-        434,
-        486,
-        58,
+        440,
+        476,
+        60,
         24
        ],
        "status": [
@@ -1203,8 +1361,8 @@
        "name": "ButtonPlayer3",
        "type": "PUSHBUTTON",
        "rect": [
-        494,
-        486,
+        502,
+        476,
         24,
         24
        ],
@@ -1217,9 +1375,9 @@
        "name": "StaticTextPlayer3",
        "type": "STATICTEXT",
        "rect": [
-        520,
-        486,
-        58,
+        528,
+        476,
+        60,
         24
        ],
        "status": [
@@ -1234,8 +1392,8 @@
        "name": "ButtonPlayer4",
        "type": "PUSHBUTTON",
        "rect": [
-        236,
-        540,
+        238,
+        532,
         24,
         24
        ],
@@ -1248,9 +1406,9 @@
        "name": "StaticTextPlayer4",
        "type": "STATICTEXT",
        "rect": [
-        262,
-        540,
-        58,
+        264,
+        532,
+        60,
         24
        ],
        "status": [
@@ -1265,8 +1423,8 @@
        "name": "ButtonPlayer5",
        "type": "PUSHBUTTON",
        "rect": [
-        322,
-        540,
+        326,
+        532,
         24,
         24
        ],
@@ -1279,9 +1437,9 @@
        "name": "StaticTextPlayer5",
        "type": "STATICTEXT",
        "rect": [
-        348,
-        540,
-        58,
+        352,
+        532,
+        60,
         24
        ],
        "status": [
@@ -1296,8 +1454,8 @@
        "name": "ButtonPlayer6",
        "type": "PUSHBUTTON",
        "rect": [
-        408,
-        540,
+        414,
+        532,
         24,
         24
        ],
@@ -1310,9 +1468,9 @@
        "name": "StaticTextPlayer6",
        "type": "STATICTEXT",
        "rect": [
-        434,
-        540,
-        58,
+        440,
+        532,
+        60,
         24
        ],
        "status": [
@@ -1327,8 +1485,8 @@
        "name": "ButtonPlayer7",
        "type": "PUSHBUTTON",
        "rect": [
-        494,
-        540,
+        502,
+        532,
         24,
         24
        ],
@@ -1341,9 +1499,9 @@
        "name": "StaticTextPlayer7",
        "type": "STATICTEXT",
        "rect": [
-        520,
-        540,
-        58,
+        528,
+        532,
+        60,
         24
        ],
        "status": [
@@ -1374,10 +1532,10 @@
      "name": "ObserverPlayerInfoWindow",
      "type": "USER",
      "rect": [
-      230,
-      478,
-      356,
-      118
+      232,
+      468,
+      362,
+      128
      ],
      "status": [
       "ENABLED",
@@ -1388,9 +1546,9 @@
        "name": "StaticTextPlayerName",
        "type": "STATICTEXT",
        "rect": [
-        236,
-        484,
-        344,
+        238,
+        474,
+        350,
         16
        ],
        "status": [
@@ -1405,8 +1563,8 @@
        "name": "WinFlag",
        "type": "USER",
        "rect": [
-        236,
-        504,
+        238,
+        494,
         32,
         24
        ],
@@ -1432,8 +1590,8 @@
        "name": "StaticTextNumberOfUnits",
        "type": "STATICTEXT",
        "rect": [
-        276,
-        504,
+        278,
+        494,
         300,
         14
        ],
@@ -1449,8 +1607,8 @@
        "name": "StaticTextNumberOfBuildings",
        "type": "STATICTEXT",
        "rect": [
-        276,
-        520,
+        278,
+        510,
         300,
         14
        ],
@@ -1466,8 +1624,8 @@
        "name": "StaticTextNumberOfUnitsKilled",
        "type": "STATICTEXT",
        "rect": [
-        276,
-        536,
+        278,
+        526,
         300,
         14
        ],
@@ -1483,8 +1641,8 @@
        "name": "StaticTextNumberOfUnitsLost",
        "type": "STATICTEXT",
        "rect": [
-        276,
-        552,
+        278,
+        542,
         300,
         14
        ],
@@ -1516,10 +1674,10 @@
      "name": "RightHUD",
      "type": "USER",
      "rect": [
-      590,
-      474,
-      206,
-      122
+      600,
+      446,
+      196,
+      150
      ],
      "status": [
       "ENABLED"
@@ -1529,26 +1687,26 @@
        "name": "WinUnitSelected",
        "type": "USER",
        "rect": [
-        598,
-        480,
+        608,
+        452,
         120,
-        84
+        88
        ],
        "status": [
         "ENABLED"
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1556,10 +1714,10 @@
        "name": "CameoWindow",
        "type": "USER",
        "rect": [
-        598,
-        480,
+        608,
+        452,
         120,
-        84
+        88
        ],
        "status": [
         "ENABLED",
@@ -1567,16 +1725,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1584,10 +1742,10 @@
        "name": "CameoMovieWindow",
        "type": "USER",
        "rect": [
-        598,
-        480,
+        608,
+        452,
         120,
-        84
+        88
        ],
        "status": [
         "ENABLED",
@@ -1595,16 +1753,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1612,8 +1770,8 @@
        "name": "UnitUpgrade1",
        "type": "USER",
        "rect": [
-        598,
-        568,
+        608,
+        548,
         22,
         22
        ],
@@ -1622,16 +1780,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1639,8 +1797,8 @@
        "name": "UnitUpgrade2",
        "type": "USER",
        "rect": [
-        622,
-        568,
+        632,
+        548,
         22,
         22
        ],
@@ -1649,16 +1807,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1666,8 +1824,8 @@
        "name": "UnitUpgrade3",
        "type": "USER",
        "rect": [
-        646,
-        568,
+        656,
+        548,
         22,
         22
        ],
@@ -1676,16 +1834,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1693,8 +1851,8 @@
        "name": "UnitUpgrade4",
        "type": "USER",
        "rect": [
-        670,
-        568,
+        680,
+        548,
         22,
         22
        ],
@@ -1703,16 +1861,16 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       },
@@ -1720,8 +1878,8 @@
        "name": "UnitUpgrade5",
        "type": "USER",
        "rect": [
-        694,
-        568,
+        704,
+        548,
         22,
         22
        ],
@@ -1730,38 +1888,39 @@
        ],
        "colors": {
         "enabled": [
-         18,
-         20,
-         26,
-         255
+         0,
+         0,
+         0,
+         0
         ],
         "enabledBorder": [
-         70,
-         78,
-         94,
-         255
+         0,
+         0,
+         0,
+         0
         ]
        }
       }
      ],
      "colors": {
       "enabled": [
-       26,
-       30,
-       38,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       90,
-       100,
-       120,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     }
    ],
    "system": "ControlBarSystem",
    "input": "ControlBarInput",
+   "draw": "W3DCommandBarBackgroundDraw",
    "colors": {
     "enabled": [
      0,

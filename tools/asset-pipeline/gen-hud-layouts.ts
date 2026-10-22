@@ -22,6 +22,7 @@ import { writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { LayoutSpec, WindowSpec } from "./wnd.ts";
+import { HUD } from "./hud-skin.ts";
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "assets-free", "windows");
 
@@ -40,37 +41,42 @@ const nn = (i: number) => String(i).padStart(2, "0");
 const PANEL = { enabled: [26, 30, 38, 255], enabledBorder: [90, 100, 120, 255] } as const;
 const INNER = { enabled: [18, 20, 26, 255], enabledBorder: [70, 78, 94, 255] } as const;
 const CLEAR = { enabled: [0, 0, 0, 0], enabledBorder: [0, 0, 0, 0] } as const;
+const CAMEO = { enabled: "GxUSA_Cameo", hilite: "GxUSA_Cameo", disabled: "GxUSA_Cameo" };
 
-// Geometry follows the retail 800x600 scheme (Data/INI/ControlBarScheme.ini, America8x6):
-// ControlBarSchemeManager moves MoneyDisplay (360,438), PowerWindow (260,470), ButtonGeneral
-// (719,432), ButtonLarge (646,432), ButtonOptions (184,490), ButtonIdleWorker (184,516),
-// ButtonPlaceBeacon (184,545), PopupCommunicator (184,568), WinUAttack (140,412) and
-// ExpBarForeground to those screen positions at runtime, so the bar's parent starts at
-// y=432 (its upper 48 rows overlap the tactical view and stay transparent) and the opaque
-// body is a separate window from y=470 down.
-const TOP = 432, BODY = 470;
+// Geometry comes from hud-skin.ts (HUD): the bar art is drawn by the ControlBarScheme
+// (W3DCommandBarBackgroundDraw on the parent), the windows here are transparent holes and
+// buttons on top of it. ControlBarSchemeManager moves MoneyDisplay, PowerWindow, the side
+// buttons, ButtonGeneral/Large and WinUAttack to the scheme's coordinates at runtime, which
+// are the same HUD values, so nothing jumps.
 
 // ---------------------------------------------------------------------------
 // ControlBar.wnd
 // ---------------------------------------------------------------------------
+const g = HUD.grid;
 const commandButtons: WindowSpec[] = [];
-for (let i = 0; i < 18; i++) {
-  const c = i % 6, r = Math.floor(i / 6);
-  commandButtons.push(button(`ButtonCommand${nn(i + 1)}`, [234 + c * 58, 482 + r * 38, 56, 36]));
+for (let i = 0; i < g.cols * g.rows; i++) {
+  const c = i % g.cols, r = Math.floor(i / g.cols);
+  commandButtons.push(button(`ButtonCommand${nn(i + 1)}`, [g.x + c * (g.w + g.gap), g.y + r * (g.h + g.gap), g.w, g.h], { status: ["ENABLED", "IMAGE"], images: CAMEO }));
 }
 const queueButtons: WindowSpec[] = [];
-for (let i = 0; i < 9; i++) queueButtons.push(button(`ButtonQueue${nn(i + 1)}`, [236 + i * 38, 520, 36, 36]));
+for (let i = 0; i < 9; i++) queueButtons.push(button(`ButtonQueue${nn(i + 1)}`, [g.x + 2 + i * 40, g.y + 44, 36, 36], { status: ["ENABLED", "IMAGE"], images: { enabled: "GxUSA_Queue", hilite: "GxUSA_Queue", disabled: "GxUSA_Queue" } }));
+const [px, py, pw, ph] = HUD.portrait;
 const upgradeCameos: WindowSpec[] = [];
-for (let i = 0; i < 5; i++) upgradeCameos.push(win(`UnitUpgrade${i + 1}`, "USER", [598 + i * 24, 568, 22, 22], { colors: INNER }));
+for (let i = 0; i < 5; i++) upgradeCameos.push(win(`UnitUpgrade${i + 1}`, "USER", [px + i * 24, HUD.upgradeY, 22, 22], { colors: CLEAR }));
 const observerList: WindowSpec[] = [];
 for (let i = 0; i < 8; i++) {
-  const x = 236 + (i % 4) * 86, y = 486 + Math.floor(i / 4) * 54;
+  const x = g.x + 4 + (i % 4) * 88, y = g.y + 6 + Math.floor(i / 4) * 56;
   observerList.push(button(`ButtonPlayer${i}`, [x, y, 24, 24]));
-  observerList.push(label(`StaticTextPlayer${i}`, [x + 26, y, 58, 24]));
+  observerList.push(label(`StaticTextPlayer${i}`, [x + 26, y, 60, 24]));
 }
 
-// The context panels share the middle of the bar; ControlBar shows one at a time.
-const MID: Rect = [230, 478, 356, 118];
+// The context panels share the command grid area; ControlBar shows one at a time.
+const MID: Rect = [g.x - 2, g.y - 2, g.cols * (g.w + g.gap) - g.gap + 4, g.rows * (g.h + g.gap) - g.gap + 4];
+const [rx, ry, rw, rh] = HUD.rightHud;
+// Side buttons draw the scheme's images (ControlBarSchemeManager assigns them per state), so they
+// need the IMAGE status; the .wnd carries the USA plates as the initial images.
+const imgs = (n: string) => ({ status: ["ENABLED", "IMAGE"], images: { enabled: `GxUSA_${n}`, hilite: `GxUSA_${n}H`, disabled: `GxUSA_${n}I` } });
+const sideBtn = (name: string, y: number, img: string, extra: Partial<WindowSpec> = {}) => button(name, [HUD.sideX, y, HUD.sideW, HUD.sideH], { ...imgs(img), ...extra });
 
 const controlBar: LayoutSpec = {
   file: "ControlBar.wnd",
@@ -79,66 +85,64 @@ const controlBar: LayoutSpec = {
   creationResolution: [800, 600],
   defaults: { font: ["Arial", 11, 1], headerTemplate: "Small" },
   windows: [
-    panel("ControlBarParent", [0, TOP, 800, 600 - TOP], [
-      hidden(win("BackgroundMarker", "USER", [0, TOP, 1, 1])),
-      // our own: the opaque body of the bar (everything else sits on top of it)
-      win("GxBarBody", "USER", [0, BODY, 800, 600 - BODY], { colors: { enabled: [34, 38, 48, 255], enabledBorder: [110, 120, 140, 255] } }),
-      // top strip (over the tactical view)
-      label("MoneyDisplay", [360, 438, 80, 19], undefined, { headerTemplate: "Label", colors: { enabled: [0, 0, 0, 160], enabledBorder: [0, 0, 0, 0] } }),
-      button("ButtonGeneral", [719, 432, 80, 31]),
-      hidden(button("ButtonLarge", [646, 432, 72, 31])),
-      hidden(button("ButtonMedium", [646, 432, 72, 31])),
-      hidden(button("ButtonSmall", [646, 432, 72, 31])),
-      hidden(win("WinUAttack", "USER", [140, 412, 35, 18], { colors: INNER })),
-      // left: radar (W3D draws TheRadar into it)
-      win("LeftHUD", "USER", [6, 476, 150, 118], { input: "LeftHUDInput", draw: "W3DLeftHUDDraw", colors: INNER }),
-      win("PowerWindow", "USER", [260, 470, 278, 6], { colors: INNER }),
-      panel("GeneralsExp", [160, 476, 20, 118], [
-        win("ExpBarForeground", "USER", [160, 592, 20, 1], { colors: { enabled: [200, 170, 60, 255], enabledBorder: [200, 170, 60, 255] } }),
-      ], { colors: INNER }),
-      button("ButtonOptions", [184, 490, 36, 24], { text: "GUI:Options" }),
-      button("ButtonIdleWorker", [184, 516, 36, 24], { text: "GUI:Units" }),
-      hidden(button("PopupCommunicator", [184, 568, 36, 24])),
-      hidden(win("WinGeneralPortrait", "USER", [600, 478, 60, 30])),
-      hidden(win("TextEntryGeneralName", "ENTRYFIELD", [664, 478, 120, 20])),
+    panel("ControlBarParent", [0, HUD.barTop, 800, HUD.barHeight], [
+      hidden(win("BackgroundMarker", "USER", [0, HUD.barTop, 1, 1])),
+      // left: radar (W3DLeftHUDDraw renders TheRadar), the vertical experience bar, the side buttons
+      win("LeftHUD", "USER", [...HUD.radar], { input: "LeftHUDInput", draw: "W3DLeftHUDDraw", colors: CLEAR }),
+      panel("GeneralsExp", [...HUD.expBar], [
+        win("ExpBarForeground", "USER", [HUD.expBar[0], HUD.expBar[1] + HUD.expBar[3] - 1, HUD.expBar[2], 1], { colors: CLEAR }),
+      ], { colors: CLEAR }),
+      sideBtn("ButtonOptions", HUD.sideY.options, "Options"),
+      sideBtn("ButtonIdleWorker", HUD.sideY.worker, "Worker"),
+      hidden(sideBtn("PopupCommunicator", HUD.sideY.chat, "Chat")),
+      button("ButtonGeneral", [...HUD.general], imgs("General")),
+      hidden(button("ButtonLarge", [...HUD.minMax])),
+      hidden(button("ButtonMedium", [...HUD.minMax])),
+      hidden(button("ButtonSmall", [...HUD.minMax])),
+      hidden(win("WinUAttack", "USER", [...HUD.uAttack], { colors: CLEAR })),
+      hidden(win("WinGeneralPortrait", "USER", [px, py, 60, 30])),
+      hidden(win("TextEntryGeneralName", "ENTRYFIELD", [px + 64, py, 56, 20])),
+      // status strip: money (text over the art's slot) and the power bar (W3DPowerDraw, PowerPoint* images)
+      label("MoneyDisplay", [...HUD.money], undefined, { headerTemplate: "Label", colors: CLEAR }),
+      win("PowerWindow", "USER", [...HUD.power], { draw: "W3DPowerDraw", colors: CLEAR }),
 
       // middle: the context panels
-      panel("CommandWindow", MID, commandButtons, { colors: PANEL }),
-      hidden(panel("ProductionQueueWindow", MID, queueButtons, { colors: PANEL })),
+      panel("CommandWindow", MID, commandButtons, { colors: CLEAR }),
+      hidden(panel("ProductionQueueWindow", MID, queueButtons, { colors: CLEAR })),
       hidden(panel("UnderConstructionWindow", MID, [
-        label("UnderConstructionDesc", [236, 484, 344, 40]),
-        button("ButtonCancelConstruction", [236, 540, 120, 24], { text: "GUI:Cancel" }),
-      ], { colors: PANEL })),
+        label("UnderConstructionDesc", [g.x + 4, g.y + 4, 350, 40]),
+        button("ButtonCancelConstruction", [g.x + 4, g.y + 60, 120, 24], { text: "GUI:Cancel" }),
+      ], { colors: CLEAR })),
       hidden(panel("OCLTimerWindow", MID, [
-        label("OCLTimerStaticText", [236, 484, 344, 20]),
-        win("OCLTimerProgressBar", "PROGRESSBAR", [236, 510, 344, 16], { colors: { ...INNER, hilite: [80, 140, 230, 255], hiliteBorder: [80, 140, 230, 255] } }),
-        button("OCLTimerSellButton", [236, 540, 120, 24]),
-      ], { colors: PANEL })),
+        label("OCLTimerStaticText", [g.x + 4, g.y + 4, 350, 20]),
+        win("OCLTimerProgressBar", "PROGRESSBAR", [g.x + 4, g.y + 30, 350, 16], { colors: { ...INNER, hilite: [80, 140, 230, 255], hiliteBorder: [80, 140, 230, 255] } }),
+        button("OCLTimerSellButton", [g.x + 4, g.y + 60, 120, 24]),
+      ], { colors: CLEAR })),
       hidden(panel("BeaconWindow", MID, [
-        label("StaticTextBeaconLabel", [236, 484, 344, 16], "GUI:BeaconLabel"),
-        win("EditBeaconText", "ENTRYFIELD", [236, 504, 344, 20], { colors: INNER }),
-        button("ButtonClearBeaconText", [236, 540, 100, 22], { text: "GUI:BeaconClear" }),
-        button("ButtonDeleteBeacon", [346, 540, 100, 22], { text: "GUI:DeleteBeacon" }),
-        button("ButtonPlaceBeacon", [456, 540, 100, 22], { text: "GUI:Beacon" }),
-      ], { input: "BeaconWindowInput", colors: PANEL })),
+        label("StaticTextBeaconLabel", [g.x + 4, g.y + 4, 350, 16], "GUI:BeaconLabel"),
+        win("EditBeaconText", "ENTRYFIELD", [g.x + 4, g.y + 24, 350, 20], { colors: INNER }),
+        button("ButtonClearBeaconText", [g.x + 4, g.y + 60, 100, 22], { text: "GUI:BeaconClear" }),
+        button("ButtonDeleteBeacon", [g.x + 114, g.y + 60, 100, 22], { text: "GUI:DeleteBeacon" }),
+        button("ButtonPlaceBeacon", [g.x + 224, g.y + 60, 100, 22], { text: "GUI:Beacon" }), // the scheme moves it to the side column with the beacon icon
+      ], { input: "BeaconWindowInput", colors: CLEAR })),
       hidden(panel("ObserverPlayerListWindow", MID, observerList, { colors: PANEL })),
       hidden(panel("ObserverPlayerInfoWindow", MID, [
-        label("StaticTextPlayerName", [236, 484, 344, 16]),
-        win("WinFlag", "USER", [236, 504, 32, 24], { colors: INNER }),
-        label("StaticTextNumberOfUnits", [276, 504, 300, 14]),
-        label("StaticTextNumberOfBuildings", [276, 520, 300, 14]),
-        label("StaticTextNumberOfUnitsKilled", [276, 536, 300, 14]),
-        label("StaticTextNumberOfUnitsLost", [276, 552, 300, 14]),
+        label("StaticTextPlayerName", [g.x + 4, g.y + 4, 350, 16]),
+        win("WinFlag", "USER", [g.x + 4, g.y + 24, 32, 24], { colors: INNER }),
+        label("StaticTextNumberOfUnits", [g.x + 44, g.y + 24, 300, 14]),
+        label("StaticTextNumberOfBuildings", [g.x + 44, g.y + 40, 300, 14]),
+        label("StaticTextNumberOfUnitsKilled", [g.x + 44, g.y + 56, 300, 14]),
+        label("StaticTextNumberOfUnitsLost", [g.x + 44, g.y + 72, 300, 14]),
       ], { colors: PANEL })),
 
-      // right: selected-unit portrait and upgrade cameos
-      panel("RightHUD", [590, 474, 206, 122], [
-        win("WinUnitSelected", "USER", [598, 480, 120, 84], { colors: INNER }),
-        hidden(win("CameoWindow", "USER", [598, 480, 120, 84], { colors: INNER })),
-        hidden(win("CameoMovieWindow", "USER", [598, 480, 120, 84], { colors: INNER })),
+      // right: the faction panel (RightHUDImage art), selected-unit portrait, upgrade cameos
+      panel("RightHUD", [rx, ry, rw, rh], [
+        win("WinUnitSelected", "USER", [px, py, pw, ph], { colors: CLEAR }),
+        hidden(win("CameoWindow", "USER", [px, py, pw, ph], { colors: CLEAR })),
+        hidden(win("CameoMovieWindow", "USER", [px, py, pw, ph], { colors: CLEAR })),
         ...upgradeCameos,
-      ], { colors: PANEL }),
-    ], { system: "ControlBarSystem", input: "ControlBarInput", colors: CLEAR }),
+      ], { colors: CLEAR }),
+    ], { system: "ControlBarSystem", input: "ControlBarInput", draw: "W3DCommandBarBackgroundDraw", colors: CLEAR }),
   ],
 };
 
@@ -176,8 +180,8 @@ function shortcutBar(side: string): LayoutSpec {
   for (let i = 0; i < 11; i++) {
     const y = 124 + i * 32;
     parents.push(panel(`ButtonParent${i + 1}`, [2, y, 56, 30], [
-      button(`ButtonCommand${i + 1}`, [4, y + 2, 52, 26]),
-    ], { colors: INNER }));
+      button(`ButtonCommand${i + 1}`, [4, y + 2, 52, 26], { status: ["ENABLED", "IMAGE"], images: CAMEO }),
+    ], { colors: CLEAR }));
   }
   return {
     file: `GenPowersShortcutBar${side}.wnd`,

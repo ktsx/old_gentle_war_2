@@ -37,23 +37,94 @@ export class Image32 {
     this.fillRect(x0, y0, w, 1, c); this.fillRect(x0, y0 + h - 1, w, 1, c);
     this.fillRect(x0, y0, 1, h, c); this.fillRect(x0 + w - 1, y0, 1, h, c);
   }
+  get(x: number, y: number): RGBA {
+    const i = (y * this.width + x) * 4;
+    return [this.data[i], this.data[i + 1], this.data[i + 2], this.data[i + 3]];
+  }
+  /** Source-over blend of c (with its alpha) onto the pixel. */
+  blend(x: number, y: number, c: RGBA) {
+    if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+    const a = c[3] / 255, d = this.get(x, y);
+    this.set(x, y, [Math.round(c[0] * a + d[0] * (1 - a)), Math.round(c[1] * a + d[1] * (1 - a)), Math.round(c[2] * a + d[2] * (1 - a)), Math.max(d[3], c[3])]);
+  }
+  blendRect(x0: number, y0: number, w: number, h: number, c: RGBA) {
+    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) this.blend(x, y, c);
+  }
+  /** Vertical gradient from `top` to `bottom`. */
+  vGradient(x0: number, y0: number, w: number, h: number, top: RGBA, bottom: RGBA) {
+    for (let y = 0; y < h; y++) {
+      const t = h > 1 ? y / (h - 1) : 0;
+      const c: RGBA = [0, 1, 2, 3].map((i) => Math.round(top[i] + (bottom[i] - top[i]) * t)) as RGBA;
+      this.fillRect(x0, y0 + y, w, 1, c);
+    }
+  }
+  /** Bevelled plate: fill, light top/left edge, dark bottom/right edge, optional 1px dark outline outside. */
+  plate(x0: number, y0: number, w: number, h: number, fill: RGBA, light: RGBA, dark: RGBA, outline?: RGBA) {
+    if (outline) this.strokeRect(x0, y0, w, h, outline);
+    const i = outline ? 1 : 0;
+    this.fillRect(x0 + i, y0 + i, w - 2 * i, h - 2 * i, fill);
+    this.fillRect(x0 + i, y0 + i, w - 2 * i, 1, light); this.fillRect(x0 + i, y0 + i, 1, h - 2 * i, light);
+    this.fillRect(x0 + i, y0 + h - 1 - i, w - 2 * i, 1, dark); this.fillRect(x0 + w - 1 - i, y0 + i, 1, h - 2 * i, dark);
+  }
+  /** Recessed slot: dark fill, dark top/left, light bottom/right. */
+  slot(x0: number, y0: number, w: number, h: number, fill: RGBA, light: RGBA, dark: RGBA) {
+    this.fillRect(x0, y0, w, h, fill);
+    this.fillRect(x0, y0, w, 1, dark); this.fillRect(x0, y0, 1, h, dark);
+    this.fillRect(x0, y0 + h - 1, w, 1, light); this.fillRect(x0 + w - 1, y0, 1, h, light);
+  }
+  line(x0: number, y0: number, x1: number, y1: number, c: RGBA) {
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy, x = x0, y = y0;
+    for (;;) {
+      this.set(x, y, c);
+      if (x === x1 && y === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x += sx; }
+      if (e2 <= dx) { err += dx; y += sy; }
+    }
+  }
+  disc(cx: number, cy: number, r: number, c: RGBA) {
+    for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) if (x * x + y * y <= r * r) this.set(cx + x, cy + y, c);
+  }
+  ring(cx: number, cy: number, r: number, c: RGBA) {
+    for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const d = x * x + y * y; if (d <= r * r && d > (r - 1) * (r - 1)) this.set(cx + x, cy + y, c); }
+  }
+  copy(src: Image32, sx: number, sy: number, w: number, h: number, dx: number, dy: number) {
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) this.set(dx + x, dy + y, src.get(sx + x, sy + y));
+  }
 }
 
-export function encodeTga(img: Image32): Buffer {
+/** Uncompressed (type 2) or RLE (type 10) 32-bit TGA, top-left origin. RLE suits flat generated art (10-50x smaller). */
+export function encodeTga(img: Image32, rle = false): Buffer {
   const header = Buffer.alloc(18);
-  header[2] = 2;                       // uncompressed true-colour
+  header[2] = rle ? 10 : 2;            // true-colour, optionally run-length encoded
   header.writeUInt16LE(img.width, 12);
   header.writeUInt16LE(img.height, 14);
   header[16] = 32;                     // bits per pixel
   header[17] = 0x28;                   // 8 alpha bits, top-left origin
-  const px = Buffer.alloc(img.width * img.height * 4);
-  for (let i = 0; i < img.width * img.height; i++) {
-    px[i * 4] = img.data[i * 4 + 2];     // B
-    px[i * 4 + 1] = img.data[i * 4 + 1]; // G
-    px[i * 4 + 2] = img.data[i * 4];     // R
-    px[i * 4 + 3] = img.data[i * 4 + 3]; // A
+  const n = img.width * img.height;
+  const bgra = (i: number) => [img.data[i * 4 + 2], img.data[i * 4 + 1], img.data[i * 4], img.data[i * 4 + 3]];
+  if (!rle) {
+    const px = Buffer.alloc(n * 4);
+    for (let i = 0; i < n; i++) { const p = bgra(i); px[i * 4] = p[0]; px[i * 4 + 1] = p[1]; px[i * 4 + 2] = p[2]; px[i * 4 + 3] = p[3]; }
+    return Buffer.concat([header, px]);
   }
-  return Buffer.concat([header, px]);
+  const same = (a: number, b: number) => img.data[a * 4] === img.data[b * 4] && img.data[a * 4 + 1] === img.data[b * 4 + 1] && img.data[a * 4 + 2] === img.data[b * 4 + 2] && img.data[a * 4 + 3] === img.data[b * 4 + 3];
+  const out: number[] = [];
+  for (let row = 0; row < img.height; row++) {     // packets never cross scanlines (Targa spec)
+    let i = row * img.width; const end = i + img.width;
+    while (i < end) {
+      let run = 1;
+      while (i + run < end && run < 128 && same(i, i + run)) run++;
+      if (run >= 2) { out.push(0x80 | (run - 1), ...bgra(i)); i += run; continue; }
+      let raw = 1;
+      while (i + raw < end && raw < 128 && !(i + raw + 1 < end && same(i + raw, i + raw + 1))) raw++;
+      out.push(raw - 1);
+      for (let k = 0; k < raw; k++) out.push(...bgra(i + k));
+      i += raw;
+    }
+  }
+  return Buffer.concat([header, Buffer.from(out)]);
 }
 
 /**
@@ -94,16 +165,9 @@ export function generateFreeImages(): Record<string, Image32> {
     const v = Math.round(225 + 30 * noise(x, y, 11));
     lightNoise.set(x, y, [v, v, v, 255]);
   }
-  // The in-game control bar skins are 512x512 atlases (MappedImages/TextureSize_512/
-  // S{A,N,U}ControlBar512.INI: 45 images each, USA/China/GLA). A missing atlas draws every
-  // HUD image magenta; a flat dark one makes all of them dark panel pieces.
-  const atlas = new Image32(512, 512, [30, 34, 44, 255]);
-  for (let i = 0; i < 512; i += 16) { atlas.fillRect(i, 0, 1, 512, [36, 40, 52, 255]); atlas.fillRect(0, i, 512, 1, [36, 40, 52, 255]); }
-
   return {
     "gxlogo.tga": logo, "gxbutton.tga": btn, "gxbutton_hi.tga": btnHi, "gxbutton_dis.tga": btnDis,
     "TSCloudMed.tga": cloud, "TSNoiseUrb.tga": lightNoise,
-    "SAControlBar512_001.tga": atlas, "SNControlBar512_001.tga": atlas, "SUControlBar512_001.tga": atlas,
   };
 }
 

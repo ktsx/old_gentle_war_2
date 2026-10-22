@@ -52,23 +52,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -95,23 +101,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -138,23 +150,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -181,23 +199,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -224,23 +248,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -267,23 +297,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -310,23 +346,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -353,23 +395,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -396,23 +444,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -439,23 +493,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     },
@@ -482,23 +542,29 @@
         26
        ],
        "status": [
-        "ENABLED"
+        "ENABLED",
+        "IMAGE"
        ],
-       "headerTemplate": "Small"
+       "headerTemplate": "Small",
+       "images": {
+        "enabled": "GxUSA_Cameo",
+        "hilite": "GxUSA_Cameo",
+        "disabled": "GxUSA_Cameo"
+       }
       }
      ],
      "colors": {
       "enabled": [
-       18,
-       20,
-       26,
-       255
+       0,
+       0,
+       0,
+       0
       ],
       "enabledBorder": [
-       70,
-       78,
-       94,
-       255
+       0,
+       0,
+       0,
+       0
       ]
      }
     }

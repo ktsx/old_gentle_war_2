@@ -12,7 +12,8 @@
  * Output (<outDir>/assets/):
  *   INIZH.big     Data/INI/**, Data/English/{Language,HeaderTemplate,CommandMap}.ini, Data/English/generals.csf
  *   WindowZH.big  Window/Menus/*.wnd, Window/*.wnd (in-game HUD)
- *   TexturesZH.big Art/Textures/*.tga, Art/Terrain/*.tga (generated placeholders, see tga.ts)
+ *   TexturesZH.big Art/Textures/*.tga (tga.ts placeholders, hud-skin.ts atlases, mapped-images.ts labelled
+ *                 placeholder atlases for every corpus MappedImage texture), Art/Terrain/*.tga
  *   MapsZH.big    Maps/<name>/<name>.map
  *
  * Usage:
@@ -29,6 +30,8 @@ import { parseStr, buildCsf } from "./strings.ts";
 import { buildWnd } from "./wnd.ts";
 import { packDir } from "./big.ts";
 import { writeFreeImages } from "./tga.ts";
+import { writeHudSkin } from "./hud-skin.ts";
+import { writePlaceholderAtlases } from "./mapped-images.ts";
 import { buildMap } from "./map.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
@@ -96,8 +99,13 @@ function main() {
     console.log(`${spec.dir ?? "Menus"}/${spec.file}: built`);
   }
 
-  // 5. placeholder images
+  // 5. placeholder images + the control bar skin (atlases, MappedImages, our ControlBarScheme.ini — the
+  //    scheme replaces the corpus file, which references retail art)
   console.log(`textures: ${writeFreeImages(texStage).join(", ")}`);
+  console.log(`hud skin: ${writeHudSkin(texStage, iniStage).join(", ")}`);
+  // every texture the corpus MappedImages reference, as labelled placeholder atlases (mapped-images.ts)
+  const ph = writePlaceholderAtlases(patchData, texStage);
+  console.log(`placeholder atlases: ${ph.textures} textures, ${(ph.bytes / 1e6).toFixed(1)} MB`);
 
   // 6. maps
   const mapDir = join(freeRoot, "maps");

@@ -14,7 +14,8 @@
  * OverwriteConfirmParent, LoadConfirmParent, DeleteConfirmParent (Confirm / Cancel each) and
  * SaveDescParent (EntryDesc + Confirm / Cancel). The dialogs come last so they draw on top.
  *
- * Saves go to <UserData>/Save/ — /userdata, the IDBFS mount (web_pre.js), so they survive a reload.
+ * ListboxGames forces a selection: clicking the selected row would otherwise clear it and grey out
+ * LOAD / DELETE. Saves go to <UserData>/save/ — /userdata, the IDBFS mount (web_pre.js), so they survive a reload.
  *
  * Usage: node --experimental-strip-types tools/asset-pipeline/gen-saveload-layouts.ts
  */
@@ -75,7 +76,7 @@ function saveLoad(file: string, init: string): LayoutSpec {
         children: place([
           heading("StaticTextTitle", [16, 14, 300, 24], "GUI:SaveAndLoad"),
           win("ListboxGames", "SCROLLLISTBOX", [16, 48, 488, 340], {
-            listbox: { length: 100, scrollBar: true, columns: 2, columnWidths: [68, 32], forceSelect: false },
+            listbox: { length: 100, scrollBar: true, columns: 2, columnWidths: [68, 32], forceSelect: true },
             colors: GADGET, headerTemplate: "Small",
           }),
           win("MenuButtonFrame", "USER", [16, 404, 488, 48], {

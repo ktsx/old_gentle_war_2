@@ -298,6 +298,21 @@ jobs:
             "click 512,412;shot options.png;key Escape;click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;shot quitmenu.png;click 512,384;shot options-ingame.png;key Escape;click 512,261;wait 2000;click 600,400;click 820,640;click 300,700;click 470,420;key Backquote;shot diplomacy.png;key Backquote;key Enter;shot chat.png;key Escape;wait 3000;shot clicks.png" \
             | tee ui-smoke.log
 
+      - name: Save and load a game
+        if: always()
+        run: |
+          set -o pipefail
+          curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
+          # a skirmish; ESC > SAVE/LOAD > SAVE GAME with the default description (written to
+          # /userdata/save, flushed to IndexedDB); SAVE/LOAD again > LOAD GAME on the new row: the
+          # match must come back (GameStateMap extracts the embedded map next to the save). Then a
+          # page reload (same profile) and MAIN MENU > LOAD REPLAY > LOAD GAME (SaveLoad.wnd) loads it
+          # once more from the shell.
+          UI_EXPECT="startNewGame:ENTER mode=2 save=1;SAVEGAME: loading block 'CHUNK_GhostObject';SaveLoad.wnd:ButtonLoadConfirm" \
+          node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
+            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,323;click 272,612;shot savedesc.png;click 489,404;wait 4000;click 512,323;click 512,148;shot saveload.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded.png;reload;click 512,366;click 512,272;wait 1000;shot saveload-shell.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded-shell.png" \
+            | tee saveload-smoke.log
+
       - name: Check the terrain is visible
         if: always()
         run: |
@@ -338,6 +353,13 @@ jobs:
           grep -E "FATAL|PAGEERROR|expected console line|UI SCRIPT: FAIL" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
           grep -E "KEYS: meta|QUITMENU:|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
 
+      - name: Annotate save / load
+        if: always()
+        run: |
+          f=saveload-smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL|SAVEGAME: (error|GameStateMap throw)" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "SAVEGAME: map in save|startNewGame:ENTER|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
+
       - name: Annotate model draws
         if: always()
         run: |
@@ -368,8 +390,14 @@ jobs:
             diplomacy.png
             chat.png
             clicks.png
+            savedesc.png
+            saveload.png
+            loaded.png
+            saveload-shell.png
+            loaded-shell.png
             smoke.log
             ui-smoke.log
+            saveload-smoke.log
             map-smoke.log
             skirmish-smoke.log
             serve.log

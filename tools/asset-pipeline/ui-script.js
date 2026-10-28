@@ -9,6 +9,7 @@
 //                    REGEX — e.g. "waitfor 150000 inGame=1 isPaused=0" (TICK-DIAG, needs ?diag=1)
 //                    instead of a fixed pause for a map load; fails the script when it times out
 //   shot FILE        screenshot
+//   reload           reload the page and boot again (same profile: IndexedDB saves survive)
 //   mem              print the wasm heap and JS heap size
 //   stack N          pause the page N times through the DevTools protocol and print the JS/wasm
 //                    stacks (names with the RelWithDebInfo build) — for a page that stopped
@@ -39,11 +40,14 @@ const { chromium } = require('playwright');
   // attach the debugger before the main thread gets busy (see hang-stack.js)
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Debugger.enable');
+  const boot = async () => {
+    await page.waitForSelector('#gx-loading.gx-await-start #gx-start', { timeout: 180000 });
+    await page.click('#gx-start');
+    await page.waitForTimeout(Number(bootWait || 9000));
+    await page.mouse.move(100, 100); await page.mouse.move(400, 300, { steps: 10 }); await page.waitForTimeout(1000);
+  };
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('#gx-loading.gx-await-start #gx-start', { timeout: 180000 });
-  await page.click('#gx-start');
-  await page.waitForTimeout(Number(bootWait || 9000));
-  await page.mouse.move(100, 100); await page.mouse.move(400, 300, { steps: 10 }); await page.waitForTimeout(1000);
+  await boot();
   for (const step of steps.split(';').map((s) => s.trim()).filter(Boolean)) {
     const [op, arg = ''] = [step.split(' ')[0], step.slice(step.indexOf(' ') + 1)];
     if (op === 'click') {
@@ -61,6 +65,10 @@ const { chromium } = require('playwright');
       const from = all.length;
       while (Date.now() < limit && !all.slice(from).some((l) => re.test(l))) await page.waitForTimeout(250);
       if (!all.slice(from).some((l) => re.test(l))) fatal.push(`waitfor timed out: ${arg}`);
+    } else if (op === 'reload') {
+      // same browser context, so IndexedDB (/userdata: saves, options) survives
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await boot();
     } else if (op === 'wait') {
       await page.waitForTimeout(Number(arg));
     } else if (op === 'shot') {

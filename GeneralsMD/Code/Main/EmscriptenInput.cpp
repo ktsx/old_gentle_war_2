@@ -23,6 +23,9 @@
 // Access to TheDisplay for logical resolution dimensions
 #include "GameClient/Display.h"
 
+// Typed characters go straight to the focused window (text entries)
+#include "GameClient/GameWindowManager.h"
+
 // dinput.h provides EmscriptenDIKEntry, EMSCRIPTEN_DINPUT_BUFFER_SIZE,
 // and the extern declarations for the key buffer globals.
 #include "dinput.h"
@@ -477,6 +480,45 @@ void EmscriptenInput_PumpEvents() {
                 g_emscriptenKeyBuffer[idx].dwTimeStamp = SDL_GetTicks();
                 g_emscriptenKeyWriteIdx++;
                 g_emscriptenKeysPressed[dik] = (event.type == SDL_KEYDOWN);
+            }
+            break;
+        }
+
+        // ------------------------------------------------------------------
+        // Typed text → GWM_IME_CHAR to the window with keyboard focus.
+        //
+        // GeneralsX @bugfix WebPort 2026-10-28 The key events above carry no
+        // characters; on Windows WM_CHAR reaches text entries through
+        // IMEManager::serviceIMEMessage (GWM_IME_CHAR), which the web build
+        // never had — entry fields took Backspace / Enter / arrows but no
+        // letters (replay names, the skirmish player name, chat). UTF-8 from
+        // SDL is decoded to UTF-16 code units; control characters are left to
+        // the key path (Enter, Backspace, Tab are handled as keys there).
+        // ------------------------------------------------------------------
+        case SDL_TEXTINPUT: {
+            GameWindow *focus = TheWindowManager ? TheWindowManager->winGetFocus() : nullptr;
+            if (!focus)
+                break;
+            const unsigned char *p = (const unsigned char *)event.text.text;
+            while (*p) {
+                unsigned int cp;
+                int extra;
+                if (*p < 0x80)      { cp = *p; extra = 0; }
+                else if (*p < 0xE0) { cp = *p & 0x1F; extra = 1; }
+                else if (*p < 0xF0) { cp = *p & 0x0F; extra = 2; }
+                else                { cp = *p & 0x07; extra = 3; }
+                ++p;
+                for (; extra > 0 && (*p & 0xC0) == 0x80; --extra, ++p)
+                    cp = (cp << 6) | (*p & 0x3F);
+                if (cp < 32 || cp == 127)
+                    continue;
+                if (cp >= 0x10000) {   // outside the BMP: a surrogate pair
+                    cp -= 0x10000;
+                    TheWindowManager->winSendInputMsg(focus, GWM_IME_CHAR, (WindowMsgData)(0xD800 + (cp >> 10)), 0);
+                    TheWindowManager->winSendInputMsg(focus, GWM_IME_CHAR, (WindowMsgData)(0xDC00 + (cp & 0x3FF)), 0);
+                } else {
+                    TheWindowManager->winSendInputMsg(focus, GWM_IME_CHAR, (WindowMsgData)cp, 0);
+                }
             }
             break;
         }

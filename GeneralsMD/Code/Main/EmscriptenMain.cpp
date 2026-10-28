@@ -551,6 +551,9 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "FATAL: SDL2 Video init failed: %s\n", SDL_GetError());
       return 1;
     }
+    // GeneralsX @bugfix WebPort 2026-10-28 typed characters for text entries
+    // (SDL_TEXTINPUT, see EmscriptenInput_PumpEvents)
+    SDL_StartTextInput();
     fprintf(stderr, "INFO: Initializing SDL2 (Emscripten) Audio ...\n");
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
       fprintf(stderr, "WARN: SDL2 Audio init failed: %s\n", SDL_GetError());

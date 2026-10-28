@@ -392,6 +392,8 @@ void Shell::push( AsciiString filename, Bool shutdownImmediate )
 
 	// get the top of the current stack
 	WindowLayout *currentTop = top();
+	GX_DIAG_LOG("SHELL: push '%s' (top '%s' hidden=%d, %d on stack)\n", filename.str(),
+		currentTop ? currentTop->getFilename().str() : "-", currentTop ? (int)currentTop->isHidden() : -1, (int)m_screenCount);
 
 	//
 	// if we have something on the top of the stack we won't do the push
@@ -716,6 +718,7 @@ void Shell::doPush( AsciiString layoutFile )
 	// create new layout and load from window manager
 	newScreen = TheWindowManager->winCreateLayout( layoutFile );
 	DEBUG_ASSERTCRASH( newScreen != nullptr, ("Shell unable to load pending push layout") );
+	GX_DIAG_LOG("SHELL: doPush '%s' -> %s\n", layoutFile.str(), newScreen ? "created" : "NOT FOUND");
 
 	// link screen to the top
 	linkScreen( newScreen );

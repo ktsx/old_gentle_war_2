@@ -51,6 +51,7 @@
 #include "Common/Radar.h"
 
 #include "GameLogic/AIPathfind.h"
+#include <Utility/gx_trace.h>
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/Locomotor.h"
 #include "GameLogic/Object.h"
@@ -270,6 +271,7 @@ void GameLogic::clearGameData( Bool showScoreScreen )
 	TheScriptActions->closeWindows(FALSE); // Close victory or defeat windows.
 
 	Bool shellGame = FALSE;
+	GX_DIAG_LOG("SHELL: clearGameData showScoreScreen=%d shellGame=%d inGame=%d\n", (int)showScoreScreen, (int)isInShellGame(), (int)isInGame());
 	if ((!isInShellGame() || !isInGame()) && showScoreScreen && !TheGlobalData->m_headless)
 	{
 		shellGame = TRUE;

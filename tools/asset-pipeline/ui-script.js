@@ -36,7 +36,7 @@ const { chromium } = require('playwright');
     const t = m.text();
     all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
-    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
   });
   page.on('pageerror', (e) => { fatal.push(String(e)); console.log(`${stamp()} [PAGEERROR] ${String(e.stack || e).slice(0, 4000)}`); });
   // attach the debugger before the main thread gets busy (see hang-stack.js)

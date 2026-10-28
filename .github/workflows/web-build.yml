@@ -291,10 +291,11 @@ jobs:
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
           # OPTIONS from the main menu (OptionsMenu.wnd: init reaches the advanced checkboxes), ESC back;
           # then a skirmish, where ESC must open the quit menu (CommandMap.ini binds it, the engine
-          # must be "active") and its Options button the options screen again.
-          UI_EXPECT="OptionsMenu.wnd:Check3DShadows;KEYS: meta OPTIONS;QUITMENU: toggle visible=0 canOpen=1" \
+          # must be "active") and its Options button the options screen again. Then back in the match:
+          # clicks on the ground, the HUD and a unit, ` (diplomacy) and Enter (chat) — any page error fails.
+          UI_EXPECT="OptionsMenu.wnd:Check3DShadows;KEYS: meta OPTIONS;QUITMENU: toggle visible=0 canOpen=1;KEYS: meta DIPLOMACY;KEYS: meta CHAT_EVERYONE" \
           node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
-            "click 512,412;shot options.png;key Escape;click 512,274;click 512,412;click 891,722;wait 80000;key Escape;shot quitmenu.png;click 512,353;shot options-ingame.png" \
+            "click 512,412;shot options.png;key Escape;click 512,274;click 512,412;click 891,722;wait 80000;key Escape;shot quitmenu.png;click 512,353;shot options-ingame.png;key Escape;click 512,292;wait 2000;click 600,400;click 820,640;click 300,700;click 470,420;key Backquote;shot diplomacy.png;key Backquote;key Enter;shot chat.png;key Escape;wait 3000;shot clicks.png" \
             | tee ui-smoke.log
 
       - name: Check the terrain is visible
@@ -364,6 +365,9 @@ jobs:
             options.png
             quitmenu.png
             options-ingame.png
+            diplomacy.png
+            chat.png
+            clicks.png
             smoke.log
             ui-smoke.log
             map-smoke.log

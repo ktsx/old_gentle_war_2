@@ -489,6 +489,47 @@ function technicalGLA(): Mesh {
   return b.mesh();
 }
 
+// --- models the engine creates by a hard-coded name ---------------------------------------------
+// W3DWaypointBuffer: "SCMNode" (the puck on every waypoint / rally point) — it calls Set_Position on
+// the render object without a null check, so selecting anything with a path or rally point crashed
+// the Release build (an indirect call through a null vtable; RelWithDebInfo happened to survive).
+// W3DInGameUI: "Locater01" / "Locater02" (the building-placement anchor and rotation arrow; null-
+// checked, but the placement cursor was invisible). W3DWater: "new_skybox" (drawn with
+// DrawSkyBox = Yes on maps with water, Set_Position without a null check).
+
+/** SCMNode: a small two-tier puck. Not pickable (no collision flags). */
+function waypointNode(): Mesh {
+  const b = new MeshBuilder("SCMNode", UNIT_TEXTURE, ATLAS, 0);
+  b.cylinder(0, 0, 0, 1.2, 3.2, 12, { side: TEX.steel, top: TEX.houseStripe });
+  b.cylinder(0, 0, 1.2, 2.0, 1.6, 10, { side: TEX.steel, top: TEX.steel });
+  return b.mesh();
+}
+
+/** Locater01: a flat ring-like marker under the building being placed. */
+function placementAnchor(): Mesh {
+  const b = new MeshBuilder("Locater01", UNIT_TEXTURE, ATLAS, 0);
+  b.cylinder(0, 0, 0, 0.6, 9, 16, { side: TEX.hazard, top: TEX.hazard });
+  b.cylinder(0, 0, 0.6, 1.4, 3, 10, { side: TEX.steel, top: TEX.houseStripe });
+  return b.mesh();
+}
+
+/** Locater02: a flat arrow pointing +X (the facing of the building being placed). */
+function placementArrow(): Mesh {
+  const b = new MeshBuilder("Locater02", UNIT_TEXTURE, ATLAS, 0);
+  b.box([0, -2, 0], [18, 2, 1], { side: TEX.hazard, top: TEX.houseStripe });
+  b.frustum([18, -7, 0], [30, 7, 1], 0, { side: TEX.hazard, top: TEX.houseStripe });
+  b.box([27, -0.5, 0], [30, 0.5, 1], { side: TEX.hazard, top: TEX.houseStripe });   // tip
+  return b.mesh();
+}
+
+/** new_skybox: a large box seen from the inside (triangles flipped), sky gradient walls. */
+function skyBox(): Mesh {
+  const b = new MeshBuilder("new_skybox", UNIT_TEXTURE, ATLAS, 0);
+  b.box([-500, -500, -100], [500, 500, 400], { side: TEX.glass, top: TEX.glass, bottom: TEX.glass });
+  const m = b.mesh();
+  return { ...m, tris: m.tris.map(([a, c, d]) => [a, d, c] as [number, number, number]), normals: m.normals.map(([x, y, z]) => [-x, -y, -z] as [number, number, number]) };
+}
+
 export function buildFreeModels(): Record<string, Mesh> {
   const models = [
     commandCenterUSA(), commandCenterChina(),
@@ -502,6 +543,7 @@ export function buildFreeModels(): Record<string, Mesh> {
     infantry("AIRngr_SKN", TEX.olive, TEX.olive), infantry("NICNSC_SKN", TEX.khaki, TEX.khaki),
     commandCenterGLA(), barracksGLA(), supplyStashGLA(), armsDealerGLA(), holeGLA(),
     tank("UVLiteTank", TEX.rust, 14, 9, 10.5, 5), technicalGLA(),
+    waypointNode(), placementAnchor(), placementArrow(), skyBox(),
     infantry("UIWRKR_SKN", TEX.robe, TEX.scarf), infantry("UIRGrd_SKN", TEX.olive, TEX.scarf),
   ];
   for (const m of [...models]) {

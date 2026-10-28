@@ -6,6 +6,7 @@
 //   key NAME         keyboard press (Playwright key names: Escape, Enter, ArrowDown, ...)
 //   wait MS          pause
 //   shot FILE        screenshot
+//   mem              print the wasm heap and JS heap size
 //   stack N          pause the page N times through the DevTools protocol and print the JS/wasm
 //                    stacks (names with the RelWithDebInfo build) — for a page that stopped
 //                    drawing; screenshots of a stuck page time out, this does not
@@ -55,6 +56,14 @@ const { chromium } = require('playwright');
       await page.waitForTimeout(Number(arg));
     } else if (op === 'shot') {
       try { await page.screenshot({ path: arg, timeout: 20000 }); } catch (e) { console.log(`${stamp()} screenshot ${arg} failed: ${String(e).split('\n')[0]}`); }
+    } else if (op === 'mem') {
+      const m = await page.evaluate(() => {
+        const mod = window.Module || {};
+        const heap = mod.HEAPU8 ? mod.HEAPU8.length : (mod.wasmMemory ? mod.wasmMemory.buffer.byteLength : -1);
+        const js = performance.memory ? performance.memory.usedJSHeapSize : -1;
+        return { heapMB: Math.round(heap / 1048576), jsHeapMB: Math.round(js / 1048576) };
+      }).catch((e) => ({ error: String(e) }));
+      console.log(`${stamp()} mem ${JSON.stringify(m)}`);
     } else if (op === 'stack') {
       for (let i = 0; i < Number(arg || 3); i++) {
         const paused = new Promise((resolve) => cdp.once('Debugger.paused', resolve));

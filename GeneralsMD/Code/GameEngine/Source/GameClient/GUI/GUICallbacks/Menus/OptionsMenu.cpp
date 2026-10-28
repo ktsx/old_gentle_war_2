@@ -1423,6 +1423,16 @@ void OptionsMenuInit( WindowLayout *layout, void *userData )
 	}
 
 
+#ifdef __EMSCRIPTEN__
+	// GeneralsX @feature WebPort 2026-10-28 The browser window sets the resolution: web_shell.html
+	// sizes the canvas and passes -xres/-yres, so a mode switch from here would desync engine and
+	// canvas. Gamma is ignored in windowed mode (W3DDisplay::setGamma), which the web build always is.
+	if (comboBoxResolution)
+		comboBoxResolution->winEnable(FALSE);
+	if (sliderGamma && TheDisplay->getWindowed())
+		sliderGamma->winEnable(FALSE);
+#endif
+
 	TheWindowManager->winSetModal(parent);
 	ignoreSelected = FALSE;
 }

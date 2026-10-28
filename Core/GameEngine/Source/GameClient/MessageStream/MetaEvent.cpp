@@ -59,6 +59,7 @@
 
 #ifdef DUMP_ALL_KEYS_TO_LOG
 #include "GameClient/Keyboard.h"
+#include <Utility/gx_trace.h>
 #endif
 
 MetaMap *TheMetaMap = nullptr;
@@ -539,6 +540,7 @@ void MetaEventTranslator::onKeyEvent(const GameMessage *msg, GameMessageDisposit
 
 	const MappableKeyType keyType = getActionKeyType(systemKey);
 	const MappableKeyModState keyModState = getKeyModState(systemKeyState);
+	GX_DIAG_LOG("KEYS: meta translator key=%d mod=%d state=0x%x\n", (int)keyType, (int)keyModState, systemKeyState);
 
 	const Bool modStateRemoved = (keyType == MK_NONE) && (msg->getType() == GameMessage::MSG_RAW_KEY_UP);
 
@@ -591,6 +593,7 @@ void MetaEventTranslator::onKeyModStateRemoved(GameMessageDisposition &disp, Map
 					continue;
 
 				TheMessageStream->appendMessage(map->m_meta);
+				GX_DIAG_LOG("KEYS: meta %s (modifier released)\n", findGameMessageNameByType(map->m_meta));
 				disp = DESTROY_MESSAGE;
 			}
 		}
@@ -646,6 +649,7 @@ void MetaEventTranslator::onKeyPressed(GameMessageDisposition &disp, Int systemK
 				}
 
 				/*GameMessage *metaMsg =*/ TheMessageStream->appendMessage(map->m_meta);
+				GX_DIAG_LOG("KEYS: meta %s\n", findGameMessageNameByType(map->m_meta));
 				//DEBUG_LOG(("Frame %d: MetaEventTranslator::translateGameMessage() normal: %s", TheGameLogic->getFrame(), findGameMessageNameByType(map->m_meta)));
 			}
 

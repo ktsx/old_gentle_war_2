@@ -105,13 +105,33 @@ const TYPE_STYLE: Record<string, string> = {
   TABCONTROL: "TABCONTROL", TABPANE: "TABPANE", COMBOBOX: "COMBOBOX",
 };
 
+const THUMB_COLORS: Required<Colors> = {
+  enabled: [190, 160, 80, 255], enabledBorder: [255, 230, 150, 255],
+  disabled: [80, 80, 80, 255], disabledBorder: [110, 110, 110, 255],
+  hilite: [240, 200, 100, 255], hiliteBorder: [255, 255, 200, 255],
+};
 const rgba = (c: RGBA) => c.join(" ");
 
-function drawData(label: string, c: Required<Colors>, state: "enabled" | "disabled" | "hilite", image?: string): string {
+/** Per-slot overrides of draw-data entries 1..8 (entry 0 is the window itself). */
+type Slots = Record<number, { color: RGBA; border: RGBA }>;
+
+/**
+ * CHECKBOX slots (GadgetCheckBox.h): 1 = unchecked box, 2 = checked box. The colour draws the
+ * "x", the border the box. Unchecked gets the background colour, so its "x" is invisible —
+ * with one colour in every slot a checked box looked exactly like an unchecked one.
+ */
+function checkboxSlots(c: Required<Colors>, state: "enabled" | "disabled" | "hilite"): Slots {
+  const bg = c[state];
+  const box: RGBA = state === "disabled" ? [110, 110, 110, 255] : [230, 230, 230, 255];
+  const x: RGBA = state === "disabled" ? [140, 140, 140, 255] : [255, 214, 90, 255];
+  return { 1: { color: bg, border: box }, 2: { color: x, border: box } };
+}
+
+function drawData(label: string, c: Required<Colors>, state: "enabled" | "disabled" | "hilite", image?: string, slots: Slots = {}): string {
   const color = c[state];
   const border = c[`${state}Border` as keyof Colors] as RGBA;
-  const entry = (img: string) => `IMAGE: ${img}, COLOR: ${rgba(color)}, BORDERCOLOR: ${rgba(border)}`;
-  const entries = Array.from({ length: 9 }, (_, i) => entry(i === 0 && image ? image : "NoImage"));
+  const entry = (img: string, i: number) => `IMAGE: ${img}, COLOR: ${rgba(slots[i]?.color ?? color)}, BORDERCOLOR: ${rgba(slots[i]?.border ?? border)}`;
+  const entries = Array.from({ length: 9 }, (_, i) => entry(i === 0 && image ? image : "NoImage", i));
   return `  ${label} = ${entries.join(",\n" + " ".repeat(label.length + 5))};`;
 }
 
@@ -165,9 +185,34 @@ function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: stri
   }
   if (w.type === "HORZSLIDER" || w.type === "VERTSLIDER") L(`  SLIDERDATA = MINVALUE: ${w.slider?.min ?? 0}, MAXVALUE: ${w.slider?.max ?? 100};`);
   if (w.type === "RADIOBUTTON") L(`  RADIOBUTTONDATA = GROUP: ${w.radio?.group ?? 1};`);
-  for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled", w.images?.enabled).split("\n")) L(line);
-  for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled", w.images?.disabled).split("\n")) L(line);
-  for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite).split("\n")) L(line);
+  // Sliders, and the scroll bars of list/combo boxes, take their thumb's look from these blocks
+  // (GameWindowManagerScript: enabledSliderThumbDrawData etc., copied into the thumb child on
+  // creation). Without them the thumb has no colour and the slider shows no handle at all.
+  // The other parts of list and combo boxes work the same way: scroll buttons and the scroll
+  // track (LISTBOX*), the drop-down button, edit field and list of a combo box (COMBOBOX*). Unset,
+  // they keep whatever the previous window in the file left in those globals (zero at first),
+  // which left the scroll buttons of a combo list invisible.
+  const block = (prefix: string, c: Required<Colors>) => {
+    for (const st of ["enabled", "disabled", "hilite"] as const) {
+      const name = prefix.replace("%", st.toUpperCase());
+      for (const line of drawData(name, c, st).split("\n")) L(line);
+    }
+  };
+  if (["HORZSLIDER", "VERTSLIDER", "SCROLLLISTBOX", "COMBOBOX"].includes(w.type)) block("SLIDERTHUMB%DRAWDATA", THUMB_COLORS);
+  if (["SCROLLLISTBOX", "COMBOBOX"].includes(w.type)) {
+    block("LISTBOX%UPBUTTONDRAWDATA", THUMB_COLORS);
+    block("LISTBOX%DOWNBUTTONDRAWDATA", THUMB_COLORS);
+    block("LISTBOX%SLIDERDRAWDATA", colors);
+  }
+  if (w.type === "COMBOBOX") {
+    block("COMBOBOXDROPDOWNBUTTON%DRAWDATA", THUMB_COLORS);
+    block("COMBOBOXEDITBOX%DRAWDATA", colors);
+    block("COMBOBOXLISTBOX%DRAWDATA", colors);
+  }
+  const slots = (st: "enabled" | "disabled" | "hilite") => (w.type === "CHECKBOX" ? checkboxSlots(colors, st) : {});
+  for (const line of drawData("ENABLEDDRAWDATA", colors, "enabled", w.images?.enabled, slots("enabled")).split("\n")) L(line);
+  for (const line of drawData("DISABLEDDRAWDATA", colors, "disabled", w.images?.disabled, slots("disabled")).split("\n")) L(line);
+  for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite, slots("hilite")).split("\n")) L(line);
   if (w.children && w.children.length) {
     L("  CHILD");
     for (const c of w.children) emitWindow(c, spec, out, indent + "  ");

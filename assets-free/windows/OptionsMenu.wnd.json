@@ -1,0 +1,2797 @@
+{
+ "file": "OptionsMenu.wnd",
+ "version": 2,
+ "layout": {
+  "init": "OptionsMenuInit",
+  "update": "OptionsMenuUpdate",
+  "shutdown": "OptionsMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "OptionsMenuParent",
+   "type": "USER",
+   "rect": [
+    60,
+    30,
+    680,
+    540
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "OptionsMenuSystem",
+   "input": "OptionsMenuInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     240
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      48,
+      400,
+      30
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Title",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:Options",
+     "font": [
+      "Arial",
+      20,
+      1
+     ]
+    },
+    {
+     "name": "StaticTextAudio",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      260,
+      304,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:AudioOptions",
+     "font": [
+      "Arial",
+      14,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextMusic",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      291,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:MusicVolume"
+    },
+    {
+     "name": "SliderMusicVolume",
+     "type": "HORZSLIDER",
+     "rect": [
+      238,
+      288,
+      150,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 0,
+      "max": 100
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextSFX",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      321,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:SFXVolume"
+    },
+    {
+     "name": "SliderSFXVolume",
+     "type": "HORZSLIDER",
+     "rect": [
+      238,
+      318,
+      150,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 0,
+      "max": 100
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextVoice",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      351,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:VoiceVolume"
+    },
+    {
+     "name": "SliderVoiceVolume",
+     "type": "HORZSLIDER",
+     "rect": [
+      238,
+      348,
+      150,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 0,
+      "max": 100
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextGameplay",
+     "type": "STATICTEXT",
+     "rect": [
+      412,
+      94,
+      304,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GX:Gameplay",
+     "font": [
+      "Arial",
+      14,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextScrollSpeed",
+     "type": "STATICTEXT",
+     "rect": [
+      412,
+      125,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:ScrollSpeed"
+    },
+    {
+     "name": "SliderScrollSpeed",
+     "type": "HORZSLIDER",
+     "rect": [
+      566,
+      122,
+      150,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 10,
+      "max": 300
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckAlternateMouse",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      150,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:AlternateMouse",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "Retaliation",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      180,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:RetaliationTitle",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckDoubleClickAttackMove",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      210,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:DoubleClickAttackMove",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckBoxDrawAnchor",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      240,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:DrawScrollAnchor",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckBoxMoveAnchor",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      270,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:MoveScrollAnchor",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckBoxSaveCamera",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      300,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:SaveCamera",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckBoxUseCamera",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      330,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GUI:UseCamera",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "CheckLanguageFilter",
+     "type": "CHECKBOX",
+     "rect": [
+      412,
+      360,
+      234,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "text": "GX:LanguageFilter",
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ComboBoxIP",
+     "type": "COMBOBOX",
+     "rect": [
+      84,
+      410,
+      150,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 6,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "ButtonFirewallRefresh",
+     "type": "PUSHBUTTON",
+     "rect": [
+      244,
+      410,
+      140,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE",
+      "HIDDEN"
+     ],
+     "text": "GUI:FirewallRefresh",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "LabelVersion",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      476,
+      420,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "",
+     "font": [
+      "Arial",
+      10,
+      0
+     ],
+     "textColor": {
+      "enabled": [
+       140,
+       150,
+       170,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonDefaults",
+     "type": "PUSHBUTTON",
+     "rect": [
+      84,
+      522,
+      150,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Defaults",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonBack",
+     "type": "PUSHBUTTON",
+     "rect": [
+      404,
+      522,
+      150,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Back",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonAccept",
+     "type": "PUSHBUTTON",
+     "rect": [
+      566,
+      522,
+      150,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Accept",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "SliderGamma",
+     "type": "HORZSLIDER",
+     "rect": [
+      238,
+      212,
+      150,
+      18
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "slider": {
+      "min": 0,
+      "max": 100
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextGamma",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      215,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:GammaAdjustment"
+    },
+    {
+     "name": "ComboBoxAntiAliasing",
+     "type": "COMBOBOX",
+     "rect": [
+      238,
+      182,
+      150,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 6,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "StaticTextAntiAliasing",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      185,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:AntiAliasing"
+    },
+    {
+     "name": "ComboBoxDetail",
+     "type": "COMBOBOX",
+     "rect": [
+      238,
+      152,
+      150,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 6,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "StaticTextDetail",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      155,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:Detail"
+    },
+    {
+     "name": "ComboBoxResolution",
+     "type": "COMBOBOX",
+     "rect": [
+      238,
+      122,
+      150,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 6,
+      "maxChars": 24
+     }
+    },
+    {
+     "name": "StaticTextResolution",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      125,
+      146,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:Resolution"
+    },
+    {
+     "name": "StaticTextDisplay",
+     "type": "STATICTEXT",
+     "rect": [
+      84,
+      94,
+      304,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:DisplayOptions",
+     "font": [
+      "Arial",
+      14,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "WinAdvancedDisplayOptions",
+     "type": "USER",
+     "rect": [
+      150,
+      100,
+      500,
+      400
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       250
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextAdvanced",
+       "type": "STATICTEXT",
+       "rect": [
+        174,
+        116,
+        452,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Label",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:AdvanceDisplayOptions",
+       "font": [
+        "Arial",
+        14,
+        1
+       ],
+       "textColor": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextTextureRes",
+       "type": "STATICTEXT",
+       "rect": [
+        174,
+        152,
+        200,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:TextureResolution"
+      },
+      {
+       "name": "LowResSlider",
+       "type": "HORZSLIDER",
+       "rect": [
+        382,
+        154,
+        244,
+        18
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "slider": {
+        "min": 0,
+        "max": 2
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextTextureLow",
+       "type": "STATICTEXT",
+       "rect": [
+        382,
+        174,
+        80,
+        16
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:TextureLow",
+       "font": [
+        "Arial",
+        10,
+        0
+       ]
+      },
+      {
+       "name": "StaticTextTextureHigh",
+       "type": "STATICTEXT",
+       "rect": [
+        546,
+        174,
+        80,
+        16
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:TextureHigh",
+       "font": [
+        "Arial",
+        10,
+        0
+       ]
+      },
+      {
+       "name": "Check3DShadows",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        202,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:Shadows3D",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "Check2DShadows",
+       "type": "CHECKBOX",
+       "rect": [
+        404,
+        202,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:Shadows2D",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckCloudShadows",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        232,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:CloudShadows",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckGroundLighting",
+       "type": "CHECKBOX",
+       "rect": [
+        404,
+        232,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:GroundLighting",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckSmoothWater",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        262,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:SmoothWater",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckExtraAnimations",
+       "type": "CHECKBOX",
+       "rect": [
+        404,
+        262,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:ExtraAnimations",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckNoDynamicLOD",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        292,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:NoDynamicLOD",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckHeatEffects",
+       "type": "CHECKBOX",
+       "rect": [
+        404,
+        292,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:HeatEffects",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckUnlockFPS",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        322,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:UnlockMaxFPS",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckBehindBuilding",
+       "type": "CHECKBOX",
+       "rect": [
+        404,
+        322,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:BehindBuilding",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "CheckShowProps",
+       "type": "CHECKBOX",
+       "rect": [
+        174,
+        352,
+        222,
+        26
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "text": "GUI:ShowProps",
+       "headerTemplate": "Small",
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextParticleCap",
+       "type": "STATICTEXT",
+       "rect": [
+        174,
+        390,
+        200,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:ParticleCap"
+      },
+      {
+       "name": "ParticleCapSlider",
+       "type": "HORZSLIDER",
+       "rect": [
+        382,
+        392,
+        244,
+        18
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "slider": {
+        "min": 100,
+        "max": 5000
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextFewer",
+       "type": "STATICTEXT",
+       "rect": [
+        382,
+        412,
+        120,
+        16
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:LessParticlesFaster",
+       "font": [
+        "Arial",
+        10,
+        0
+       ]
+      },
+      {
+       "name": "ButtonAdvanceBack",
+       "type": "PUSHBUTTON",
+       "rect": [
+        334,
+        452,
+        140,
+        30
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Back",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonAdvanceAccept",
+       "type": "PUSHBUTTON",
+       "rect": [
+        486,
+        452,
+        140,
+        30
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Accept",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

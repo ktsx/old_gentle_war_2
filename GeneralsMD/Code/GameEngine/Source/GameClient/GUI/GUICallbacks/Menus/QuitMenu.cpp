@@ -53,6 +53,7 @@
 #include "GameClient/GameWindowTransitions.h"
 #include "GameClient/DisconnectMenu.h"
 #include "GameLogic/ScriptEngine.h"
+#include <Utility/gx_trace.h>
 
 
 
@@ -267,6 +268,8 @@ Bool canOpenQuitMenu()
 //-------------------------------------------------------------------------------------------------
 void ToggleQuitMenu()
 {
+	GX_DIAG_LOG("QUITMENU: toggle visible=%d canOpen=%d (active=%d loadingMap=%d)\n", (int)isVisible, (int)canOpenQuitMenu(),
+		TheGameEngine ? (int)TheGameEngine->isActive() : -1, TheGameLogic ? (int)TheGameLogic->isLoadingMap() : -1);
 	if (!isVisible && !canOpenQuitMenu())
 		return;
 

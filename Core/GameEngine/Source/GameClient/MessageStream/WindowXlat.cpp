@@ -55,6 +55,7 @@
 #include "GameClient/WindowXlat.h"
 #include "GameClient/Shell.h"
 #include "GameClient/Display.h"
+#include <Utility/gx_trace.h>
 
 
 // DEFINES ////////////////////////////////////////////////////////////////////
@@ -314,6 +315,8 @@ GameMessageDisposition WindowTranslator::translateGameMessage(const GameMessage 
 			// process event through window system
 			if( TheWindowManager )
 				returnCode = TheWindowManager->winProcessKey( key, state );
+			GX_DIAG_LOG("KEYS: raw key=0x%02x state=0x%x window=%s\n", key, state,
+				returnCode == WIN_INPUT_USED ? "used" : "passed");
 
 
 			// If we're in a movie, we want to be able to escape out of it

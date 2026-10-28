@@ -20,3 +20,19 @@ END
 GX:Maps
 US: "Maps"
 END
+
+GX:Gameplay
+US: "GAMEPLAY"
+END
+
+GX:LanguageFilter
+US: "Language Filter"
+END
+
+GX:TextureResolution
+US: "Texture Resolution"
+END
+
+GX:GameMenu
+US: "GAME MENU"
+END

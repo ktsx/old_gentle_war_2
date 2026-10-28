@@ -859,7 +859,7 @@ AsciiString GameState::getSaveDirectory() const
 #ifdef _WIN32
 	tmp.concat("Save\\");
 #else
-	// TheSuperHackers @bugfix GeneralsX WebPort 2026-10-28 A backslash is not a separator here:
+	// GeneralsX @bugfix WebPort 2026-10-28 A backslash is not a separator here:
 	// "Save\" made CreateDirectory create a directory literally named "Save\", fopen wrote the
 	// file next to it as "Save\00000000.sav", and iterateSaveFiles (chdir + readdir) listed
 	// nothing, so saved games never showed up.
@@ -897,6 +897,14 @@ Bool GameState::isInSaveDirectory(const AsciiString& path) const
 AsciiString GameState::getMapLeafName(const AsciiString& in) const
 {
 	const char* p = strrchr(in.str(), '\\');
+#ifndef _WIN32
+	// GeneralsX @bugfix WebPort 2026-10-28 The save directory is "<UserData>Save/"
+	// here; with only '\\' as a separator the leaf of "/userdata/Save/gxtest.map" was the whole
+	// path, and a load rebuilt it as "/userdata/Save//userdata/Save/gxtest.map".
+	const char* slash = strrchr(in.str(), '/');
+	if (slash && (!p || slash > p))
+		p = slash;
+#endif
 	if (p)
 	{
 		//
@@ -922,6 +930,10 @@ static const char* findLastBackslashInRangeInclusive(const char* start, const ch
 	{
 		if (*end == '\\')
 			return end;
+#ifndef _WIN32
+		if (*end == '/')
+			return end;
+#endif
 		--end;
 	}
 	return nullptr;

@@ -121,7 +121,12 @@ extern Win32Mouse *TheWin32Mouse;
 
 GameEngine *CreateGameEngine(void) {
   fprintf(stderr, "INFO: CreateGameEngine() — Win32GameEngine for WebGL 2.0\n");
-  return NEW Win32GameEngine();
+  GameEngine *engine = NEW Win32GameEngine();
+  // GeneralsX @bugfix WebPort 2026-10-28 WinMain sets this from WM_ACTIVATEAPP; nothing did on the
+  // web, so it stayed FALSE and canOpenQuitMenu() refused every ESC in a match. A page that is not
+  // focused gets no key events anyway, so "active" is simply true here.
+  engine->setIsActive(TRUE);
+  return engine;
 }
 
 extern "C" void EmscriptenInput_RouteMouseEvent(unsigned int msg,

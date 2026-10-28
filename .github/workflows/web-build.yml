@@ -166,6 +166,10 @@ jobs:
             fi
           done
           ls -la build-web/GeneralsMD/GeneralsZH.*
+          # --emit-symbol-map names the map after the main output (.html or .js, by emscripten
+          # version); publish it under one stable name
+          sym=$(ls build-web/GeneralsMD/GeneralsZH*.symbols 2>/dev/null | head -1)
+          if [ -n "$sym" ]; then cp "$sym" build-web/GeneralsMD/GeneralsZH.symbols; else echo "::warning::no symbol map emitted"; fi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -201,7 +205,7 @@ jobs:
             build-web/GeneralsMD/GeneralsZH.html \
             build-web/GeneralsMD/GeneralsZH.js \
             build-web/GeneralsMD/GeneralsZH.wasm \
-            build-web/GeneralsMD/GeneralsZH.js.symbols \
+            $(ls build-web/GeneralsMD/GeneralsZH.symbols 2>/dev/null) \
             build-web/GeneralsMD/serve.py
 
   # Boots the Release build in headless Chromium with the EA-free asset set

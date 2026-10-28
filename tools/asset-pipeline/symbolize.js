@@ -1,14 +1,14 @@
 // symbolize.js — put C++ names into a Release-build browser stack.
 // The Release wasm has no name section, so stacks read "wasm-function[3659]:0x178431". The link
-// emits GeneralsZH.js.symbols ("<index>:<mangled name>" per line, --emit-symbol-map); this replaces
+// emits a symbol map (the CI release publishes it as GeneralsZH.symbols) ("<index>:<mangled name>" per line, --emit-symbol-map); this replaces
 // every wasm-function[N] in the input with the name (demangled when c++filt is available).
 //
-// usage: node symbolize.js <GeneralsZH.js.symbols> [log]     (reads stdin without a log file)
+// usage: node symbolize.js <GeneralsZH.symbols> [log]     (reads stdin without a log file)
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 
 const [symFile, logFile] = process.argv.slice(2);
-if (!symFile) { console.error('usage: node symbolize.js <GeneralsZH.js.symbols> [log]'); process.exit(2); }
+if (!symFile) { console.error('usage: node symbolize.js <GeneralsZH.symbols> [log]'); process.exit(2); }
 const names = new Map();
 for (const line of fs.readFileSync(symFile, 'utf8').split('\n')) {
   const i = line.indexOf(':');

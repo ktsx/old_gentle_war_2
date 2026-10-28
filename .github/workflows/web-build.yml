@@ -307,10 +307,10 @@ jobs:
           # /userdata/save, flushed to IndexedDB); SAVE/LOAD again > LOAD GAME on the new row: the
           # match must come back (GameStateMap extracts the embedded map next to the save). Then a
           # page reload (same profile) and MAIN MENU > LOAD REPLAY > LOAD GAME (SaveLoad.wnd) loads it
-          # once more from the shell.
-          UI_EXPECT="startNewGame:ENTER mode=2 save=1;SAVEGAME: loading block 'CHUNK_GhostObject';SaveLoad.wnd:ButtonLoadConfirm" \
+          # once more from the shell (no confirm there; the last waitfor can only be met by that load).
+          UI_EXPECT="startNewGame:ENTER mode=2 save=1;SAVEGAME: loading block 'CHUNK_GhostObject'" \
           node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
-            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,323;click 272,612;shot savedesc.png;click 489,404;wait 4000;click 512,323;click 512,148;shot saveload.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded.png;reload;click 512,366;click 512,272;wait 1000;shot saveload-shell.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded-shell.png" \
+            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,323;click 272,612;shot savedesc.png;click 489,404;wait 4000;click 512,323;click 512,148;shot saveload.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded.png;reload;click 512,366;click 512,272;wait 1000;shot saveload-shell.png;click 431,612;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded-shell.png" \
             | tee saveload-smoke.log
 
       - name: Check the terrain is visible

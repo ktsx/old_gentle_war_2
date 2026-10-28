@@ -52,3 +52,11 @@ END
 GX:Unmute
 US: "Unmute"
 END
+
+GX:Advice
+US: "Advice"
+END
+
+GX:BattleSummary
+US: "BATTLE SUMMARY"
+END

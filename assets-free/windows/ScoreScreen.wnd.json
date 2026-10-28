@@ -1,0 +1,4888 @@
+{
+ "file": "ScoreScreen.wnd",
+ "version": 2,
+ "layout": {
+  "init": "ScoreScreenInit",
+  "update": "ScoreScreenUpdate",
+  "shutdown": "ScoreScreenShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "ParentScoreScreen",
+   "type": "USER",
+   "rect": [
+    0,
+    0,
+    800,
+    600
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "ScoreScreenSystem",
+   "input": "ScoreScreenInput",
+   "colors": {
+    "enabled": [
+     10,
+     12,
+     16,
+     255
+    ],
+    "enabledBorder": [
+     10,
+     12,
+     16,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "MainBackdrop",
+     "type": "USER",
+     "rect": [
+      0,
+      0,
+      800,
+      600
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "colors": {
+      "enabled": [
+       10,
+       12,
+       16,
+       255
+      ],
+      "enabledBorder": [
+       10,
+       12,
+       16,
+       255
+      ]
+     }
+    },
+    {
+     "name": "GadgetParent",
+     "type": "USER",
+     "rect": [
+      30,
+      24,
+      740,
+      420
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       240
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextTitle",
+       "type": "STATICTEXT",
+       "rect": [
+        50,
+        38,
+        400,
+        28
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Label",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:BattleSummary",
+       "font": [
+        "Arial",
+        16,
+        1
+       ],
+       "textColor": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextHeaderPlayer",
+       "type": "STATICTEXT",
+       "rect": [
+        54,
+        80,
+        160,
+        34
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:Player",
+       "font": [
+        "Arial",
+        11,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextHeaderUnitsBuilt",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:UnitsBuilt"
+      },
+      {
+       "name": "StaticTextHeaderUnitsLost",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:UnitsLost"
+      },
+      {
+       "name": "StaticTextHeaderUnitsDestroyed",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:UnitsKilled"
+      },
+      {
+       "name": "StaticTextHeaderBuildingsBuilt",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:BuildingsBuilt"
+      },
+      {
+       "name": "StaticTextHeaderBuildingsLost",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:BuildingsLost"
+      },
+      {
+       "name": "StaticTextHeaderBuildingsDestroyed",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:BuildingsKilled"
+      },
+      {
+       "name": "StaticTextHeaderResources",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        76,
+        73,
+        38
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:ResourcesCollected"
+      },
+      {
+       "name": "RowsBackground",
+       "type": "USER",
+       "rect": [
+        42,
+        114,
+        716,
+        296
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "colors": {
+        "enabled": [
+         14,
+         16,
+         22,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      },
+      {
+       "name": "GameWindowWinner0",
+       "type": "USER",
+       "rect": [
+        46,
+        126,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer0",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        124,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver0",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        124,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt0",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost0",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed0",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt0",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost0",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed0",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources0",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        124,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore0",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        124,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner1",
+       "type": "USER",
+       "rect": [
+        46,
+        162,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer1",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        160,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver1",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        160,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt1",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost1",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed1",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt1",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost1",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed1",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources1",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        160,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore1",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        160,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner2",
+       "type": "USER",
+       "rect": [
+        46,
+        198,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer2",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        196,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver2",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        196,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt2",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost2",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed2",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt2",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost2",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed2",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources2",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        196,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore2",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        196,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner3",
+       "type": "USER",
+       "rect": [
+        46,
+        234,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer3",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        232,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver3",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        232,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt3",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost3",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed3",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt3",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost3",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed3",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources3",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        232,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore3",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        232,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner4",
+       "type": "USER",
+       "rect": [
+        46,
+        270,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer4",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        268,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver4",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        268,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt4",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost4",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed4",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt4",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost4",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed4",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources4",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        268,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore4",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        268,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner5",
+       "type": "USER",
+       "rect": [
+        46,
+        306,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer5",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        304,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver5",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        304,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt5",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost5",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed5",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt5",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost5",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed5",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources5",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        304,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore5",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        304,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner6",
+       "type": "USER",
+       "rect": [
+        46,
+        342,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer6",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        340,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver6",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        340,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt6",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost6",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed6",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt6",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost6",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed6",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources6",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        340,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore6",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        340,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "GameWindowWinner7",
+       "type": "USER",
+       "rect": [
+        46,
+        378,
+        4,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "colors": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         255,
+         214,
+         120,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextPlayer7",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        376,
+        166,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "",
+       "font": [
+        "Arial",
+        12,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextObserver7",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        376,
+        300,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:PlayerObserver"
+      },
+      {
+       "name": "StaticTextUnitsBuilt7",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsLost7",
+       "type": "STATICTEXT",
+       "rect": [
+        303,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextUnitsDestroyed7",
+       "type": "STATICTEXT",
+       "rect": [
+        380,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsBuilt7",
+       "type": "STATICTEXT",
+       "rect": [
+        457,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsLost7",
+       "type": "STATICTEXT",
+       "rect": [
+        534,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextBuildingsDestroyed7",
+       "type": "STATICTEXT",
+       "rect": [
+        611,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextResources7",
+       "type": "STATICTEXT",
+       "rect": [
+        688,
+        376,
+        73,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextScore7",
+       "type": "STATICTEXT",
+       "rect": [
+        765,
+        376,
+        1,
+        22
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      }
+     ]
+    },
+    {
+     "name": "StaticTextWarSchool",
+     "type": "STATICTEXT",
+     "rect": [
+      30,
+      452,
+      300,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GX:Advice",
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ListboxWarschoolAdvice",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      30,
+      474,
+      460,
+      106
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "listbox": {
+      "length": 20,
+      "scrollBar": true
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "BigPortrait",
+     "type": "USER",
+     "rect": [
+      60,
+      90,
+      220,
+      280
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ChallengeWinLossText",
+     "type": "STATICTEXT",
+     "rect": [
+      310,
+      100,
+      440,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "",
+     "font": [
+      "Arial",
+      16,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "GeneralRemarks",
+     "type": "STATICTEXT",
+     "rect": [
+      310,
+      150,
+      440,
+      200
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": ""
+    },
+    {
+     "name": "StaticTextGameSaveComplete",
+     "type": "STATICTEXT",
+     "rect": [
+      510,
+      452,
+      260,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:GameSaved"
+    },
+    {
+     "name": "ButtonSaveReplay",
+     "type": "PUSHBUTTON",
+     "rect": [
+      510,
+      486,
+      125,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:SaveReplay",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonContinue",
+     "type": "PUSHBUTTON",
+     "rect": [
+      510,
+      540,
+      125,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE",
+      "HIDDEN"
+     ],
+     "text": "GUI:Continue",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonOk",
+     "type": "PUSHBUTTON",
+     "rect": [
+      645,
+      540,
+      125,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Ok",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    }
+   ]
+  }
+ ]
+}

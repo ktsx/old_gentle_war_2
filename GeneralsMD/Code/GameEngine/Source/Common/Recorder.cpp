@@ -26,6 +26,9 @@
 
 #include "Common/Recorder.h"
 #include <Utility/gx_trace.h>
+#ifdef __EMSCRIPTEN__
+extern "C" void GX_FlushIdbfs_Tab(const char *reason);
+#endif
 #include "Common/file.h"
 #include "Common/FileSystem.h"
 #include "Common/PlayerList.h"
@@ -714,6 +717,10 @@ void RecorderClass::stopRecording() {
 
 		if (m_archiveReplays)
 			archiveReplay(m_fileName);
+#ifdef __EMSCRIPTEN__
+		// GeneralsX @feature WebPort 2026-10-28 persist the finished replay (IDBFS)
+		GX_FlushIdbfs_Tab("replay");
+#endif
 	}
 	m_fileName.clear();
 }
@@ -1637,7 +1644,15 @@ RecorderClass::CullBadCommandsResult RecorderClass::cullBadCommands() {
 AsciiString RecorderClass::getReplayDir()
 {
 	AsciiString tmp = TheGlobalData->getPath_UserData();
+#ifdef _WIN32
 	tmp.concat("Replays\\");
+#else
+	// GeneralsX @bugfix WebPort 2026-10-28 A real separator, and lower case: the web build's
+	// getFileListInDirectory / doesFileExist lowercase the path (BigVFS keys), while files under
+	// /userdata keep their case — "Replays\\" made a "Replays" directory the replay list never found,
+	// and PopupReplay's CopyFile / DeleteFile got a backslash path.
+	tmp.concat("replays/");
+#endif
 	return tmp;
 }
 

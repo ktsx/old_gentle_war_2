@@ -1,0 +1,388 @@
+{
+ "file": "PopupReplay.wnd",
+ "version": 2,
+ "layout": {
+  "init": "PopupReplayInit",
+  "update": "PopupReplayUpdate",
+  "shutdown": "PopupReplayShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "PopupReplayMenu",
+   "type": "USER",
+   "rect": [
+    180,
+    90,
+    440,
+    420
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "PopupReplaySystem",
+   "input": "PopupReplayInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     240
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      196,
+      102,
+      300,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:SaveReplay",
+     "font": [
+      "Arial",
+      16,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "MenuButtonFrame",
+     "type": "USER",
+     "rect": [
+      180,
+      134,
+      440,
+      376
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "children": [
+      {
+       "name": "ListboxGames",
+       "type": "SCROLLLISTBOX",
+       "rect": [
+        196,
+        134,
+        408,
+        262
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "listbox": {
+        "length": 100,
+        "scrollBar": true
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       },
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "TextEntryReplayName",
+       "type": "ENTRYFIELD",
+       "rect": [
+        196,
+        406,
+        408,
+        28
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "entry": {
+        "maxLen": 48
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       },
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonSave",
+       "type": "PUSHBUTTON",
+       "rect": [
+        196,
+        450,
+        196,
+        36
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Save",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonBack",
+       "type": "PUSHBUTTON",
+       "rect": [
+        408,
+        450,
+        196,
+        36
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Back",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    },
+    {
+     "name": "PopupReplaySaved",
+     "type": "USER",
+     "rect": [
+      250,
+      240,
+      300,
+      80
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       252
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextReplaySaved",
+       "type": "STATICTEXT",
+       "rect": [
+        250,
+        268,
+        300,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:ReplaySaved"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

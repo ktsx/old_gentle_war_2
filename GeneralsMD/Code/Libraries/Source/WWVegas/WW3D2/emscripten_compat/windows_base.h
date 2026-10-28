@@ -991,7 +991,36 @@ inline int GX_CreateDirectory_Web(const char *path) {
 #endif
 struct hostent;
 typedef struct hostent HOSTENT;
+#ifdef __EMSCRIPTEN__
+// GeneralsX @feature WebPort 2026-10-28 CopyFile for real (PopupReplay saves a replay by copying
+// the last one); backslashes become separators, like GX_CreateDirectory_Web. Win32 BOOL: non-zero on success.
+#include <stdio.h>
+inline int GX_CopyFile_Web(const char *from, const char *to, int failIfExists) {
+  if (!from || !to) return 0;
+  char src[1024], dst[1024];
+  size_t i;
+  for (i = 0; from[i] && i < sizeof(src) - 1; ++i) src[i] = (from[i] == '\\') ? '/' : from[i];
+  src[i] = '\0';
+  for (i = 0; to[i] && i < sizeof(dst) - 1; ++i) dst[i] = (to[i] == '\\') ? '/' : to[i];
+  dst[i] = '\0';
+  if (failIfExists) { FILE *e = fopen(dst, "rb"); if (e) { fclose(e); return 0; } }
+  FILE *in = fopen(src, "rb");
+  if (!in) return 0;
+  FILE *out = fopen(dst, "wb");
+  if (!out) { fclose(in); return 0; }
+  char buf[16384];
+  size_t n;
+  int ok = 1;
+  while ((n = fread(buf, 1, sizeof(buf), in)) > 0)
+    if (fwrite(buf, 1, n, out) != n) { ok = 0; break; }
+  fclose(in);
+  if (fclose(out) != 0) ok = 0;
+  return ok;
+}
+#define CopyFile(a, b, c) GX_CopyFile_Web((a), (b), (c))
+#else
 #define CopyFile(a, b, c) 0
+#endif
 #define GetComputerName(a, b) 0
 #define GetUserName(a, b) 0
 #define GetDoubleClickTime() 500

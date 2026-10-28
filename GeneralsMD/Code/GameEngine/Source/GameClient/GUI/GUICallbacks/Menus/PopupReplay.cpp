@@ -58,6 +58,9 @@
 #include "GameClient/MessageBox.h"
 #include "GameClient/Shell.h"
 #include "GameLogic/GameLogic.h"
+#ifdef __EMSCRIPTEN__
+extern "C" void GX_FlushIdbfs_Tab(const char *reason);
+#endif
 
 
 // PRIVATE DATA ///////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +100,11 @@ void ShowReplaySavedPopup(Bool show)
 // ------------------------------------------------------------------------------------------------
 static void closeSaveMenu( GameWindow *window )
 {
-	WindowLayout *layout = window->winGetLayout();
+	// GeneralsX @bugfix WebPort 2026-10-28 BACK sits in MenuButtonFrame, which reports to itself
+	// (inherited system callback); only the layout's top-level window knows the layout — climb.
+	WindowLayout *layout = nullptr;
+	for( GameWindow *w = window; w && !layout; w = w->winGetParent() )
+		layout = w->winGetLayout();
 
 	if( layout )
 		layout->hide( TRUE );
@@ -328,6 +335,10 @@ void reallySaveReplay()
 	// populate the listbox with the save games on disk
 	PopulateReplayFileListbox(listboxGames);
 
+#ifdef __EMSCRIPTEN__
+	// GeneralsX @feature WebPort 2026-10-28 persist the copy (IDBFS)
+	GX_FlushIdbfs_Tab("replay");
+#endif
 	ShowReplaySavedPopup(TRUE);
 	s_fileSavePopupStartTime = timeGetTime();
 }

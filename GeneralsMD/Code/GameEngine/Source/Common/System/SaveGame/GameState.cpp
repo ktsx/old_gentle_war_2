@@ -65,6 +65,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <Utility/gx_trace.h>
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
@@ -723,8 +724,14 @@ SaveCode GameState::loadGame( AvailableGameInfo gameInfo )
 		xferSaveData( &xferLoad, SNAPSHOT_SAVELOAD );
 
 	}
+	catch( XferStatus status )
+	{
+		GX_DIAG_LOG("SAVEGAME: load failed, XferStatus %d\n", (int)status);
+		error = TRUE;
+	}
 	catch( ... )
 	{
+		GX_DIAG_LOG("SAVEGAME: load failed (non-Xfer exception)\n");
 		error = TRUE;
 	}
 
@@ -741,6 +748,7 @@ SaveCode GameState::loadGame( AvailableGameInfo gameInfo )
 	}
 	catch (...)
 	{
+		GX_DIAG_LOG("SAVEGAME: post-process of the load failed\n");
 		error = TRUE;
 	}
 
@@ -1531,6 +1539,7 @@ void GameState::xferSaveData( Xfer *xfer, SnapshotType which )
 
 					DEBUG_CRASH(( "Error saving block '%s' in file '%s'",
 												blockName.str(), xfer->getIdentifier().str() ));
+					GX_DIAG_LOG("SAVEGAME: error saving block '%s'\n", blockName.str());
 					throw;
 
 				}
@@ -1595,6 +1604,7 @@ void GameState::xferSaveData( Xfer *xfer, SnapshotType which )
 
 					// read block start
 					blockSize = xfer->beginBlock();
+					GX_DIAG_LOG("SAVEGAME: loading block '%s' (%d bytes)\n", blockInfo->blockName.str(), (int)blockSize);
 
 					// parse this data
 					xfer->xferSnapshot( blockInfo->snapshot );
@@ -1608,6 +1618,7 @@ void GameState::xferSaveData( Xfer *xfer, SnapshotType which )
 
 					DEBUG_CRASH(( "Error loading block '%s' in file '%s'",
 												blockInfo->blockName.str(), xfer->getIdentifier().str() ));
+					GX_DIAG_LOG("SAVEGAME: error loading block '%s'\n", blockInfo->blockName.str());
 					throw;
 
 				}

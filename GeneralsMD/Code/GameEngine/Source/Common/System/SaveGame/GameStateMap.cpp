@@ -47,6 +47,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <Utility/gx_trace.h>
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
@@ -90,7 +91,7 @@ static void embedPristineMap( AsciiString map, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "embedPristineMap - Error opening source file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #1 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -106,7 +107,7 @@ static void embedPristineMap( AsciiString map, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "embedPristineMap - Unable to allocate buffer for file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #2 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -117,7 +118,7 @@ static void embedPristineMap( AsciiString map, Xfer *xfer )
 		delete[] buffer;
 
 		DEBUG_CRASH(( "embedPristineMap - Error reading from file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #3 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -148,7 +149,7 @@ static void embedInUseMap( AsciiString map, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "embedInUseMap - Unable to open file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #4 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -165,7 +166,7 @@ static void embedInUseMap( AsciiString map, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "embedInUseMap - Unable to allocate buffer for file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #5 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -176,7 +177,7 @@ static void embedInUseMap( AsciiString map, Xfer *xfer )
 		delete[] buffer;
 
 		DEBUG_CRASH(( "embedInUseMap - Error reading from file '%s'", map.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #6 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -206,7 +207,7 @@ static void extractAndSaveMap( AsciiString mapToSave, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "extractAndSaveMap - Unable to open file '%s'", mapToSave.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #7 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -219,7 +220,7 @@ static void extractAndSaveMap( AsciiString mapToSave, Xfer *xfer )
 	{
 
 		DEBUG_CRASH(( "extractAndSaveMap - Unable to allocate buffer for file '%s'", mapToSave.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #8 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -233,7 +234,7 @@ static void extractAndSaveMap( AsciiString mapToSave, Xfer *xfer )
 		delete[] buffer;
 
 		DEBUG_CRASH(( "extractAndSaveMap - Error writing to file '%s'", mapToSave.str() ));
-		throw SC_INVALID_DATA;
+		{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #9 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 
 	}
 
@@ -364,12 +365,13 @@ void GameStateMap::xfer( Xfer *xfer )
 		xfer->xferAsciiString( &tmp );
 
 		saveGameInfo->saveGameMapName = TheGameState->portableMapPathToRealMapPath(tmp);
+		GX_DIAG_LOG("SAVEGAME: map in save '%s' -> '%s' (save dir '%s')\n", tmp.str(), saveGameInfo->saveGameMapName.str(), TheGameState->getSaveDirectory().str());
 
 		if (!TheGameState->isInSaveDirectory(saveGameInfo->saveGameMapName))
 		{
 			DEBUG_CRASH(("GameState::xfer - The map filename read from the file '%s' is not in the SAVE directory, but should be",
 												 saveGameInfo->saveGameMapName.str()) );
-			throw SC_INVALID_DATA;
+			{ GX_DIAG_LOG("SAVEGAME: GameStateMap throw #10 at line %d\n", __LINE__); throw SC_INVALID_DATA; }
 		}
 
 		// set this map as the map to load in the global data

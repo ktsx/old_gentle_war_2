@@ -313,6 +313,22 @@ jobs:
             "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,323;click 272,612;shot savedesc.png;click 489,404;wait 4000;click 512,323;click 512,148;shot saveload.png;click 431,612;click 489,404;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded.png;reload;click 512,366;click 512,272;wait 1000;shot saveload-shell.png;click 431,612;waitfor 150000 inGame=1 isPaused=0;wait 3000;shot loaded-shell.png" \
             | tee saveload-smoke.log
 
+      - name: End a match (score screen, save replay)
+        if: always()
+        run: |
+          set -o pipefail
+          curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
+          # a skirmish; ESC > EXIT MISSION > YES pushes ScoreScreen.wnd (GameLogic::clearGameData);
+          # SAVE REPLAY > name > Save copies the recorded replay (replays/00000000.rep) and flushes it
+          # to IndexedDB; the list shows it on reopen; BACK, then OK leaves the score screen.
+          UI_EXPECT="SHELL: doPush 'Menus/ScoreScreen.wnd' -> created;/userdata/replays/gxreplay.rep;ScoreScreen.wnd:ButtonOk" \
+          node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
+            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,505;click 340,465;wait 6000;shot score.png;click 733,645;wait 1000;type gxreplay;click 376,599;wait 3000;js new Promise(r=>{const q=indexedDB.open('/userdata')
+          q.onsuccess=()=>{const t=q.result.transaction('FILE_DATA').objectStore('FILE_DATA').getAllKeys()
+          t.onsuccess=()=>r(t.result.filter(k=>k.includes('replays')))}
+          q.onerror=()=>r('err')});click 733,645;wait 1000;shot replay.png;click 648,599;click 906,714;wait 3000;shot after-score.png" \
+            | tee score-smoke.log
+
       - name: Check the terrain is visible
         if: always()
         run: |
@@ -360,6 +376,13 @@ jobs:
           grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL|SAVEGAME: (error|GameStateMap throw)" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
           grep -E "SAVEGAME: map in save|startNewGame:ENTER|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
 
+      - name: Annotate score screen
+        if: always()
+        run: |
+          f=score-smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "SHELL: (push|doPush)|RECORDER: start|js:|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
+
       - name: Annotate model draws
         if: always()
         run: |
@@ -395,9 +418,13 @@ jobs:
             loaded.png
             saveload-shell.png
             loaded-shell.png
+            score.png
+            replay.png
+            after-score.png
             smoke.log
             ui-smoke.log
             saveload-smoke.log
+            score-smoke.log
             map-smoke.log
             skirmish-smoke.log
             serve.log

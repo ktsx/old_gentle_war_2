@@ -19,9 +19,9 @@
    "type": "USER",
    "rect": [
     270,
-    150,
+    126,
     260,
-    268
+    316
    ],
    "status": [
     "ENABLED"
@@ -47,7 +47,7 @@
      "type": "STATICTEXT",
      "rect": [
       290,
-      168,
+      144,
       220,
       24
      ],
@@ -111,7 +111,7 @@
      "type": "PUSHBUTTON",
      "rect": [
       290,
-      210,
+      186,
       220,
       36
      ],
@@ -128,11 +128,32 @@
      "headerTemplate": "Button"
     },
     {
+     "name": "ButtonSaveLoad",
+     "type": "PUSHBUTTON",
+     "rect": [
+      290,
+      234,
+      220,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:SaveAndLoad",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
      "name": "ButtonOptions",
      "type": "PUSHBUTTON",
      "rect": [
       290,
-      258,
+      282,
       220,
       36
      ],
@@ -153,7 +174,7 @@
      "type": "PUSHBUTTON",
      "rect": [
       290,
-      306,
+      330,
       220,
       36
      ],
@@ -174,7 +195,7 @@
      "type": "PUSHBUTTON",
      "rect": [
       290,
-      354,
+      378,
       220,
       36
      ],

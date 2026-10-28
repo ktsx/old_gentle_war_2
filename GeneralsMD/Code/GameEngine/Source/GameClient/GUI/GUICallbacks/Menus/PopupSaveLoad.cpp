@@ -441,7 +441,12 @@ static void closeSaveMenu( GameWindow *window )
 
 	if(isPopup)
 	{
-		WindowLayout *saveLoadMenuLayout = window->winGetLayout();
+		// GeneralsX @bugfix WebPort 2026-10-28 Only a layout's top-level windows know their layout;
+		// a button inside the button frame or a confirm dialog reports to that container, so climb
+		// to the window that has one.
+		WindowLayout *saveLoadMenuLayout = nullptr;
+		for( GameWindow *w = window; w && !saveLoadMenuLayout; w = w->winGetParent() )
+			saveLoadMenuLayout = w->winGetLayout();
 		if( saveLoadMenuLayout )
 			saveLoadMenuLayout->hide( TRUE );
 	}

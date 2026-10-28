@@ -1,0 +1,828 @@
+{
+ "file": "SaveLoad.wnd",
+ "version": 2,
+ "layout": {
+  "init": "SaveLoadMenuFullScreenInit",
+  "update": "SaveLoadMenuUpdate",
+  "shutdown": "SaveLoadMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "SaveLoadMenu",
+   "type": "USER",
+   "rect": [
+    140,
+    50,
+    520,
+    470
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "SaveLoadMenuSystem",
+   "input": "SaveLoadMenuInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     240
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      156,
+      64,
+      300,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:SaveAndLoad",
+     "font": [
+      "Arial",
+      14,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ListboxGames",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      156,
+      98,
+      488,
+      340
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "listbox": {
+      "length": 100,
+      "scrollBar": true,
+      "columns": 2,
+      "columnWidths": [
+       68,
+       32
+      ],
+      "forceSelect": false
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "MenuButtonFrame",
+     "type": "USER",
+     "rect": [
+      156,
+      454,
+      488,
+      48
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "children": [
+      {
+       "name": "ButtonSave",
+       "type": "PUSHBUTTON",
+       "rect": [
+        156,
+        462,
+        113,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:SaveGame",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonLoad",
+       "type": "PUSHBUTTON",
+       "rect": [
+        281,
+        462,
+        113,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:LoadGame",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonDelete",
+       "type": "PUSHBUTTON",
+       "rect": [
+        406,
+        462,
+        113,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:DeleteGame",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonBack",
+       "type": "PUSHBUTTON",
+       "rect": [
+        531,
+        462,
+        113,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Back",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    },
+    {
+     "name": "OverwriteConfirmParent",
+     "type": "USER",
+     "rect": [
+      210,
+      200,
+      380,
+      150
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       252
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "OverwriteConfirmParentText",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        216,
+        348,
+        40
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:OverwriteSaveConfirmation"
+      },
+      {
+       "name": "ButtonOverwriteConfirm",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Yes",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonOverwriteCancel",
+       "type": "PUSHBUTTON",
+       "rect": [
+        454,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:No",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    },
+    {
+     "name": "LoadConfirmParent",
+     "type": "USER",
+     "rect": [
+      210,
+      200,
+      380,
+      150
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       252
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "LoadConfirmParentText",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        216,
+        348,
+        40
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:LoadGameConfirmation"
+      },
+      {
+       "name": "ButtonLoadConfirm",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Yes",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonLoadCancel",
+       "type": "PUSHBUTTON",
+       "rect": [
+        454,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:No",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    },
+    {
+     "name": "DeleteConfirmParent",
+     "type": "USER",
+     "rect": [
+      210,
+      200,
+      380,
+      150
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       252
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "DeleteConfirmParentText",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        216,
+        348,
+        40
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:DeleteFile"
+      },
+      {
+       "name": "ButtonDeleteConfirm",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Yes",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonDeleteCancel",
+       "type": "PUSHBUTTON",
+       "rect": [
+        454,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:No",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    },
+    {
+     "name": "SaveDescParent",
+     "type": "USER",
+     "rect": [
+      210,
+      200,
+      380,
+      150
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       20,
+       24,
+       32,
+       252
+      ],
+      "enabledBorder": [
+       200,
+       170,
+       90,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "SaveDescParentText",
+       "type": "STATICTEXT",
+       "rect": [
+        226,
+        216,
+        348,
+        40
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": true
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:EnterSaveDesc"
+      },
+      {
+       "name": "EntryDesc",
+       "type": "ENTRYFIELD",
+       "rect": [
+        226,
+        256,
+        348,
+        28
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "entry": {
+        "maxLen": 48
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       },
+       "headerTemplate": "Small"
+      },
+      {
+       "name": "ButtonSaveDescConfirm",
+       "type": "PUSHBUTTON",
+       "rect": [
+        322,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Save",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      },
+      {
+       "name": "ButtonSaveDescCancel",
+       "type": "PUSHBUTTON",
+       "rect": [
+        454,
+        300,
+        120,
+        32
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE"
+       ],
+       "text": "GUI:Cancel",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

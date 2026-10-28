@@ -848,7 +848,15 @@ void GameState::loadQueuedSaveGame()
 AsciiString GameState::getSaveDirectory() const
 {
 	AsciiString tmp = TheGlobalData->getPath_UserData();
+#ifdef _WIN32
 	tmp.concat("Save\\");
+#else
+	// TheSuperHackers @bugfix GeneralsX WebPort 2026-10-28 A backslash is not a separator here:
+	// "Save\" made CreateDirectory create a directory literally named "Save\", fopen wrote the
+	// file next to it as "Save\00000000.sav", and iterateSaveFiles (chdir + readdir) listed
+	// nothing, so saved games never showed up.
+	tmp.concat("Save/");
+#endif
 	return tmp;
 }
 

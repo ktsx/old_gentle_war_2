@@ -180,12 +180,14 @@ const options: LayoutSpec = {
 // QuitMenu.wnd / QuitNoSave.wnd — the in-game menu (ESC). QuitMenu.cpp opens QuitMenu.wnd in
 // single-player and skirmish games and QuitNoSave.wnd in network games and replays; the parent
 // name QuitMenuParent and the buttons are what WindowTransitions.ini (QuitFull / QuitNoSave)
-// animate. ButtonSaveLoad is left out: the code checks it for null, and PopupSaveLoad.wnd, which
-// it would open, does not exist yet. Restart/Exit texts are set by the code per game type.
+// animate. ButtonSaveLoad (QuitMenu.wnd only) opens PopupSaveLoad.wnd (gen-saveload-layouts.ts).
+// Restart/Exit texts are set by the code per game type.
 // ---------------------------------------------------------------------------
-const quitLayout = (file: string): LayoutSpec => {
-  const Q: Rect = [270, 150, 260, 268];
-  const b = (name: string, i: number, text: string) => button(name, [20, 60 + i * 48, 220, 36], text);
+const quitLayout = (file: string, saveLoad: boolean): LayoutSpec => {
+  const n = saveLoad ? 5 : 4;
+  const Q: Rect = [270, 150 - (n - 4) * 24, 260, 76 + n * 48];
+  const at = (k: number) => (saveLoad ? k : k > 1 ? k - 1 : k);   // slot 1 is SAVE/LOAD when present
+  const b = (name: string, i: number, text: string) => button(name, [20, 60 + at(i) * 48, 220, 36], text);
   return {
     file,
     version: 2,
@@ -197,16 +199,17 @@ const quitLayout = (file: string): LayoutSpec => {
         children: place([
           heading("StaticTextTitle", [20, 18, 220, 24], "GX:GameMenu"),
           b("ButtonReturn", 0, "GUI:ReturnToGame"),
-          b("ButtonOptions", 1, "GUI:Options"),
-          b("ButtonRestart", 2, "GUI:RestartMission"),
-          b("ButtonExit", 3, "GUI:ExitMission"),
+          ...(saveLoad ? [b("ButtonSaveLoad", 1, "GUI:SaveAndLoad")] : []),
+          b("ButtonOptions", 2, "GUI:Options"),
+          b("ButtonRestart", 3, "GUI:RestartMission"),
+          b("ButtonExit", 4, "GUI:ExitMission"),
         ], Q[0], Q[1]),
       }),
     ],
   };
 };
 
-for (const spec of [options, quitLayout("QuitMenu.wnd"), quitLayout("QuitNoSave.wnd")]) {
+for (const spec of [options, quitLayout("QuitMenu.wnd", true), quitLayout("QuitNoSave.wnd", false)]) {
   const path = join(outDir, spec.file + ".json");
   writeFileSync(path, JSON.stringify(spec, null, 1) + "\n");
   console.log(`wrote ${path}`);

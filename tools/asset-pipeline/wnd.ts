@@ -135,7 +135,14 @@ function drawData(label: string, c: Required<Colors>, state: "enabled" | "disabl
   return `  ${label} = ${entries.join(",\n" + " ".repeat(label.length + 5))};`;
 }
 
-function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: string): void {
+/**
+ * A gadget reports to its direct parent only (GBM_SELECTED, GCM_SELECTED, ... go to
+ * winGetParent()'s system callback; GameWinDefaultSystem ignores them, nothing bubbles up).
+ * So a plain USER container inside a menu — a button frame, a confirm dialog, a sub-panel — gets
+ * the menu's system callback, as WindowEditor layouts do; otherwise its buttons do nothing.
+ */
+function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: string, inheritedSystem?: string): void {
+  if (!w.system && w.type === "USER" && inheritedSystem) w = { ...w, system: inheritedSystem };
   const d = spec.defaults ?? {};
   const [cw, ch] = spec.creationResolution ?? [800, 600];
   const [x, y, width, height] = w.rect;
@@ -215,7 +222,7 @@ function emitWindow(w: WindowSpec, spec: LayoutSpec, out: string[], indent: stri
   for (const line of drawData("HILITEDRAWDATA", colors, "hilite", w.images?.hilite, slots("hilite")).split("\n")) L(line);
   if (w.children && w.children.length) {
     L("  CHILD");
-    for (const c of w.children) emitWindow(c, spec, out, indent + "  ");
+    for (const c of w.children) emitWindow(c, spec, out, indent + "  ", w.system ?? inheritedSystem);
     L("  ENDALLCHILDREN");
   }
   L("END");

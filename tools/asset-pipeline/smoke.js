@@ -4,6 +4,8 @@
 //   SMOKE_KEYS=Space;Escape    keys to press after Begin
 //   SMOKE_CLICKS=512,282;...   canvas clicks after Begin (viewport is 1024x768)
 //   SMOKE_SETTLE_MS=60000      wait after the last click before the screenshot (e.g. a click that starts a game)
+//   SMOKE_WAIT_FOR=<regex>     instead: wait until a console line after the last click matches (SMOKE_SETTLE_MS
+//                              becomes the upper bound, default 150000), then 3 s more
 //   SMOKE_EXPECT=a;b            console substrings that must appear (pair with ?diag=1)
 //   SMOKE_FULL=1               print the whole console instead of head/tail
 // exit 2 on FATAL C++ CRASH / page error / Begin never reached.
@@ -48,7 +50,13 @@ const { chromium } = require('playwright');
         await page.waitForTimeout(2000);
       }
       // SMOKE_SETTLE_MS — keep sampling after the last click (a click that starts a game needs the load + first ticks)
-      if (process.env.SMOKE_SETTLE_MS) await page.waitForTimeout(Number(process.env.SMOKE_SETTLE_MS));
+      if (process.env.SMOKE_WAIT_FOR) {
+        const re = new RegExp(process.env.SMOKE_WAIT_FOR);
+        const from = lines.length, limit = Date.now() + Number(process.env.SMOKE_SETTLE_MS || 150000);
+        while (Date.now() < limit && !lines.slice(from).some((l) => re.test(l))) await page.waitForTimeout(500);
+        lines.push(`${stamp()} [SMOKE] ${lines.slice(from).some((l) => re.test(l)) ? 'saw' : 'gave up waiting for'} /${process.env.SMOKE_WAIT_FOR}/`);
+        await page.waitForTimeout(3000);
+      } else if (process.env.SMOKE_SETTLE_MS) await page.waitForTimeout(Number(process.env.SMOKE_SETTLE_MS));
     } catch (e) { lines.push(`${stamp()} [SMOKE] begin failed: ${String(e).slice(0, 200)}`); }
   } else {
     await page.waitForTimeout(waitMs);

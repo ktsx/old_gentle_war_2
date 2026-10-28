@@ -5,6 +5,9 @@
 //   wheel X,Y,DY     move to X,Y and scroll the wheel by DY pixels (positive = down)
 //   key NAME         keyboard press (Playwright key names: Escape, Enter, ArrowDown, ...)
 //   wait MS          pause
+//   waitfor MS REGEX wait (at most MS) until a console line logged after this step starts matches
+//                    REGEX — e.g. "waitfor 150000 inGame=1 isPaused=0" (TICK-DIAG, needs ?diag=1)
+//                    instead of a fixed pause for a map load; fails the script when it times out
 //   shot FILE        screenshot
 //   mem              print the wasm heap and JS heap size
 //   stack N          pause the page N times through the DevTools protocol and print the JS/wasm
@@ -52,6 +55,12 @@ const { chromium } = require('playwright');
       await page.mouse.move(x, y); await page.waitForTimeout(200); await page.mouse.wheel(0, dy);
     } else if (op === 'key') {
       await page.keyboard.press(arg);
+    } else if (op === 'waitfor') {
+      const sp = arg.indexOf(' ');
+      const limit = Date.now() + Number(arg.slice(0, sp)), re = new RegExp(arg.slice(sp + 1));
+      const from = all.length;
+      while (Date.now() < limit && !all.slice(from).some((l) => re.test(l))) await page.waitForTimeout(250);
+      if (!all.slice(from).some((l) => re.test(l))) fatal.push(`waitfor timed out: ${arg}`);
     } else if (op === 'wait') {
       await page.waitForTimeout(Number(arg));
     } else if (op === 'shot') {

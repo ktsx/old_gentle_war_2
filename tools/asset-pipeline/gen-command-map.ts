@@ -8,13 +8,12 @@
  * force-fire. This writes the usual Zero Hour layout (MetaEvent.cpp names, MetaEvent.h key and
  * modifier names):
  *
- *   ESC game menu · Enter chat (Shift+Enter allies) · ` diplomacy · F9 hide control bar
+ *   ESC game menu · F9 hide control bar · F12 screenshot
  *   0-9 select group, Ctrl+n create, Shift+n add, Alt+n jump to group
  *   Q select all, W all aircraft, E matching units, Tab / Shift+Tab next/prev unit, I idle worker
  *   S stop, X scatter, D deploy, Ctrl+F formation, Ctrl+R hero
  *   held Ctrl force attack, held Alt waypoints, held Shift prefer selection, Ctrl+Alt force move
  *   H command centre, Space last radar event, Backspace camera reset, F1-F8 views (Ctrl saves)
- *   Ctrl+B beacon, Del removes it, F12 screenshot
  *
  * In a browser some combinations belong to the browser first (Ctrl+number switches tabs in most
  * of them, Ctrl+W closes the tab); web_shell.html only forwards what the page receives.
@@ -37,12 +36,10 @@ const add = (meta: string, key: string, category: string, mod = "NONE", transiti
 
 // interface
 add("OPTIONS", "KEY_ESC", "INTERFACE");
-add("CHAT_EVERYONE", "KEY_ENTER", "INTERFACE");
-add("CHAT_ALLIES", "KEY_ENTER", "INTERFACE", "SHIFT");
-add("DIPLOMACY", "KEY_TICK", "INTERFACE");
+// Not bound yet: CHAT_EVERYONE / CHAT_ALLIES (Enter), DIPLOMACY (`), PLACE/DELETE_BEACON — their
+// windows (InGameChat.wnd, Diplomacy.wnd) are not in the set, and ShowInGameChat/ShowDiplomacy
+// use the created layout without a null check. Add them together with those layouts.
 add("TOGGLE_CONTROL_BAR", "KEY_F9", "INTERFACE");
-add("PLACE_BEACON", "KEY_B", "INTERFACE", "CTRL");
-add("DELETE_BEACON", "KEY_DEL", "INTERFACE");
 add("TAKE_SCREENSHOT_PNG", "KEY_F12", "MISC", "NONE", "DOWN", "SHELL GAME OBSERVER");
 
 // control groups

@@ -6,8 +6,12 @@
 //   key NAME         keyboard press (Playwright key names: Escape, Enter, ArrowDown, ...)
 //   wait MS          pause
 //   shot FILE        screenshot
+//   stack N          pause the page N times through the DevTools protocol and print the JS/wasm
+//                    stacks (names with the RelWithDebInfo build) — for a page that stopped
+//                    drawing; screenshots of a stuck page time out, this does not
 //
-// Every step waits 1.5 s afterwards. Exit code 2 when the page logs FATAL / PAGEERROR.
+// Every step waits 1.5 s afterwards. Exit code 2 when the page logs FATAL / PAGEERROR, or when a
+// UI_EXPECT="substr;substr" line never appears in the console (use with ?diag=1 traces).
 // usage: node ui-script.js <url> "<steps>" [bootWaitMs]
 //   e.g. node ui-script.js "http://localhost:8888/GeneralsZH.html" "click 512,412;shot opt.png;key Escape;shot menu.png"
 const { chromium } = require('playwright');
@@ -20,12 +24,17 @@ const { chromium } = require('playwright');
   const t0 = Date.now();
   const stamp = () => `${((Date.now() - t0) / 1000).toFixed(1).padStart(6)}s`;
   const fatal = [];
+  const all = [];
   page.on('console', (m) => {
     const t = m.text();
+    all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
-    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|OPTIONS:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
   });
   page.on('pageerror', (e) => { fatal.push(String(e)); console.log(`${stamp()} [PAGEERROR] ${String(e.stack || e).slice(0, 4000)}`); });
+  // attach the debugger before the main thread gets busy (see hang-stack.js)
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Debugger.enable');
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#gx-loading.gx-await-start #gx-start', { timeout: 180000 });
   await page.click('#gx-start');
@@ -45,7 +54,18 @@ const { chromium } = require('playwright');
     } else if (op === 'wait') {
       await page.waitForTimeout(Number(arg));
     } else if (op === 'shot') {
-      await page.screenshot({ path: arg });
+      try { await page.screenshot({ path: arg, timeout: 20000 }); } catch (e) { console.log(`${stamp()} screenshot ${arg} failed: ${String(e).split('\n')[0]}`); }
+    } else if (op === 'stack') {
+      for (let i = 0; i < Number(arg || 3); i++) {
+        const paused = new Promise((resolve) => cdp.once('Debugger.paused', resolve));
+        await cdp.send('Debugger.pause');
+        const ev = await Promise.race([paused, new Promise((r) => setTimeout(() => r(null), 15000))]);
+        if (!ev) { console.log(`${stamp()} stack ${i}: no pause (main thread not in JS?)`); break; }
+        console.log(`${stamp()} --- stack ${i} (${ev.callFrames.length} frames) ---`);
+        for (const f of ev.callFrames.slice(0, 40)) console.log(`    ${f.functionName || '(anonymous)'}`);
+        await cdp.send('Debugger.resume');
+        await new Promise((r) => setTimeout(r, 1000));
+      }
     } else {
       console.error(`unknown step: ${step}`); process.exit(2);
     }
@@ -53,6 +73,9 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(1500);
   }
   await browser.close();
+  for (const want of (process.env.UI_EXPECT || '').split(';').filter(Boolean)) {
+    if (!all.some((l) => l.includes(want))) fatal.push(`expected console line not seen: ${want}`);
+  }
   if (fatal.length) { console.error('=== UI SCRIPT: FAIL ===\n' + fatal.join('\n')); process.exit(2); }
   console.log('=== UI SCRIPT: OK ===');
 })().catch((e) => { console.error('ui-script failed:', e); process.exit(1); });

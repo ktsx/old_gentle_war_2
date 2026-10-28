@@ -25,6 +25,7 @@
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
 
 #include "Common/Recorder.h"
+#include <Utility/gx_trace.h>
 #include "Common/file.h"
 #include "Common/FileSystem.h"
 #include "Common/PlayerList.h"
@@ -470,6 +471,8 @@ void RecorderClass::updateRecord()
 	static Int lastFrame = -1;
 	GameMessage *msg = TheCommandList->getFirstMessage();
 	while (msg != nullptr) {
+		if (msg->getType() == GameMessage::MSG_NEW_GAME)
+			GX_DIAG_LOG("RECORDER: MSG_NEW_GAME mode=%d (recorder mode %d)\n", (int)msg->getArgument(0)->integer, (int)m_mode);
 		if (msg->getType() == GameMessage::MSG_NEW_GAME &&
 			 msg->getArgument(0)->integer != GAME_SHELL &&
 			 msg->getArgument(0)->integer != GAME_SINGLE_PLAYER && // Due to the massive amount of scripts that use <local player> in GC and single player, replays have been cut for them.
@@ -536,6 +539,7 @@ void RecorderClass::startRecording(GameDifficulty diff, GameMode originalGameMod
 	m_fileName.concat(getReplayExtention());
 	filepath.concat(m_fileName);
 	m_file = TheFileSystem->openFile(filepath.str(), File::WRITE | File::BINARY);
+	GX_DIAG_LOG("RECORDER: start '%s' -> %s\n", filepath.str(), m_file ? "open" : "FAILED");
 	if (m_file == nullptr) {
 		DEBUG_ASSERTCRASH(m_file != nullptr, ("Failed to create replay file"));
 		return;

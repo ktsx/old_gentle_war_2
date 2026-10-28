@@ -9,6 +9,7 @@
 //                    REGEX — e.g. "waitfor 150000 inGame=1 isPaused=0" (TICK-DIAG, needs ?diag=1)
 //                    instead of a fixed pause for a map load; fails the script when it times out
 //   shot FILE        screenshot
+//   js EXPR          evaluate EXPR in the page and print the JSON result (e.g. FS.readdir('/userdata'))
 //   reload           reload the page and boot again (same profile: IndexedDB saves survive)
 //   mem              print the wasm heap and JS heap size
 //   stack N          pause the page N times through the DevTools protocol and print the JS/wasm
@@ -34,7 +35,7 @@ const { chromium } = require('playwright');
     const t = m.text();
     all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
-    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
   });
   page.on('pageerror', (e) => { fatal.push(String(e)); console.log(`${stamp()} [PAGEERROR] ${String(e.stack || e).slice(0, 4000)}`); });
   // attach the debugger before the main thread gets busy (see hang-stack.js)
@@ -65,6 +66,10 @@ const { chromium } = require('playwright');
       const from = all.length;
       while (Date.now() < limit && !all.slice(from).some((l) => re.test(l))) await page.waitForTimeout(250);
       if (!all.slice(from).some((l) => re.test(l))) fatal.push(`waitfor timed out: ${arg}`);
+    } else if (op === 'js') {
+      // evaluate an expression in the page and print it — e.g. "js FS.readdir('/userdata')"
+      try { console.log(`${stamp()} js: ${JSON.stringify(await page.evaluate(arg))}`.slice(0, 4000)); }
+      catch (e) { console.log(`${stamp()} js failed: ${String(e).split('\n')[0]}`); }
     } else if (op === 'reload') {
       // same browser context, so IndexedDB (/userdata: saves, options) survives
       await page.reload({ waitUntil: 'domcontentloaded' });

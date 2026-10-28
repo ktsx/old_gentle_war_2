@@ -862,8 +862,10 @@ AsciiString GameState::getSaveDirectory() const
 	// GeneralsX @bugfix WebPort 2026-10-28 A backslash is not a separator here:
 	// "Save\" made CreateDirectory create a directory literally named "Save\", fopen wrote the
 	// file next to it as "Save\00000000.sav", and iterateSaveFiles (chdir + readdir) listed
-	// nothing, so saved games never showed up.
-	tmp.concat("Save/");
+	// nothing, so saved games never showed up. Lower case, because the web build's
+	// normalizePath lowercases (BigVFS keys) and portableMapPathToRealMapPath goes through it:
+	// a load extracted its map to ".../save/x.map" while the directory was ".../Save/".
+	tmp.concat("save/");
 #endif
 	return tmp;
 }

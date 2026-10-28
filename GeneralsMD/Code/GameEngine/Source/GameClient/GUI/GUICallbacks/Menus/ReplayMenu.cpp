@@ -274,7 +274,15 @@ void PopulateReplayFileListbox(GameWindow *listbox)
 	for (it = replayFilenames.begin(); it != replayFilenames.end(); ++it)
 	{
 		// just want the filename
-		asciistr.set((*it).reverseFind('\\') + 1);
+		// GeneralsX @bugfix WebPort 2026-10-28 the web file listing returns '/' paths; with only
+		// '\\' searched, reverseFind gave null and the name was read from address 1 (empty list)
+		{
+			const char *sep = (*it).reverseFind('\\');
+			const char *slash = (*it).reverseFind('/');
+			if (!sep || (slash && slash > sep))
+				sep = slash;
+			asciistr.set(sep ? sep + 1 : (*it).str());
+		}
 
 		RecorderClass::ReplayHeader header;
 		ReplayGameInfo info;

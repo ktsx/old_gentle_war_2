@@ -207,6 +207,12 @@ UnicodeString SkirmishPreferences::getUserName()
 	{
 		IPEnumeration IPs;
 		ret.translate(IPs.getMachineName());
+#ifdef __EMSCRIPTEN__
+		// GeneralsX @bugfix WebPort 2026-10-28 there is no machine name in a browser: the skirmish
+		// player and the score screen row came out nameless
+		if (ret.isEmpty())
+			ret = TheGameText->fetch("GUI:Player");
+#endif
 		return ret;
 	}
 
@@ -216,6 +222,12 @@ UnicodeString SkirmishPreferences::getUserName()
 	{
 		IPEnumeration IPs;
 		ret.translate(IPs.getMachineName());
+#ifdef __EMSCRIPTEN__
+		// GeneralsX @bugfix WebPort 2026-10-28 there is no machine name in a browser: the skirmish
+		// player and the score screen row came out nameless
+		if (ret.isEmpty())
+			ret = TheGameText->fetch("GUI:Player");
+#endif
 		return ret;
 	}
 

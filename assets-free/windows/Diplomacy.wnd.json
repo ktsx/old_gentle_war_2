@@ -1,0 +1,2497 @@
+{
+ "file": "Diplomacy.wnd",
+ "dir": "",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "DiplomacyParent",
+   "type": "USER",
+   "rect": [
+    140,
+    50,
+    520,
+    400
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "DiplomacySystem",
+   "input": "DiplomacyInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     235
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextTitle",
+     "type": "STATICTEXT",
+     "rect": [
+      156,
+      64,
+      300,
+      24
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GX:Diplomacy",
+     "font": [
+      "Arial",
+      14,
+      1
+     ],
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "RadioButtonInGame",
+     "type": "RADIOBUTTON",
+     "rect": [
+      156,
+      92,
+      140,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "GX:Players",
+     "radio": {
+      "group": 1
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "RadioButtonBuddies",
+     "type": "RADIOBUTTON",
+     "rect": [
+      304,
+      92,
+      140,
+      22
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "text": "GUI:Buddies",
+     "radio": {
+      "group": 1
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "InGameParent",
+     "type": "USER",
+     "rect": [
+      156,
+      120,
+      488,
+      268
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextHeaderPlayer",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        124,
+        150,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:Player"
+      },
+      {
+       "name": "StaticTextHeaderSide",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        124,
+        110,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:Side"
+      },
+      {
+       "name": "StaticTextHeaderTeam",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        124,
+        60,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:Team"
+      },
+      {
+       "name": "StaticTextHeaderStatus",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        124,
+        70,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:Status"
+      },
+      {
+       "name": "StaticTextPlayer0",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        151,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide0",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        151,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam0",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        151,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus0",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        151,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        148,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute0",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        148,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer1",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        180,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide1",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        180,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam1",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        180,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus1",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        180,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        177,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute1",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        177,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer2",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        209,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide2",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        209,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam2",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        209,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus2",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        209,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        206,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute2",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        206,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer3",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        238,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide3",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        238,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam3",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        238,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus3",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        238,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        235,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute3",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        235,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer4",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        267,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide4",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        267,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam4",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        267,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus4",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        267,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        264,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute4",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        264,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer5",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        296,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide5",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        296,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam5",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        296,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus5",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        296,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        293,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute5",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        293,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer6",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        325,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide6",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        325,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam6",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        325,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus6",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        325,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        322,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute6",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        322,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "StaticTextPlayer7",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        354,
+        156,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextSide7",
+       "type": "STATICTEXT",
+       "rect": [
+        324,
+        354,
+        116,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextTeam7",
+       "type": "STATICTEXT",
+       "rect": [
+        444,
+        354,
+        60,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "StaticTextStatus7",
+       "type": "STATICTEXT",
+       "rect": [
+        508,
+        354,
+        70,
+        20
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT",
+        "HIDDEN"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": ""
+      },
+      {
+       "name": "ButtonMute7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        351,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GUI:Mute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      },
+      {
+       "name": "ButtonUnMute7",
+       "type": "PUSHBUTTON",
+       "rect": [
+        580,
+        351,
+        56,
+        24
+       ],
+       "status": [
+        "ENABLED",
+        "IMAGE",
+        "HIDDEN"
+       ],
+       "text": "GX:Unmute",
+       "images": {
+        "enabled": "GxButton",
+        "disabled": "GxButtonDis",
+        "hilite": "GxButtonHi"
+       },
+       "headerTemplate": "Button",
+       "font": [
+        "Arial",
+        10,
+        1
+       ]
+      }
+     ]
+    },
+    {
+     "name": "SoloParent",
+     "type": "USER",
+     "rect": [
+      156,
+      120,
+      488,
+      268
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextObjectives",
+       "type": "STATICTEXT",
+       "rect": [
+        164,
+        124,
+        300,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:Objectives"
+      },
+      {
+       "name": "ListboxSolo",
+       "type": "SCROLLLISTBOX",
+       "rect": [
+        164,
+        146,
+        472,
+        234
+       ],
+       "status": [
+        "ENABLED"
+       ],
+       "listbox": {
+        "length": 50,
+        "scrollBar": true
+       },
+       "colors": {
+        "enabled": [
+         34,
+         38,
+         48,
+         255
+        ],
+        "enabledBorder": [
+         110,
+         120,
+         140,
+         255
+        ],
+        "hilite": [
+         60,
+         80,
+         120,
+         255
+        ],
+        "hiliteBorder": [
+         190,
+         205,
+         230,
+         255
+        ],
+        "disabled": [
+         24,
+         24,
+         28,
+         255
+        ],
+        "disabledBorder": [
+         60,
+         60,
+         66,
+         255
+        ]
+       },
+       "headerTemplate": "Small"
+      }
+     ]
+    },
+    {
+     "name": "BuddiesParent",
+     "type": "USER",
+     "rect": [
+      156,
+      120,
+      488,
+      268
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "colors": {
+      "enabled": [
+       14,
+       16,
+       22,
+       255
+      ],
+      "enabledBorder": [
+       70,
+       78,
+       94,
+       255
+      ]
+     }
+    },
+    {
+     "name": "ButtonHide",
+     "type": "PUSHBUTTON",
+     "rect": [
+      504,
+      402,
+      140,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Close",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    }
+   ]
+  }
+ ]
+}

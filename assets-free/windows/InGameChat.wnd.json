@@ -1,0 +1,176 @@
+{
+ "file": "InGameChat.wnd",
+ "dir": "",
+ "version": 2,
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "InGameChatParent",
+   "type": "USER",
+   "rect": [
+    10,
+    430,
+    520,
+    32
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "InGameChatSystem",
+   "input": "InGameChatInput",
+   "colors": {
+    "enabled": [
+     26,
+     30,
+     38,
+     235
+    ],
+    "enabledBorder": [
+     90,
+     100,
+     120,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "StaticTextChatType",
+     "type": "STATICTEXT",
+     "rect": [
+      18,
+      437,
+      120,
+      18
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "Chat:Everyone",
+     "font": [
+      "Arial",
+      10,
+      1
+     ]
+    },
+    {
+     "name": "TextEntryChat",
+     "type": "ENTRYFIELD",
+     "rect": [
+      142,
+      434,
+      300,
+      24
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "entry": {
+      "maxLen": 120
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonClear",
+     "type": "PUSHBUTTON",
+     "rect": [
+      450,
+      433,
+      72,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Clear",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    }
+   ]
+  }
+ ]
+}

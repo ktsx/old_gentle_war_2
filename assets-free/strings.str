@@ -36,3 +36,19 @@ END
 GX:GameMenu
 US: "GAME MENU"
 END
+
+GX:Diplomacy
+US: "DIPLOMACY"
+END
+
+GX:Players
+US: "PLAYERS"
+END
+
+GX:Objectives
+US: "OBJECTIVES"
+END
+
+GX:Unmute
+US: "Unmute"
+END

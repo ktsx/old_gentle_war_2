@@ -201,6 +201,7 @@ jobs:
             build-web/GeneralsMD/GeneralsZH.html \
             build-web/GeneralsMD/GeneralsZH.js \
             build-web/GeneralsMD/GeneralsZH.wasm \
+            build-web/GeneralsMD/GeneralsZH.js.symbols \
             build-web/GeneralsMD/serve.py
 
   # Boots the Release build in headless Chromium with the EA-free asset set

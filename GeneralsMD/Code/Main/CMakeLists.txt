@@ -166,6 +166,11 @@ if(EMSCRIPTEN)
     target_link_options(z_generals PRIVATE ${EMSCRIPTEN_ASYNC_FLAGS})
     target_compile_options(z_generals PRIVATE "-sUSE_SDL=2")
 
+    # GeneralsZH.js.symbols: wasm function index -> C++ name. The Release wasm has no name section,
+    # so a browser stack reads "wasm-function[3659]"; with this map it can be symbolized
+    # (tools/asset-pipeline/symbolize.js). Costs nothing at runtime. GeneralsX @build WebPort 2026-10-28
+    target_link_options(z_generals PRIVATE "--emit-symbol-map")
+
     # NOTE: the May-24 hand-built link (link_mac.sh) included libwwaudio.a from
     # the compile-script pipeline — WWAudio has no CMakeLists and is not in the
     # CMake graph yet (tracked as an open issue). The only WWAudio symbol the

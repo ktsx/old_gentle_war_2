@@ -8,7 +8,8 @@
  * force-fire. This writes the usual Zero Hour layout (MetaEvent.cpp names, MetaEvent.h key and
  * modifier names):
  *
- *   ESC game menu · F9 hide control bar · F12 screenshot
+ *   ESC game menu · Enter chat (Shift+Enter allies) · ` diplomacy · F9 hide control bar · F12 screenshot
+ *   Ctrl+B beacon, Del removes it (network games)
  *   0-9 select group, Ctrl+n create, Shift+n add, Alt+n jump to group
  *   Q select all, W all aircraft, E matching units, Tab / Shift+Tab next/prev unit, I idle worker
  *   S stop, X scatter, D deploy, Ctrl+F formation, Ctrl+R hero
@@ -36,10 +37,14 @@ const add = (meta: string, key: string, category: string, mod = "NONE", transiti
 
 // interface
 add("OPTIONS", "KEY_ESC", "INTERFACE");
-// Not bound yet: CHAT_EVERYONE / CHAT_ALLIES (Enter), DIPLOMACY (`), PLACE/DELETE_BEACON — their
-// windows (InGameChat.wnd, Diplomacy.wnd) are not in the set, and ShowInGameChat/ShowDiplomacy
-// use the created layout without a null check. Add them together with those layouts.
+// Chat and diplomacy open InGameChat.wnd / Diplomacy.wnd (gen-ingame-layouts.ts), which
+// ShowInGameChat/ShowDiplomacy use without a null check — keep those layouts in the set.
+add("CHAT_EVERYONE", "KEY_ENTER", "INTERFACE");
+add("CHAT_ALLIES", "KEY_ENTER", "INTERFACE", "SHIFT");
+add("DIPLOMACY", "KEY_TICK", "INTERFACE");
 add("TOGGLE_CONTROL_BAR", "KEY_F9", "INTERFACE");
+add("PLACE_BEACON", "KEY_B", "INTERFACE", "CTRL");       // network games only (CommandXlat)
+add("DELETE_BEACON", "KEY_DEL", "INTERFACE");
 add("TAKE_SCREENSHOT_PNG", "KEY_F12", "MISC", "NONE", "DOWN", "SHELL GAME OBSERVER");
 
 // control groups

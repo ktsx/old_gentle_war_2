@@ -1668,6 +1668,11 @@ WindowMsgHandledType OptionsMenuSystem( GameWindow *window, UnsignedInt msg,
 			}
 			else if ( controlID == buttonKeyboardOptionsMenu )
 			{
+				// GeneralsX @bugfix WebPort 2026-10-29 OPTIONS is a popup over the shell, not a shell
+				// screen: the pushed screen opened under it. Hide it; KEYBOARD's BACK shows it again.
+				WindowLayout *optLayout = TheShell->getOptionsLayout( FALSE );
+				if( optLayout )
+					optLayout->hide( TRUE );
 				TheShell->push( "Menus/KeyboardOptionsMenu.wnd" );
 			}
 			else if(controlID == checkDrawAnchorID )

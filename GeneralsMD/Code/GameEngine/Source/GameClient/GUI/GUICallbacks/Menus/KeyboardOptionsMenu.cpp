@@ -711,6 +711,14 @@ WindowMsgHandledType KeyboardOptionsMenuSystem( GameWindow *window, UnsignedInt 
 
 				// go back one screen
 				TheShell->pop();
+				// GeneralsX @bugfix WebPort 2026-10-29 back to the OPTIONS popup it was opened from
+				// (OptionsMenu hides it before the push)
+				WindowLayout *optLayout = TheShell->getOptionsLayout( FALSE );
+				if( optLayout && optLayout->isHidden() )
+				{
+					optLayout->hide( FALSE );
+					optLayout->bringForward();
+				}
 
 			}
 			else if( controlID == buttonAssignID )

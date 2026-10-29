@@ -2,6 +2,7 @@
 // Boots like smoke.js (Begin), then runs a script of steps separated by ';':
 //
 //   click X,Y        left click (viewport 1024x768)
+//   tryclick X,Y RE  click only while no console line matched RE yet
 //   wheel X,Y,DY     move to X,Y and scroll the wheel by DY pixels (positive = down)
 //   key NAME         keyboard press (Playwright key names: Escape, Enter, ArrowDown, ...)
 //   wait MS          pause
@@ -37,7 +38,7 @@ const { chromium } = require('playwright');
     const t = m.text();
     all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
-    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:|REPLAY:|CONTROLBAR:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:|REPLAY:|CONTROLBAR:|CONSTRUCTION:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
   });
   // a file the page hands to the browser (e.g. the replay menu's DOWNLOAD): "DOWNLOAD: <name> (<bytes>)"
   page.on('download', async (d) => {
@@ -64,6 +65,14 @@ const { chromium } = require('playwright');
       const [x, y] = arg.split(',').map(Number);
       await page.mouse.move(x, y); await page.waitForTimeout(200);
       await page.mouse.down(); await page.waitForTimeout(120); await page.mouse.up();
+    } else if (op === 'tryclick') {
+      // click X,Y only while no console line matched REGEX yet (e.g. try placement spots until one works)
+      const sp = arg.indexOf(' ');
+      const [x, y] = arg.slice(0, sp).split(',').map(Number), re = new RegExp(arg.slice(sp + 1));
+      if (!all.some((l) => re.test(l))) {
+        await page.mouse.move(x, y); await page.waitForTimeout(200);
+        await page.mouse.down(); await page.waitForTimeout(120); await page.mouse.up();
+      } else console.log(`${stamp()} tryclick skipped (seen /${re.source}/)`);
     } else if (op === 'wheel') {
       const [x, y, dy] = arg.split(',').map(Number);
       await page.mouse.move(x, y); await page.waitForTimeout(200); await page.mouse.wheel(0, dy);

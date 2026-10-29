@@ -335,8 +335,40 @@ static bool Should_Preload(const std::string& filename) {
          name == "terrainzh.big";
 }
 
+// ============================================================================
+// Asset sets kept in the browser (web/launcher): web_pre.js maps each archive of
+// the chosen OPFS set to a blob: URL (window.GX_assetUrls, keys lower case) before
+// main() runs. Sync XHR with a Range header works on blob: URLs, offline too —
+// unlike URLs a service worker serves: Chromium does not route main-thread sync
+// XHR through the service worker.
+// ============================================================================
+EM_JS_DEPS(gx_asset_urls, "$stringToNewUTF8");
+
+// 1 when an in-browser asset set is active (its map exists), 0 when archives come from base_url
+EM_JS(int, gx_asset_set_active, (void), {
+  return (typeof window !== 'undefined' && window['GX_assetUrls']) ? 1 : 0;
+});
+
+// the blob: URL of an archive in the active set, or 0 (malloc'd; the caller frees it)
+EM_JS(char *, gx_asset_url_for, (const char *name), {
+  var m = (typeof window !== 'undefined') ? window['GX_assetUrls'] : null;
+  if (!m) return 0;
+  var u = m[UTF8ToString(name).toLowerCase()];
+  return u ? stringToNewUTF8(u) : 0;
+});
+
 bool BigVFS::Mount_Archive(const char *archive_name) {
   std::string url = base_url + archive_name;
+  if (gx_asset_set_active()) {
+    // GeneralsX @feature WebPort 2026-10-29 the launcher's in-browser asset set
+    char *blob_url = gx_asset_url_for(archive_name);
+    if (!blob_url) {
+      GX_TRACE_LOG("INFO: %s is not in the selected asset set\n", archive_name);
+      return false;
+    }
+    url = blob_url;
+    free(blob_url);
+  }
 
   // Step 1: Fetch the first 16 bytes containing the header metadata
   unsigned char initial_header[16];

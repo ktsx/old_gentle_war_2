@@ -29,6 +29,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFile
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { parseStr, buildCsf } from "./strings.ts";
 import { buildWnd } from "./wnd.ts";
 import { packDir } from "./big.ts";
@@ -168,6 +169,16 @@ function main() {
   console.log(`TexturesZH.big: ${n3} files`);
   console.log(`MapsZH.big: ${n4} files`);
   console.log(`W3DZH.big: ${n5} files`);
+
+  // 9. assets/manifest.json: what the launcher (web/launcher) downloads into the browser for
+  //    offline play — each archive's size and SHA-256, and a version over all of them
+  const archives = ["INIZH.big", "WindowZH.big", "TexturesZH.big", "MapsZH.big", "W3DZH.big"].map((name) => {
+    const buf = readFileSync(join(assets, name));
+    return { name, size: buf.length, sha256: createHash("sha256").update(buf).digest("hex") };
+  });
+  const version = createHash("sha256").update(archives.map((a) => a.sha256).join("")).digest("hex").slice(0, 16);
+  writeFileSync(join(assets, "manifest.json"), JSON.stringify({ set: "free", version, archives }, null, 1) + "\n");
+  console.log(`assets/manifest.json: free set ${version}, ${archives.reduce((n, a) => n + a.size, 0)} bytes`);
   rmSync(stage, { recursive: true, force: true });
 }
 

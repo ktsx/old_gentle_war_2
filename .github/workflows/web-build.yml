@@ -187,6 +187,12 @@ jobs:
       # Pushes to main publish ci-latest / ci-latest-release; pushes to merge/** publish the same
       # files under ci-branch / ci-branch-release (one rolling slot for whichever branch built last),
       # so a branch build can be fetched and tested without merging it first.
+      - name: Set up Node (launcher build)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/merge/'))
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Publish rolling release (${{ matrix.release_tag }})
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/merge/'))
         env:
@@ -194,6 +200,8 @@ jobs:
         run: |
           set -e
           cp scripts/serve.py build-web/GeneralsMD/serve.py
+          # the launcher (web/launcher): the site's index.html, service worker, manifest and icons
+          node --experimental-strip-types web/launcher/build.ts launcher-dist
           TAG='${{ matrix.release_tag }}'
           if [ "$GITHUB_REF" != "refs/heads/main" ]; then TAG="${TAG/ci-latest/ci-branch}"; fi
           gh release delete "$TAG" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
@@ -201,12 +209,13 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "CI build ${GITHUB_SHA::7} (${{ matrix.build_type }}, ${GITHUB_REF_NAME})" \
-            --notes "Automated web build of ${GITHUB_SHA} (${GITHUB_REF_NAME}, Emscripten ${EMSDK_VERSION}, ${{ matrix.build_type }}). Engine only — no game assets." \
+            --notes "Automated web build of ${GITHUB_SHA} (${GITHUB_REF_NAME}, Emscripten ${EMSDK_VERSION}, ${{ matrix.build_type }}). Engine and launcher (index.html) — no game assets." \
             build-web/GeneralsMD/GeneralsZH.html \
             build-web/GeneralsMD/GeneralsZH.js \
             build-web/GeneralsMD/GeneralsZH.wasm \
             $(ls build-web/GeneralsMD/GeneralsZH.symbols 2>/dev/null) \
-            build-web/GeneralsMD/serve.py
+            build-web/GeneralsMD/serve.py \
+            launcher-dist/*
 
   # Boots the Release build in headless Chromium with the EA-free asset set
   # (assets-free/README.md): engine must reach "Ready", the main menu must be
@@ -235,7 +244,8 @@ jobs:
       - name: Build free asset set
         run: |
           node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts free-out --cache "$RUNNER_TEMP/free-cache"
-          mkdir -p site/assets && cp free-out/assets/*.big site/assets/
+          mkdir -p site/assets && cp free-out/assets/*.big free-out/assets/manifest.json site/assets/
+          node --experimental-strip-types web/launcher/build.ts site
           ls -l site site/assets
 
       - name: Install Playwright Chromium
@@ -360,6 +370,15 @@ jobs:
             node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/$m.map" 120000 $m.png 90000 --begin | tee $m-smoke.log
           done
 
+      - name: Launcher (free set, offline, own files)
+        if: always()
+        run: |
+          set -o pipefail
+          curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
+          # web/launcher: download the free set into OPFS and boot on it; again with the network off
+          # (service worker + stored set); then the free archives picked as "own files".
+          node tools/asset-pipeline/launcher-smoke.js http://localhost:8888/ free-out/assets | tee launcher-smoke.log
+
       - name: Check the terrain is visible
         if: always()
         run: |
@@ -422,6 +441,13 @@ jobs:
           grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
           grep -E "CONSTRUCTION:|tryclick|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
 
+      - name: Annotate launcher
+        if: always()
+        run: |
+          f=launcher-smoke.log; [ -f "$f" ] || exit 0
+          grep -E "FATAL|PAGEERROR|LAUNCHER SMOKE: FAIL|NO MAIN MENU|not ready|did not finish" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
+          grep -E "\[LSMOKE\].*(main menu|service worker)|LAUNCHER SMOKE" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
+
       - name: Annotate model draws
         if: always()
         run: |
@@ -478,4 +504,6 @@ jobs:
             gxsnow-smoke.log
             map-smoke.log
             skirmish-smoke.log
+            launcher-smoke.log
+            launcher-*.png
             serve.log

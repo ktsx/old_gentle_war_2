@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Generals Zero Hour — Web</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png">
+  <style>
+    :root {
+      --bg: #0a0a0a; --panel: #121212; --line: #2a2516; --fg: #f0d27a; --text: #d8d2c0;
+      --mute: #8a7d5b; --accent: #b3261e; --ok: #6fbf5a; --warn: #d9a441;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body { font-family: 'Courier New', Consolas, monospace; font-size: 15px; line-height: 1.5; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+    header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    header img { width: 56px; height: 56px; }
+    h1 { color: var(--fg); font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+    header p { margin: 2px 0 0; color: var(--mute); font-size: 13px; }
+    section { background: var(--panel); border: 1px solid var(--line); padding: 18px 20px; margin-bottom: 16px; }
+    h2 { color: var(--fg); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 6px; }
+    section > p { margin: 0 0 12px; color: var(--text); }
+    .status { margin: 0 0 12px; font-size: 13px; color: var(--mute); min-height: 1.5em; }
+    .status.ok { color: var(--ok); } .status.warn { color: var(--warn); } .status.err { color: #e5534b; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    button, label.button {
+      font: inherit; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--fg); background: #1a1712; border: 1px solid var(--mute); padding: 8px 16px; cursor: pointer;
+    }
+    button:hover:not(:disabled), label.button:hover { border-color: var(--fg); background: #241f15; }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    button.primary:hover:not(:disabled) { background: #c93a31; border-color: #e0574e; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    label.button input { display: none; }
+    progress { width: 100%; height: 8px; margin: 0 0 12px; accent-color: var(--accent); }
+    ul.files { list-style: none; margin: 0 0 12px; padding: 0; font-size: 13px; columns: 2; }
+    ul.files li::before { content: '· '; color: var(--mute); }
+    ul.files li.have::before { content: '✓ '; color: var(--ok); }
+    footer { color: var(--mute); font-size: 12px; margin-top: 20px; }
+    footer a { color: var(--mute); }
+    @media (max-width: 520px) { ul.files { columns: 1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="icon-192.png" alt="">
+      <div>
+        <h1>Generals Zero Hour — Web</h1>
+        <p>The game engine in your browser. Pick the game files to play with.</p>
+      </div>
+      <button id="install" hidden>Install</button>
+    </header>
+
+    <section id="free">
+      <h2>Free asset set</h2>
+      <p>Stand-in models, interface and test maps made for this port. Downloaded once, then it plays offline.</p>
+      <div class="status" id="free-status">Checking…</div>
+      <progress id="free-progress" hidden></progress>
+      <div class="row">
+        <button class="primary" id="free-play" disabled>Play</button>
+        <button id="free-download" disabled>Download</button>
+        <button id="free-remove" disabled>Remove</button>
+      </div>
+    </section>
+
+    <section id="own">
+      <h2>Your game files</h2>
+      <p>Choose the folder where Zero Hour is installed (or its <code>.big</code> files). They are copied into this browser's storage and never leave your device.</p>
+      <div class="status" id="own-status">Checking…</div>
+      <progress id="own-progress" hidden></progress>
+      <ul class="files" id="own-files"></ul>
+      <div class="row">
+        <button class="primary" id="own-play" disabled>Play</button>
+        <label class="button">Choose folder<input type="file" id="own-folder" webkitdirectory multiple></label>
+        <label class="button">Choose files<input type="file" id="own-pick" accept=".big" multiple></label>
+        <button id="own-remove" disabled>Remove</button>
+      </div>
+    </section>
+
+    <section id="stream">
+      <h2>Stream from this server</h2>
+      <p>Play the free set straight from the server, without storing anything. Needs a connection the whole time.</p>
+      <div class="row"><button id="stream-play">Play</button></div>
+    </section>
+
+    <footer>
+      <span id="storage"></span>
+      · Not affiliated with Electronic Arts. Command &amp; Conquer is a trademark of Electronic Arts.
+    </footer>
+  </main>
+  <script src="launcher.js"></script>
+</body>
+</html>

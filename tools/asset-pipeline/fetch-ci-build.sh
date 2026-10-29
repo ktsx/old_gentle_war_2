@@ -11,7 +11,7 @@
 #
 # usage: tools/asset-pipeline/fetch-ci-build.sh <sha> <outDir> [tag]
 #   tag defaults to ci-branch-release; the script exits non-zero if the build job for <sha> fails.
-#   Downloads GeneralsZH.{html,js,wasm}, GeneralsZH.symbols (if published) and serve.py.
+#   Downloads GeneralsZH.{html,js,wasm}, GeneralsZH.symbols (if published), serve.py and the launcher.
 set -euo pipefail
 sha="${1:?usage: fetch-ci-build.sh <sha> <outDir> [tag]}"
 out="${2:?usage: fetch-ci-build.sh <sha> <outDir> [tag]}"
@@ -30,7 +30,7 @@ until [ "$(gh api "repos/$repo/releases/tags/$tag" --jq .target_commitish 2>/dev
   sleep 15
 done
 echo "release $tag = ${sha:0:9} after $(( $(date +%s) - start )) s"
-for a in GeneralsZH.html GeneralsZH.js GeneralsZH.wasm GeneralsZH.symbols serve.py; do
+for a in GeneralsZH.html GeneralsZH.js GeneralsZH.wasm GeneralsZH.symbols serve.py index.html launcher.js sw.js manifest.webmanifest icon-192.png icon-512.png; do
   id=$(gh api "repos/$repo/releases/tags/$tag" --jq ".assets[] | select(.name==\"$a\") | .id")
   [ -n "$id" ] || continue
   gh api -H "Accept: application/octet-stream" "repos/$repo/releases/assets/$id" > "$out/$a"

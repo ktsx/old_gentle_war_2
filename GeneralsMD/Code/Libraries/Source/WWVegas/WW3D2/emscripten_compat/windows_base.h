@@ -514,6 +514,30 @@ typedef struct _SYSTEMTIME {
 } SYSTEMTIME;
 #endif
 
+/* GeneralsX @bugfix WebPort 2026-10-29 GetLocalTime was an empty macro: saves and replays were
+   stamped with an uninitialised SYSTEMTIME (shown as 00:00, 00/00/0000). */
+#if defined(__EMSCRIPTEN__) && !defined(GetLocalTime)
+#include <sys/time.h>
+#include <time.h>
+inline void GX_GetLocalTime_Web(SYSTEMTIME *st) {
+  if (!st) return;
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+  time_t t = (time_t)tv.tv_sec;
+  struct tm lt;
+  localtime_r(&t, &lt);
+  st->wYear = (uint16_t)(lt.tm_year + 1900);
+  st->wMonth = (uint16_t)(lt.tm_mon + 1);
+  st->wDayOfWeek = (uint16_t)lt.tm_wday;
+  st->wDay = (uint16_t)lt.tm_mday;
+  st->wHour = (uint16_t)lt.tm_hour;
+  st->wMinute = (uint16_t)lt.tm_min;
+  st->wSecond = (uint16_t)lt.tm_sec;
+  st->wMilliseconds = (uint16_t)(tv.tv_usec / 1000);
+}
+#define GetLocalTime(x) GX_GetLocalTime_Web(x)
+#endif
+
 #define LOCALE_SYSTEM_DEFAULT 0x0800
 inline int GetDateFormat(unsigned int Locale, unsigned int dwFlags,
                          const SYSTEMTIME *lpDate, const char *lpFormat,

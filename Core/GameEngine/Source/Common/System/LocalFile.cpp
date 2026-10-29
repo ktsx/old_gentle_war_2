@@ -549,6 +549,7 @@ Int LocalFile::writeFormat( const Char* format, ... )
 
 Int LocalFile::writeFormat( const WideChar* format, ... )
 {
+#ifdef _WIN32
 	WideChar buffer[1024];
 
 	va_list args;
@@ -557,6 +558,19 @@ Int LocalFile::writeFormat( const WideChar* format, ... )
 	va_end(args);
 
 	return write( buffer, length * sizeof(WideChar) );
+#else
+	// GeneralsX @bugfix WebPort 2026-10-29 the engine writes wide strings as L"%s" (MSVC: a wide
+	// string); standard vswprintf reads %s as a narrow char*, so replay headers kept only the first
+	// letter ("V" for the version, which then never matched). UnicodeString::format_va translates
+	// the MSVC specifiers.
+	UnicodeString text;
+	va_list args;
+	va_start(args, format);
+	text.format_va(format, args);
+	va_end(args);
+
+	return write( text.str(), text.getLength() * sizeof(WideChar) );
+#endif
 }
 
 //=================================================================

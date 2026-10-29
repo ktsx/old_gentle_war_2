@@ -75,7 +75,7 @@ const keyboard: LayoutSpec = {
           win("ListBoxCommandList", "SCROLLLISTBOX", [24, 88, LW, 380], {
             listbox: { length: 100, scrollBar: true, forceSelect: false }, colors: GADGET, headerTemplate: "Small",
           }),
-          label("StaticTextDescription", [RX, 96, RW, 150], "GUI:NULL", { staticText: { centered: false } }),
+          label("StaticTextDescription", [RX, 96, RW, 60], "GUI:NULL", { staticText: { centered: false } }),
           label("StaticTextHotkeyLabel", [RX, 300, RW, 20], "GX:KeyboardHotkey", { textColor: GOLD }),
           label("StaticTextCurrentHotkey", [RX, 324, RW, 30], "GUI:NULL", { font: ["Arial", 16, 1], headerTemplate: "Label" }),
           // not functional in Zero Hour (empty ASSIGN handler, nothing saved): present, hidden

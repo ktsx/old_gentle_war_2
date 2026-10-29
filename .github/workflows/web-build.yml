@@ -344,7 +344,7 @@ jobs:
           # (placeholder-models.ts) while the barracks rises out of the ground.
           UI_EXPECT="CONSTRUCTION: started" \
           node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
-            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key H;wait 1500;key I;wait 1500;click 490,627;wait 500;shot placement.png;tryclick 600,420 CONSTRUCTION: started;wait 1500;tryclick 450,460 CONSTRUCTION: started;wait 1500;tryclick 640,330 CONSTRUCTION: started;wait 1500;tryclick 380,330 CONSTRUCTION: started;waitfor 20000 CONSTRUCTION: started;wait 60000;shot construction.png" \
+            "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key H;wait 1500;key I;wait 1500;click 490,627;wait 500;shot placement.png;tryclick 600,420 CONSTRUCTION: started;wait 1500;tryclick 450,460 CONSTRUCTION: started;wait 1500;tryclick 640,330 CONSTRUCTION: started;wait 1500;tryclick 380,330 CONSTRUCTION: started;wait 60000;shot construction.png" \
             | tee build-smoke.log
 
       - name: Check the terrain is visible

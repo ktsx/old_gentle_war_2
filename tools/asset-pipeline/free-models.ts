@@ -509,16 +509,19 @@ function waypointNode(): Mesh {
 function placementAnchor(): Mesh {
   const b = new MeshBuilder("Locater01", UNIT_TEXTURE, ATLAS, 0);
   b.cylinder(0, 0, 0, 0.6, 9, 16, { side: TEX.hazard, top: TEX.hazard });
-  b.cylinder(0, 0, 0.6, 1.4, 3, 10, { side: TEX.steel, top: TEX.houseStripe });
+  b.cylinder(0, 0, 0.6, 1.4, 3, 10, { side: TEX.steel, top: TEX.yellow });
   return b.mesh();
 }
 
-/** Locater02: a flat arrow pointing +X (the facing of the building being placed). */
+/**
+ * Locater02: a flat arrow pointing +X (the facing of the building being placed), yellow and
+ * hazard stripes rather than house colour, so it reads the same whatever the player's colour.
+ */
 function placementArrow(): Mesh {
   const b = new MeshBuilder("Locater02", UNIT_TEXTURE, ATLAS, 0);
-  b.box([0, -2, 0], [18, 2, 1], { side: TEX.hazard, top: TEX.houseStripe });
-  b.frustum([18, -7, 0], [30, 7, 1], 0, { side: TEX.hazard, top: TEX.houseStripe });
-  b.box([27, -0.5, 0], [30, 0.5, 1], { side: TEX.hazard, top: TEX.houseStripe });   // tip
+  b.box([0, -2, 0], [18, 2, 1], { side: TEX.hazard, top: TEX.yellow });
+  b.frustum([18, -7, 0], [30, 7, 1], 0, { side: TEX.hazard, top: TEX.hazard });
+  b.box([27, -0.5, 0], [30, 0.5, 1], { side: TEX.hazard, top: TEX.yellow });   // tip
   return b.mesh();
 }
 

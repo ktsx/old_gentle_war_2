@@ -324,13 +324,14 @@ jobs:
           # to IndexedDB; the list shows it on reopen; BACK, then OK leaves the score screen. Then
           # BACK > LOAD REPLAY > LOAD (ReplayMenu.wnd): DOWNLOAD > YES hands the replay to the browser,
           # LOAD on the first row plays it back (no "older replay version" prompt: the header must
-          # match this build).
-          UI_EXPECT="SHELL: doPush 'Menus/ScoreScreen.wnd' -> created;/userdata/replays/gxreplay.rep;ScoreScreen.wnd:ButtonOk;SHELL: doPush 'Menus/ReplayMenu.wnd' -> created;DOWNLOAD: 00000000.rep;ReplayMenu.wnd:ButtonLoadReplay" \
+          # match this build) — startNewGame in mode 3 (GAME_REPLAY); the recorded match is short,
+          # so the replay may already be over by the time a TICK-DIAG line would show it.
+          UI_EXPECT="SHELL: doPush 'Menus/ScoreScreen.wnd' -> created;/userdata/replays/gxreplay.rep;ScoreScreen.wnd:ButtonOk;SHELL: doPush 'Menus/ReplayMenu.wnd' -> created;DOWNLOAD: 00000000.rep;ReplayMenu.wnd:ButtonLoadReplay;startNewGame:ENTER mode=3" \
           node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
             "click 512,274;click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key Escape;click 512,505;click 340,465;wait 6000;shot score.png;click 733,645;wait 1000;type gxreplay;click 376,599;wait 3000;js new Promise(r=>{const q=indexedDB.open('/userdata')
           q.onsuccess=()=>{const t=q.result.transaction('FILE_DATA').objectStore('FILE_DATA').getAllKeys()
           t.onsuccess=()=>r(t.result.filter(k=>k.includes('replays')))}
-          q.onerror=()=>r('err')});click 733,645;wait 1000;shot replay.png;click 648,599;click 906,714;wait 3000;shot after-score.png;click 130,720;wait 3000;click 512,366;click 512,318;wait 2000;shot replaymenu.png;click 614,663;click 340,465;wait 2000;click 174,663;waitfor 150000 inGame=1 isPaused=0;wait 5000;shot replay-playing.png" \
+          q.onerror=()=>r('err')});click 733,645;wait 1000;shot replay.png;click 648,599;click 906,714;wait 3000;shot after-score.png;click 130,720;wait 3000;click 512,366;click 512,318;wait 2000;shot replaymenu.png;click 614,663;click 340,465;wait 2000;click 174,663;wait 6000;shot replay-playing.png" \
             | tee score-smoke.log
 
       - name: Build a barracks

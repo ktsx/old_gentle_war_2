@@ -17,7 +17,7 @@
 //                    stacks (names with the RelWithDebInfo build) — for a page that stopped
 //                    drawing; screenshots of a stuck page time out, this does not
 //
-// UI_TAIL=N prints the last N console lines at the end.
+// UI_TAIL=N prints the last N console lines at the end. Downloads are logged as "DOWNLOAD: name (bytes)".
 // Every step waits 1.5 s afterwards. Exit code 2 when the page logs FATAL / PAGEERROR, or when a
 // UI_EXPECT="substr;substr" line never appears in the console (use with ?diag=1 traces).
 // usage: node ui-script.js <url> "<steps>" [bootWaitMs]
@@ -38,6 +38,13 @@ const { chromium } = require('playwright');
     all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
     if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:|REPLAY:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+  });
+  // a file the page hands to the browser (e.g. the replay menu's DOWNLOAD): "DOWNLOAD: <name> (<bytes>)"
+  page.on('download', async (d) => {
+    let bytes = -1;
+    try { const p = await d.path(); bytes = require('fs').statSync(p).size; } catch (e) {}
+    const line = `DOWNLOAD: ${d.suggestedFilename()} (${bytes} bytes)`;
+    all.push(line); console.log(`${stamp()} ${line}`);
   });
   page.on('pageerror', (e) => { fatal.push(String(e)); console.log(`${stamp()} [PAGEERROR] ${String(e.stack || e).slice(0, 4000)}`); });
   // attach the debugger before the main thread gets busy (see hang-stack.js)

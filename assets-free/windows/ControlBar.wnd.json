@@ -1690,7 +1690,7 @@
         608,
         452,
         120,
-        88
+        118
        ],
        "status": [
         "ENABLED"
@@ -1708,35 +1708,171 @@
          0,
          0
         ]
-       }
-      },
-      {
-       "name": "CameoWindow",
-       "type": "USER",
-       "rect": [
-        608,
-        452,
-        120,
-        88
-       ],
-       "status": [
-        "ENABLED",
-        "HIDDEN"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
+       },
+       "children": [
+        {
+         "name": "CameoWindow",
+         "type": "USER",
+         "rect": [
+          608,
+          452,
+          120,
+          88
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "UnitUpgrade1",
+         "type": "USER",
+         "rect": [
+          608,
+          548,
+          22,
+          22
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "UnitUpgrade2",
+         "type": "USER",
+         "rect": [
+          632,
+          548,
+          22,
+          22
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "UnitUpgrade3",
+         "type": "USER",
+         "rect": [
+          656,
+          548,
+          22,
+          22
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "UnitUpgrade4",
+         "type": "USER",
+         "rect": [
+          680,
+          548,
+          22,
+          22
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "name": "UnitUpgrade5",
+         "type": "USER",
+         "rect": [
+          704,
+          548,
+          22,
+          22
+         ],
+         "status": [
+          "ENABLED"
+         ],
+         "colors": {
+          "enabled": [
+           0,
+           0,
+           0,
+           0
+          ],
+          "enabledBorder": [
+           0,
+           0,
+           0,
+           0
+          ]
+         }
+        }
+       ]
       },
       {
        "name": "CameoMovieWindow",
@@ -1750,141 +1886,6 @@
        "status": [
         "ENABLED",
         "HIDDEN"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
-      },
-      {
-       "name": "UnitUpgrade1",
-       "type": "USER",
-       "rect": [
-        608,
-        548,
-        22,
-        22
-       ],
-       "status": [
-        "ENABLED"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
-      },
-      {
-       "name": "UnitUpgrade2",
-       "type": "USER",
-       "rect": [
-        632,
-        548,
-        22,
-        22
-       ],
-       "status": [
-        "ENABLED"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
-      },
-      {
-       "name": "UnitUpgrade3",
-       "type": "USER",
-       "rect": [
-        656,
-        548,
-        22,
-        22
-       ],
-       "status": [
-        "ENABLED"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
-      },
-      {
-       "name": "UnitUpgrade4",
-       "type": "USER",
-       "rect": [
-        680,
-        548,
-        22,
-        22
-       ],
-       "status": [
-        "ENABLED"
-       ],
-       "colors": {
-        "enabled": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "enabledBorder": [
-         0,
-         0,
-         0,
-         0
-        ]
-       }
-      },
-      {
-       "name": "UnitUpgrade5",
-       "type": "USER",
-       "rect": [
-        704,
-        548,
-        22,
-        22
-       ],
-       "status": [
-        "ENABLED"
        ],
        "colors": {
         "enabled": [

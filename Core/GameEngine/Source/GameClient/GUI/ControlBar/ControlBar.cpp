@@ -62,6 +62,7 @@
 #include "GameLogic/ScriptEngine.h"
 
 #include "GameClient/AnimateWindowManager.h"
+#include <Utility/gx_trace.h>
 #include "GameClient/ControlBar.h"
 #include "GameClient/ControlBarScheme.h"
 #include "GameClient/Drawable.h"
@@ -1768,6 +1769,15 @@ void ControlBar::evaluateContextUI()
 	// sanity
 	if( selectedDrawables->empty() == TRUE )
 		return;
+
+	{
+		const Drawable *d0 = selectedDrawables->front();
+		const Object *o0 = d0 ? d0->getObject() : nullptr;
+		const Player *owner = o0 ? o0->getControllingPlayer() : nullptr;
+		GX_DIAG_LOG("CONTROLBAR: eval count=%d controllable=%d first='%s' owner=%d local=%d\n", (int)TheInGameUI->getSelectCount(),
+			(int)TheInGameUI->areSelectedObjectsControllable(), o0 ? o0->getTemplate()->getName().str() : "-",
+			owner ? (int)owner->getPlayerIndex() : -1, ThePlayerList->getLocalPlayer() ? (int)ThePlayerList->getLocalPlayer()->getPlayerIndex() : -1);
+	}
 
 	//Make sure the selected objects are in fact, controllable! If not, then
 	//we don't show any GUI commands for them!!!

@@ -137,10 +137,14 @@ const controlBar: LayoutSpec = {
 
       // right: the faction panel (RightHUDImage art), selected-unit portrait, upgrade cameos
       panel("RightHUD", [rx, ry, rw, rh], [
-        win("WinUnitSelected", "USER", [px, py, pw, ph], { colors: CLEAR }),
-        hidden(win("CameoWindow", "USER", [px, py, pw, ph], { colors: CLEAR })),
+        // ControlBar::setPortraitByObject shows / hides WinUnitSelected and only sets the image of
+        // CameoWindow (and the upgrade cameos): they are its children, visible, like in the retail
+        // layout — as hidden siblings the portrait never showed.
+        win("WinUnitSelected", "USER", [px, py, pw, HUD.upgradeY + 22 - py], { colors: CLEAR, children: [
+          win("CameoWindow", "USER", [px, py, pw, ph], { colors: CLEAR }),
+          ...upgradeCameos,
+        ] }),
         hidden(win("CameoMovieWindow", "USER", [px, py, pw, ph], { colors: CLEAR })),
-        ...upgradeCameos,
       ], { colors: CLEAR }),
     ], { system: "ControlBarSystem", input: "ControlBarInput", draw: "W3DCommandBarBackgroundDraw", colors: CLEAR }),
   ],

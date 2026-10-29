@@ -37,7 +37,7 @@ const { chromium } = require('playwright');
     const t = m.text();
     all.push(t);
     if (/FATAL C\+\+ CRASH|Assertion|abort\(/.test(t)) fatal.push(t);
-    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:|REPLAY:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
+    if (/GBM_SELECTED|GCM_SELECTED|FATAL|MessageBox|KEYS: meta|QUITMENU:|GAMELOGIC: startNewGame|SAVEGAME:|RECORDER:|SHELL:|REPLAY:|CONTROLBAR:/.test(t)) console.log(`${stamp()} ${t.slice(0, 200)}`);
   });
   // a file the page hands to the browser (e.g. the replay menu's DOWNLOAD): "DOWNLOAD: <name> (<bytes>)"
   page.on('download', async (d) => {

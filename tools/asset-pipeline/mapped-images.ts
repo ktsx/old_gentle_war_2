@@ -7,6 +7,8 @@
  * "missing texture" plates, every texture is generated with each image's rectangle drawn as
  * a bevelled tile carrying its MappedImage name (pixel font, wrapped), so the command bar,
  * menus and score screens are readable until real art replaces a texture — one file at a time.
+ * Images the INIs use as cameos (unit / building / upgrade / power buttons and portraits) get a
+ * drawn icon instead — side colour, silhouette, display name (cameos.ts).
  *
  * Usage:
  *   node --experimental-strip-types mapped-images.ts <patchDataDir> <outDir>   # writes <outDir>/Art/Textures/*.tga
@@ -15,6 +17,7 @@ import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "n
 import { join } from "node:path";
 import { Image32, encodeTga, type RGBA } from "./tga.ts";
 import { drawText, textWidth, wrapName, GLYPH_H, GLYPH_W } from "./pixelfont.ts";
+import { collectCameos, drawCameo } from "./cameos.ts";
 
 export interface MappedImage { name: string; texture: string; texW: number; texH: number; l: number; t: number; r: number; b: number }
 
@@ -89,12 +92,17 @@ export function buildPlaceholderAtlases(patchDataDir: string, skip: Set<string> 
     const list = byTex.get(mi.texture) ?? [];
     list.push(mi); byTex.set(mi.texture, list);
   }
+  const cameos = collectCameos(patchDataDir);
   const atlases = new Map<string, Image32>();
   for (const [tex, list] of byTex) {
     const W = Math.min(1024, Math.max(...list.map((m) => m.texW || 0), ...list.map((m) => m.r), 16));
     const H = Math.min(1024, Math.max(...list.map((m) => m.texH || 0), ...list.map((m) => m.b), 16));
     const img = new Image32(W, H, [40, 20, 50, 255]);
-    for (const mi of list) drawPlaceholder(img, mi);
+    for (const mi of list) {
+      const cameo = cameos.get(mi.name.toLowerCase());
+      if (cameo && mi.r - mi.l >= 24 && mi.b - mi.t >= 20) drawCameo(img, mi.l, mi.t, mi.r - mi.l, mi.b - mi.t, cameo);
+      else drawPlaceholder(img, mi);
+    }
     atlases.set(tex, img);
   }
   return atlases;

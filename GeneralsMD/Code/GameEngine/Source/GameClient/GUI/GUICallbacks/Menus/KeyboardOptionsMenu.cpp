@@ -718,6 +718,8 @@ WindowMsgHandledType KeyboardOptionsMenuSystem( GameWindow *window, UnsignedInt 
 				{
 					optLayout->hide( FALSE );
 					optLayout->bringForward();
+					// and its keyboard focus, so ESC closes it again
+					TheWindowManager->winSetFocus( optLayout->getFirstWindow() );
 				}
 
 			}

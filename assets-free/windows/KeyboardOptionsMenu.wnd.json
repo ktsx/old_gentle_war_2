@@ -1,0 +1,564 @@
+{
+ "file": "KeyboardOptionsMenu.wnd",
+ "version": 2,
+ "layout": {
+  "init": "KeyboardOptionsMenuInit",
+  "update": "KeyboardOptionsMenuUpdate",
+  "shutdown": "KeyboardOptionsMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "ParentKeyboardOptionsMenu",
+   "type": "USER",
+   "rect": [
+    0,
+    0,
+    800,
+    600
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "KeyboardOptionsMenuSystem",
+   "input": "KeyboardOptionsMenuInput",
+   "colors": {
+    "enabled": [
+     10,
+     12,
+     16,
+     255
+    ],
+    "enabledBorder": [
+     10,
+     12,
+     16,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "KeyboardPanel",
+     "type": "USER",
+     "rect": [
+      80,
+      40,
+      640,
+      520
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       240
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextTitle",
+       "type": "STATICTEXT",
+       "rect": [
+        104,
+        54,
+        400,
+        26
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Label",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:KeyboardOptions",
+       "font": [
+        "Arial",
+        16,
+        1
+       ],
+       "textColor": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         255
+        ]
+       }
+      },
+      {
+       "name": "DescriptionBox",
+       "type": "USER",
+       "rect": [
+        412,
+        128,
+        292,
+        300
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "colors": {
+        "enabled": [
+         14,
+         16,
+         22,
+         255
+        ],
+        "enabledBorder": [
+         70,
+         78,
+         94,
+         255
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "ListBoxCommandList",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      104,
+      128,
+      300,
+      380
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "listbox": {
+      "length": 100,
+      "scrollBar": true,
+      "forceSelect": false
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "StaticTextDescription",
+     "type": "STATICTEXT",
+     "rect": [
+      420,
+      136,
+      276,
+      150
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:NULL"
+    },
+    {
+     "name": "StaticTextHotkeyLabel",
+     "type": "STATICTEXT",
+     "rect": [
+      420,
+      340,
+      276,
+      20
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Small",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GX:KeyboardHotkey",
+     "textColor": {
+      "enabled": [
+       255,
+       214,
+       120,
+       255
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       255
+      ]
+     }
+    },
+    {
+     "name": "StaticTextCurrentHotkey",
+     "type": "STATICTEXT",
+     "rect": [
+      420,
+      364,
+      276,
+      30
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "headerTemplate": "Label",
+     "staticText": {
+      "centered": false
+     },
+     "colors": {
+      "enabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "enabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabled": [
+       0,
+       0,
+       0,
+       0
+      ],
+      "disabledBorder": [
+       0,
+       0,
+       0,
+       0
+      ]
+     },
+     "text": "GUI:NULL",
+     "font": [
+      "Arial",
+      16,
+      1
+     ]
+    },
+    {
+     "name": "TextEntryAssignHotkey",
+     "type": "ENTRYFIELD",
+     "rect": [
+      420,
+      440,
+      276,
+      26
+     ],
+     "status": [
+      "ENABLED",
+      "HIDDEN"
+     ],
+     "entry": {
+      "maxLen": 32
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonAssign",
+     "type": "PUSHBUTTON",
+     "rect": [
+      420,
+      474,
+      130,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE",
+      "HIDDEN"
+     ],
+     "text": "GUI:Assign",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonResetAll",
+     "type": "PUSHBUTTON",
+     "rect": [
+      566,
+      474,
+      130,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE",
+      "HIDDEN"
+     ],
+     "text": "GUI:ResetAll",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonBack",
+     "type": "PUSHBUTTON",
+     "rect": [
+      546,
+      516,
+      150,
+      32
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Back",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ComboBoxCategoryList",
+     "type": "COMBOBOX",
+     "rect": [
+      104,
+      92,
+      300,
+      26
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "headerTemplate": "Small",
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "combo": {
+      "maxDisplay": 8,
+      "maxChars": 24
+     }
+    }
+   ]
+  }
+ ]
+}

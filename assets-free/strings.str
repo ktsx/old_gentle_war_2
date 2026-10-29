@@ -80,3 +80,15 @@ END
 GX:DownloadReplayConfirm
 US: "Download this replay to your computer?"
 END
+
+GUI:TEAM
+US: "Groups"
+END
+
+GUI:NULL
+US: ""
+END
+
+GX:KeyboardHotkey
+US: "Hotkey:"
+END

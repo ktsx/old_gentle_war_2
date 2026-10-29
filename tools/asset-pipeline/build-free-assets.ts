@@ -95,6 +95,7 @@ function main() {
   const entries = [
     ...parseStr(readFileSync(join(patchData, "generals.str"), "utf8"), "US"),
     ...parseStr(readFileSync(join(freeRoot, "strings.str"), "utf8"), "US"),   // our own labels (GX:*)
+    ...parseStr(readFileSync(join(freeRoot, "command-strings.str"), "utf8"), "US"),   // hotkey names (gen-command-map.ts)
   ];
   writeFileSync(join(iniStage, "Data", "English", "generals.csf"), buildCsf(entries, "US"));
   console.log(`generals.csf: ${entries.length} labels`);

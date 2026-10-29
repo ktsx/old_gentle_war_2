@@ -1401,6 +1401,12 @@ void OptionsMenuInit( WindowLayout *layout, void *userData )
 		// disable controls that you can't change the options for in game
 		comboBoxLANIP->winEnable(FALSE);
 
+		// GeneralsX @tweak WebPort 2026-10-29 the hotkey screen is a shell screen (TheShell->push):
+		// from the in-game options it would open over the match
+		GameWindow *buttonKeyboard = TheWindowManager->winGetWindowFromId( nullptr, TheNameKeyGenerator->nameToKey( "OptionsMenu.wnd:ButtonKeyboardOptions" ) );
+		if (buttonKeyboard)
+			buttonKeyboard->winEnable(FALSE);
+
 		if (comboBoxOnlineIP)
 			comboBoxOnlineIP->winEnable(FALSE);
 

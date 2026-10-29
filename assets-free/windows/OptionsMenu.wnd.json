@@ -1051,6 +1051,27 @@
      }
     },
     {
+     "name": "ButtonKeyboardOptions",
+     "type": "PUSHBUTTON",
+     "rect": [
+      412,
+      400,
+      200,
+      30
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:KeyboardOptions",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
      "name": "ComboBoxIP",
      "type": "COMBOBOX",
      "rect": [

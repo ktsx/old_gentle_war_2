@@ -26,7 +26,7 @@
  *             in the code and left out)
  *   Bottom    LabelVersion, ButtonDefaults, ButtonBack, ButtonAccept
  *
- * ButtonKeyboardOptions is left out until KeyboardOptionsMenu.wnd exists (the button pushes it).
+ * ButtonKeyboardOptions (Gameplay column) pushes KeyboardOptionsMenu.wnd, the hotkey reference.
  *
  * Usage: node --experimental-strip-types tools/asset-pipeline/gen-options-layout.ts
  */
@@ -113,6 +113,9 @@ const gameplay: WindowSpec[] = [
   check("CheckBoxSaveCamera", [R, row(6, 92), W, 22], "GUI:SaveCamera"),
   check("CheckBoxUseCamera", [R, row(7, 92), W, 22], "GUI:UseCamera"),
   check("CheckLanguageFilter", [R, row(8, 92), W, 22], "GX:LanguageFilter"),
+  // the hotkey reference (KeyboardOptionsMenu.wnd, gen-keyboard-layout.ts); OptionsMenuInit
+  // disables it in a match, where pushing a shell screen would cover the game
+  button("ButtonKeyboardOptions", [R, row(9, 92) + 8, 200, 30], "GUI:KeyboardOptions"),
 ];
 const network: WindowSpec[] = [
   hidden(combo("ComboBoxIP", [L, 380, 150, 24])),

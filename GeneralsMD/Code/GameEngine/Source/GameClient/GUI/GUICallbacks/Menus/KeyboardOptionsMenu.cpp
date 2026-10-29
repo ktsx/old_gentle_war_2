@@ -115,6 +115,55 @@ UnicodeString shift;
 
 
 
+#ifdef __EMSCRIPTEN__
+// "Ctrl+Shift+F1", "`", "Alt (hold)" for a command map record
+static UnicodeString gxHotkeyText( const MetaMapRec *rec )
+{
+	UnicodeString text;
+	if( rec->m_modState & CTRL )  text.concat( TheGameText->fetch( "KEYBOARD:Ctrl+" ) );
+	if( rec->m_modState & ALT )   text.concat( TheGameText->fetch( "KEYBOARD:Alt+" ) );
+	if( rec->m_modState & SHIFT ) text.concat( TheGameText->fetch( "KEYBOARD:Shift+" ) );
+
+	if( rec->m_key == MK_NONE )
+	{
+		// a held modifier on its own: drop the trailing '+'
+		if( text.getLength() > 0 && text.getCharAt( text.getLength() - 1 ) == L'+' )
+			text.truncateBy( 1 );
+		text.concat( L" (hold)" );
+		return text;
+	}
+
+	static const struct { const char *raw; const wchar_t *shown; } special[] = {
+		{ "KEY_ESC", L"Esc" }, { "KEY_ENTER", L"Enter" }, { "KEY_TICK", L"`" }, { "KEY_TAB", L"Tab" },
+		{ "KEY_SPACE", L"Space" }, { "KEY_BACKSPACE", L"Backspace" }, { "KEY_DEL", L"Delete" },
+		{ "KEY_INS", L"Insert" }, { "KEY_HOME", L"Home" }, { "KEY_END", L"End" },
+		{ "KEY_PGUP", L"Page Up" }, { "KEY_PGDN", L"Page Down" }, { "KEY_UP", L"Up" },
+		{ "KEY_DOWN", L"Down" }, { "KEY_LEFT", L"Left" }, { "KEY_RIGHT", L"Right" },
+	};
+	for (const LookupListRec* keyName = KeyNames; keyName->name; keyName++)
+	{
+		if( keyName->value != rec->m_key )
+			continue;
+		for( size_t i = 0; i < ARRAY_SIZE(special); ++i )
+		{
+			if( strcmp( keyName->name, special[i].raw ) == 0 )
+			{
+				text.concat( special[i].shown );
+				return text;
+			}
+		}
+		const char *name = keyName->name;
+		if( strncmp( name, "KEY_", 4 ) == 0 )
+			name += 4;
+		UnicodeString key;
+		key.translate( name );
+		text.concat( key );
+		return text;
+	}
+	return text;
+}
+#endif
+
 void populateCategoryBox()
 {
 	Int i;
@@ -125,7 +174,8 @@ void populateCategoryBox()
 	GadgetComboBoxReset(comboBoxCategoryList);
 	for ( i = 0; i < CATEGORY_NUM_CATEGORIES; ++i)
 	{
-		temp.format("GUI:%s", CategoryListName[i]);
+		// GeneralsX @bugfix WebPort 2026-10-29 the record's name, not the whole LookupListRec, goes to %s
+		temp.format("GUI:%s", CategoryListName[i].name);
 		str = TheGameText->fetch( temp );
 		index = GadgetComboBoxAddEntry(comboBoxCategoryList, str, color);
 	}
@@ -155,7 +205,9 @@ void fillCommandListBox( MappableKeyCategories cat )
 
 	for(const MetaMapRec *rec = TheMetaMap->getFirstMetaMapRec(); rec; rec = rec->m_next)
 	{
-		if(rec->m_category == cat)
+		// GeneralsX @tweak WebPort 2026-10-29 records without a name (the release half of a held
+		// command, END_*) would show up as empty rows
+		if(rec->m_category == cat && !rec->m_displayName.isEmpty())
 			GadgetListBoxAddEntryText(listBoxCommandList, rec->m_displayName, color, -1, -1 );
 
 	}
@@ -617,6 +669,12 @@ WindowMsgHandledType KeyboardOptionsMenuSystem( GameWindow *window, UnsignedInt 
 						//enable text entry for assigning different hotkey
 						textEntryAssignHotkey->winEnable( true );
 
+#ifdef __EMSCRIPTEN__
+						// GeneralsX @tweak WebPort 2026-10-29 the hotkey as a player reads it — "Ctrl+1",
+						// "Alt (hold)" — instead of the raw "KEY_1" / "KEY_NONE"
+						GadgetStaticTextSetText( staticTextCurrentHotkey, gxHotkeyText( rec ) );
+						break;
+#endif
 						for (const LookupListRec* keyName = KeyNames; keyName->name; keyName++)
 						{
 							if( keyName->value == type )

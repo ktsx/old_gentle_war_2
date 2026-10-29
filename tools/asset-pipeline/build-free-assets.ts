@@ -36,9 +36,10 @@ import { encodeTga, writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
 import { writeFxTextures } from "./fx-textures.ts";
-import { buildMap, buildMapPreview, mapCacheEntry, buildMapCacheIni } from "./map.ts";
-import { writeFreeModels } from "./free-models.ts";
-import { writePlaceholderModels } from "./placeholder-models.ts";
+import { buildMap, buildMapPreview, mapCacheEntry, buildMapCacheIni, buildMapIni } from "./map.ts";
+import { writeFreeModels, buildFreeModels, buildUnitAtlas } from "./free-models.ts";
+import { writePlaceholderModels, buildPlaceholderModels } from "./placeholder-models.ts";
+import { writeVariantModels, snowAtlas, UNIT_TEXTURE_SNOW } from "./variants.ts";
 
 const PATCH_REPO = "https://github.com/TheSuperHackers/GeneralsGamePatch.git";
 const PATCH_COMMIT = "6c7f40d6af6a4babb77a33a4502ec7656446c13e"; // 2026-09-18
@@ -125,6 +126,14 @@ function main() {
   // 6. models (their shared texture goes into TexturesZH.big)
   console.log(`models: ${writeFreeModels(w3dStage, texStage).join(", ")}`);
   const placeholders = writePlaceholderModels(patchData, w3dStage);
+  {
+    // night / snow models of everything above (variants.ts) and the snowed unit atlas
+    const free = Object.values(buildFreeModels());
+    const all = [...free, ...buildPlaceholderModels(patchData, new Set(free.map((m) => m.name.toLowerCase())))];
+    const v = writeVariantModels(patchData, w3dStage, all);
+    writeFileSync(join(texStage, "Art", "Textures", UNIT_TEXTURE_SNOW), encodeTga(snowAtlas(buildUnitAtlas()), true));
+    console.log(`night / snow models: ${v.models} (${(v.bytes / 1e6).toFixed(2)} MB) + ${UNIT_TEXTURE_SNOW}`);
+  }
   console.log(`placeholder models: ${placeholders.models} (${(placeholders.bytes / 1e6).toFixed(2)} MB) for the rest of the faction rosters`);
 
   // 7. maps
@@ -137,6 +146,8 @@ function main() {
     const buf = buildMap(spec);
     writeFileSync(join(dir, `${spec.name}.map`), buf);
     writeFileSync(join(dir, `${spec.name}.tga`), encodeTga(buildMapPreview(spec)));
+    const mapIni = buildMapIni(spec);                // per-map INI overrides, e.g. snowfall
+    if (mapIni) writeFileSync(join(dir, "map.ini"), mapIni);
     console.log(`Maps/${spec.name}/${spec.name}.map: ${buf.length} bytes (+ preview tga)`);
     mapCache.push(mapCacheEntry(spec, buf));
   }

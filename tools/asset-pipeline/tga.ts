@@ -202,7 +202,25 @@ export function generateTerrainImages(): Record<string, Image32> {
     const k = edge ? 0.75 : 1;
     grass.set(x, y, [Math.round((70 + 40 * n) * k), Math.round((120 + 50 * n) * k), Math.round((45 + 30 * n) * k), 255]);
   }
-  return { "gxgrass.tga": grass };
+  // gxsnow.tga: packed snow, bluish shadows in the hollows (snowy maps)
+  const snow = new Image32(size, size);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const n = noise(x >> 1, y >> 1, 3) * 0.5 + noise(x >> 3, y >> 3, 11) * 0.5;
+    const edge = x % 64 === 0 || y % 64 === 0;
+    const k = edge ? 0.9 : 1;
+    snow.set(x, y, [Math.round((206 + 34 * n) * k), Math.round((214 + 32 * n) * k), Math.round((228 + 24 * n) * k), 255]);
+  }
+  return { "gxgrass.tga": grass, "gxsnow.tga": snow };
+}
+
+/** ExSnowFlake.tga (Weather.ini SnowTexture): a soft white dot for the snow particles. */
+export function snowFlake(): Image32 {
+  const s = 16, img = new Image32(s, s, [255, 255, 255, 0]);
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++) {
+    const d = Math.hypot(x + 0.5 - s / 2, y + 0.5 - s / 2) / (s / 2);
+    if (d < 1) img.set(x, y, [255, 255, 255, Math.round(255 * Math.pow(1 - d, 1.6))]);
+  }
+  return img;
 }
 
 export function writeFreeImages(outDir: string): string[] {
@@ -215,7 +233,7 @@ export function writeFreeImages(outDir: string): string[] {
       names.push(`${sub}/${name}`);
     }
   };
-  write("Textures", generateFreeImages());
+  write("Textures", { ...generateFreeImages(), "ExSnowFlake.tga": snowFlake() });
   write("Terrain", generateTerrainImages());
   return names;
 }

@@ -643,7 +643,14 @@ void DX8Caps::Compute_Caps(WW3DFormat display_format, const D3DADAPTER_IDENTIFIE
 		adapter_id.DeviceIdentifier.Data4[7]));
 
 
+#ifdef __EMSCRIPTEN__
+	// GeneralsX @bugfix WebPort 2026-10-29 the GLES/WebGL shim reports a point size but does not
+	// emulate D3D8 point sprites (POINTSPRITEENABLE / POINTSCALE): snow drew nothing. Without the cap
+	// W3DSnow uses its quad path, whatever a map's Weather says.
+	SupportPointSprites = false;
+#else
 	SupportPointSprites = (Caps.MaxPointSize > 1.0f);
+#endif
 	SupportNPatches = ((Caps.DevCaps&D3DDEVCAPS_NPATCHES)==D3DDEVCAPS_NPATCHES);
 	SupportZBias = ((Caps.RasterCaps&D3DPRASTERCAPS_ZBIAS)==D3DPRASTERCAPS_ZBIAS);
 	supportGamma=((Caps.Caps2&D3DCAPS2_FULLSCREENGAMMA)==D3DCAPS2_FULLSCREENGAMMA);

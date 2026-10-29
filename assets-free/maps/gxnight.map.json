@@ -1,0 +1,281 @@
+{
+  "name": "gxnight",
+  "playable": [
+    64,
+    64
+  ],
+  "border": 8,
+  "height": 20,
+  "heightNoise": 1,
+  "terrain": {
+    "name": "GxGrass",
+    "tiles": 2
+  },
+  "timeOfDay": "night",
+  "players": [
+    {
+      "name": "GxPlayer",
+      "faction": "FactionAmerica",
+      "human": true,
+      "displayName": "Player",
+      "color": [
+        0,
+        80,
+        255
+      ],
+      "start": [
+        20,
+        20
+      ]
+    },
+    {
+      "name": "GxRival",
+      "faction": "FactionChina",
+      "human": false,
+      "displayName": "Rival",
+      "color": [
+        220,
+        40,
+        40
+      ],
+      "start": [
+        44,
+        44
+      ]
+    }
+  ],
+  "camera": [
+    26,
+    20
+  ],
+  "objects": [
+    {
+      "template": "AmericaCommandCenter",
+      "at": [
+        20,
+        20
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaPowerPlant",
+      "at": [
+        8,
+        26
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaBarracks",
+      "at": [
+        22,
+        6
+      ],
+      "angle": 1.5708,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaVehicleDozer",
+      "at": [
+        30,
+        16
+      ],
+      "angle": 0.4,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaTankCrusader",
+      "at": [
+        33,
+        27
+      ],
+      "angle": 0.2,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaVehicleHumvee",
+      "at": [
+        36,
+        24
+      ],
+      "angle": -0.3,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaInfantryRanger",
+      "at": [
+        30,
+        22
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "AmericaInfantryRanger",
+      "at": [
+        31,
+        24
+      ],
+      "angle": 0.3,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "ChinaCommandCenter",
+      "at": [
+        44,
+        44
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaPowerPlant",
+      "at": [
+        56,
+        38
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaBarracks",
+      "at": [
+        42,
+        58
+      ],
+      "angle": -1.5708,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaVehicleDozer",
+      "at": [
+        36,
+        42
+      ],
+      "angle": 3.0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaTankBattleMaster",
+      "at": [
+        33,
+        46
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "ChinaInfantryRedguard",
+      "at": [
+        36,
+        46
+      ],
+      "angle": 3.1416,
+      "owner": "GxRival"
+    },
+    {
+      "template": "AmericaSupplyCenter",
+      "at": [
+        10,
+        36
+      ],
+      "angle": 0,
+      "owner": "GxPlayer",
+      "health": 50
+    },
+    {
+      "template": "AmericaWarFactory",
+      "at": [
+        26,
+        36
+      ],
+      "angle": 0,
+      "owner": "GxPlayer",
+      "health": 20
+    },
+    {
+      "template": "AmericaTankCrusader",
+      "at": [
+        36,
+        30
+      ],
+      "angle": 2.2,
+      "owner": "GxPlayer",
+      "health": 20
+    },
+    {
+      "template": "GLACommandCenter",
+      "at": [
+        8,
+        10
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLABarracks",
+      "at": [
+        6,
+        52
+      ],
+      "angle": 0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLASupplyStash",
+      "at": [
+        18,
+        50
+      ],
+      "angle": 0,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLAArmsDealer",
+      "at": [
+        14,
+        60
+      ],
+      "angle": 1.5708,
+      "owner": "GxRival"
+    },
+    {
+      "template": "GLATankScorpion",
+      "at": [
+        17,
+        12
+      ],
+      "angle": 0.3,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAVehicleTechnical",
+      "at": [
+        17,
+        8
+      ],
+      "angle": -0.4,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAInfantryWorker",
+      "at": [
+        15,
+        15
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    },
+    {
+      "template": "GLAInfantryRebel",
+      "at": [
+        16,
+        16
+      ],
+      "angle": 0,
+      "owner": "GxPlayer"
+    }
+  ]
+}

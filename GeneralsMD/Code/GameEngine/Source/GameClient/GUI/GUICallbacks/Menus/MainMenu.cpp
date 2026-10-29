@@ -885,7 +885,13 @@ void MainMenuUpdate( WindowLayout *layout, void *userData )
 		if(initialGadgetDelay == 1)
 		{
 			TheTransitionHandler->setGroup("MainMenuDefaultMenuLogoFade");
-			TheWindowManager->winSetFocus( parentMainMenu );
+			// GeneralsX @bugfix WebPort 2026-10-29 coming back from KEYBOARD the OPTIONS popup is open
+			// over the menu again: keep the keyboard on it, so ESC closes it
+			WindowLayout *optLayout = TheShell->getOptionsLayout( FALSE );
+			if( optLayout && !optLayout->isHidden() )
+				TheWindowManager->winSetFocus( optLayout->getFirstWindow() );
+			else
+				TheWindowManager->winSetFocus( parentMainMenu );
 			initialGadgetDelay = 2;
 			justEntered = FALSE;
 		}

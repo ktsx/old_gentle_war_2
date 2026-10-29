@@ -31,6 +31,7 @@
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
 
 #include "Common/ActionManager.h"
+#include <Utility/gx_trace.h>
 #include "Common/Team.h"
 #include "Common/StateMachine.h"
 #include "Common/BuildAssistant.h"
@@ -389,6 +390,7 @@ Object *WorkerAIUpdate::construct( const ThingTemplate *what,
 
 	// create an object at the destination location
 	Object *obj = TheThingFactory->newObject( what, owningPlayer->getDefaultTeam(), statusBits );
+	GX_DIAG_LOG("CONSTRUCTION: started '%s' (worker)\n", what->getName().str());
 
 	// even though we haven't actually built anything yet, this keeps things tidy
 	obj->setProducer( getObject() );

@@ -358,49 +358,50 @@ jobs:
 
       # Surface the interesting console lines as check-run annotations (readable through the API without
       # downloading artifacts): failures as errors, load/tick progress as notices. One step per log, since
-      # GitHub keeps at most 10 annotations of each level per step.
+      # GitHub keeps at most 10 annotations of each level per step — and about 50 per job, so the
+      # notices stay short: the later steps' errors must still fit.
       - name: Annotate menu smoke
         if: always()
         run: |
           f=smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "GBM_SELECTED|Clearing|VERDICT|UI STATE" "$f" | cut -c1-900 | tail -10 | sed "s/^/::notice title=$f::/"
+          grep -E "GBM_SELECTED|Clearing|VERDICT|UI STATE" "$f" | cut -c1-900 | tail -3 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate map smoke
         if: always()
         run: |
           f=map-smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "LOAD: progress|GAMELOGIC:" "$f" | cut -c1-900 | tail -6 | sed "s/^/::notice title=$f::/"
-          grep -E "TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
+          grep -E "LOAD: progress|GAMELOGIC:" "$f" | cut -c1-900 | tail -2 | sed "s/^/::notice title=$f::/"
+          grep -E "TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -2 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate skirmish smoke
         if: always()
         run: |
           f=skirmish-smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|INI ERROR|PAGEERROR|\[MessageBox\]|expected console line|VERDICT: FAIL|begin failed" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "GBM_SELECTED|GAMELOGIC: startNewGame:ENTER|TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -10 | sed "s/^/::notice title=$f::/"
+          grep -E "GBM_SELECTED|GAMELOGIC: startNewGame:ENTER|TICK-DIAG|VERDICT" "$f" | cut -c1-900 | tail -3 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate options / in-game menu
         if: always()
         run: |
           f=ui-smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|PAGEERROR|expected console line|UI SCRIPT: FAIL" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "KEYS: meta|QUITMENU:|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
+          grep -E "KEYS: meta|QUITMENU:|UI SCRIPT" "$f" | cut -c1-900 | tail -3 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate save / load
         if: always()
         run: |
           f=saveload-smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL|SAVEGAME: (error|GameStateMap throw)" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "SAVEGAME: map in save|startNewGame:ENTER|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
+          grep -E "SAVEGAME: map in save|startNewGame:ENTER|UI SCRIPT" "$f" | cut -c1-900 | tail -3 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate score screen
         if: always()
         run: |
           f=score-smoke.log; [ -f "$f" ] || exit 0
           grep -E "FATAL|PAGEERROR|expected console line|waitfor timed out|UI SCRIPT: FAIL" "$f" | cut -c1-900 | head -10 | sed "s/^/::error title=$f::/"
-          grep -E "SHELL: (push|doPush)|RECORDER: start|js:|UI SCRIPT" "$f" | cut -c1-900 | tail -8 | sed "s/^/::notice title=$f::/"
+          grep -E "SHELL: (push|doPush)|RECORDER: start|js:|UI SCRIPT" "$f" | cut -c1-900 | tail -4 | sed "s/^/::notice title=$f::/"
 
       - name: Annotate construction
         if: always()

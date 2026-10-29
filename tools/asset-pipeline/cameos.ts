@@ -11,7 +11,7 @@
  *                 infantry / vehicle / aircraft / structure  (Object KindOf, else EditorSorting)
  *                 upgrade (chevrons), special power (burst), general's promotion (medal),
  *                 orders: sell ($), stop (square), other commands (diamond)
- *   label       the display name in the 5x7 pixel font (one line on a button, two on a portrait)
+ *   label       the display name in the 5x7 pixel font, one line (2x on the big 120x96 images)
  *
  * What an image stands for is read from the INIs: Object blocks (SelectPortrait, ButtonImage,
  * Side, KindOf, EditorSorting, DisplayName), CommandButton blocks (ButtonImage, Command, Object,
@@ -257,18 +257,33 @@ function silhouette(p: Pen, kind: CameoKind) {
 /** Leading words that say little on a cameo ("Construction Dozer" -> "Dozer") when the name does not fit. */
 const FILLER = new Set(["CONSTRUCTION", "AMERICA", "AMERICAN", "CHINA", "CHINESE", "GLA", "TACTICAL", "UPGRADE"]);
 
-/** Fit a label: the whole name if it fits, else its words, each cut to the width. */
+/**
+ * Fit a label. One line (a button): the name if it fits, else its first two words with the longest
+ * one shortened a letter at a time (down to 3) — "War Factory" -> "WAR FACTO", "Nuclear Reactor" ->
+ * "NUCL REAC" — so related buildings stay apart. Two lines (a portrait): word-wrapped.
+ */
 function labelLines(label: string, maxChars: number, maxLines: number): string[] {
   let words = label.toUpperCase().split(" ").filter(Boolean);
   while (words.length > 1 && words.join(" ").length > maxChars * maxLines && FILLER.has(words[0])) words = words.slice(1);
   if (!words.length) return [];
+  if (maxLines === 1) {
+    if (words.join(" ").length <= maxChars) return [words.join(" ")];
+    let w = words.slice(0, 2);
+    while (w.join(" ").length > maxChars) {
+      let longest = 0;
+      for (let i = 1; i < w.length; i++) if (w[i].length > w[longest].length) longest = i;
+      if (w[longest].length <= 3) { w = w.slice(0, 1); break; }
+      w[longest] = w[longest].slice(0, -1);
+    }
+    return [w.join(" ").slice(0, maxChars)];
+  }
   const lines: string[] = [];
   let cur = "";
-  for (const w of words) {
-    const next = cur ? `${cur} ${w}` : w;
+  for (const word of words) {
+    const next = cur ? `${cur} ${word}` : word;
     if (next.length <= maxChars) { cur = next; continue; }
     if (cur) lines.push(cur);
-    cur = w.length > maxChars ? w.slice(0, maxChars) : w;
+    cur = word.slice(0, maxChars);
     if (lines.length === maxLines) break;
   }
   if (cur && lines.length < maxLines) lines.push(cur);
@@ -283,9 +298,11 @@ export function drawCameo(img: Image32, l: number, t: number, w: number, h: numb
   img.strokeRect(l, t, w, h, mix(base, [0, 0, 0, 255], 0.7));
   img.fillRect(l + 1, t + 1, w - 2, 1, mix(base, [255, 255, 255, 255], 0.4));
 
+  // A big image (120x96 — portraits, but some buttons use one too and get drawn at half size)
+  // gets the 2x font, one line: legible either way.
   const big = w >= 100 && h >= 80;
-  const scale = big ? 2 : 1;
-  const bandH = big ? 2 * (GLYPH_H + 2) * 1 + 4 : GLYPH_H + 3;      // portrait: two lines of the 1x font
+  const fs = big ? 2 : 1;
+  const bandH = (GLYPH_H + 3) * fs;
   const areaH = h - bandH - 2;
   const s = Math.max(0.5, Math.min((w - 8) / 32, areaH / 24) * (big ? 0.9 : 1));
   const ox = l + Math.round((w - 32 * s) / 2), oy = t + 2 + Math.round((areaH - 24 * s) / 2);
@@ -296,13 +313,8 @@ export function drawCameo(img: Image32, l: number, t: number, w: number, h: numb
   // label band
   const bandY = t + h - bandH;
   img.fillRect(l + 1, bandY, w - 2, bandH - 1, mix(base, [0, 0, 0, 255], 0.65));
-  const fs = 1;
   const maxChars = Math.max(1, Math.floor((w - 4) / ((GLYPH_W + 1) * fs)));
-  const lines = labelLines(info.label, maxChars, big ? 2 : 1);
-  let y = bandY + Math.floor((bandH - lines.length * (GLYPH_H + 2) + 2) / 2);
-  for (const ln of lines) {
-    drawText(img, l + Math.floor((w - textWidth(ln, fs)) / 2), y, ln, [240, 226, 170, 255], fs);
-    y += GLYPH_H + 2;
-  }
-  void scale;
+  const lines = labelLines(info.label, maxChars, 1);
+  const y = bandY + Math.floor((bandH - GLYPH_H * fs) / 2);
+  for (const ln of lines) drawText(img, l + Math.floor((w - textWidth(ln, fs)) / 2), y, ln, [240, 226, 170, 255], fs);
 }

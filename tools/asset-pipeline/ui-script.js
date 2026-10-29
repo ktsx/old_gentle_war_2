@@ -17,6 +17,7 @@
 //                    stacks (names with the RelWithDebInfo build) — for a page that stopped
 //                    drawing; screenshots of a stuck page time out, this does not
 //
+// UI_TAIL=N prints the last N console lines at the end.
 // Every step waits 1.5 s afterwards. Exit code 2 when the page logs FATAL / PAGEERROR, or when a
 // UI_EXPECT="substr;substr" line never appears in the console (use with ?diag=1 traces).
 // usage: node ui-script.js <url> "<steps>" [bootWaitMs]
@@ -110,6 +111,8 @@ const { chromium } = require('playwright');
   for (const want of (process.env.UI_EXPECT || '').split(';').filter(Boolean)) {
     if (!all.some((l) => l.includes(want))) fatal.push(`expected console line not seen: ${want}`);
   }
+  // UI_TAIL=N: the last N console lines, unfiltered (what the page said before it stopped)
+  if (Number(process.env.UI_TAIL) > 0) console.log('=== LAST CONSOLE LINES ===\n' + all.slice(-Number(process.env.UI_TAIL)).map((l) => l.slice(0, 400)).join('\n'));
   if (fatal.length) { console.error('=== UI SCRIPT: FAIL ===\n' + fatal.join('\n')); process.exit(2); }
   console.log('=== UI SCRIPT: OK ===');
 })().catch((e) => { console.error('ui-script failed:', e); process.exit(1); });

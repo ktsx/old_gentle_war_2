@@ -8,7 +8,8 @@
  * tooltip function and is filled by PopulateReplayFileListbox), ButtonLoadReplay, ButtonDeleteReplay,
  * ButtonCopyReplay and ButtonBack. The list has 4 columns — name, time + date, version, map — and the
  * GUI hack in ReplayMenuInit swaps columns 1 and 2 when the date column is the narrower one, so it is
- * made the wider. Double-clicking a row loads it. GadgetParent is optional (the init hides it).
+ * made the wider. Double-clicking a row loads it. GadgetParent is the target of the ReplayMenuFade
+ * transition (WindowTransitions.ini).
  *
  * In the browser COPY REPLAY (copy to the desktop) downloads the file instead (ReplayMenu.cpp).
  *
@@ -76,6 +77,9 @@ const replayMenu: LayoutSpec = {
             ...headers,
           ], P[0], P[1]),
         }),
+        // WindowTransitions.ini fades ReplayMenu.wnd:GadgetParent in (ReplayMenuFade); the init hides
+        // it first. Kept empty so the menu never depends on the fade un-hiding it.
+        win("GadgetParent", "USER", [0, 0, 1, 1], { colors: CLEAR, status: ["ENABLED", "NOINPUT"] }),
         // the list and the buttons report to ParentReplayMenu directly
         ...place([
           win("ListboxReplayFiles", "SCROLLLISTBOX", LIST, {

@@ -196,6 +196,11 @@ void TransitionWindow::update( Int frame )
 
 Bool TransitionWindow::isFinished()
 {
+	// GeneralsX @bugfix WebPort 2026-10-29 a transition whose window is not in the layout (or was
+	// destroyed) has nothing to animate; it used to stay "not finished" forever, so a screen whose
+	// shutdown waits for its fade (ReplayMenu: ReplayMenuFade on GadgetParent) never finished.
+	if(m_win == nullptr)
+		return TRUE;
 	if(m_transition)
 		return m_transition->isFinished();
 	return TRUE;
@@ -321,7 +326,7 @@ Bool TransitionGroup::isFinished()
 			if (m_currentFrame > 60 && (spamCounter++ % 30 == 0))
 			{
 				GX_DIAG_LOG( "GX-TRACE: TransitionGroup '%s' frame=%d NOT finished because window '%s' (style=%d) is not finished.\n",
-					m_name.str(), m_currentFrame, tWin->m_winName.str(), tWin->m_style);
+					m_name.str(), (Int)m_currentFrame, tWin->m_winName.str(), tWin->m_style);
 			}
 		}
 		it++;

@@ -47,6 +47,12 @@
 #include "GameClient/Mouse.h"
 #include "GameClient/GameText.h"
 #include "GameClient/GameWindowTransitions.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <vector>
+#include <Utility/gx_trace.h>
+extern "C" void GX_FlushIdbfs_Tab(const char *reason);
+#endif
 
 typedef UnicodeString ReplayName;
 typedef UnicodeString TooltipString;
@@ -801,7 +807,12 @@ WindowMsgHandledType ReplayMenuSystem( GameWindow *window, UnsignedInt msg,
 					break;
 				}
 				filename = GetReplayFilenameFromListbox(listboxReplayFiles, selected);
+#ifdef __EMSCRIPTEN__
+				// GeneralsX @feature WebPort 2026-10-29 there is no desktop to copy to: the file is downloaded
+				MessageBoxYesNo(TheGameText->fetch("GX:DownloadReplay"), TheGameText->fetch("GX:DownloadReplayConfirm"), copyReplayFlag, nullptr);
+#else
 				MessageBoxYesNo(TheGameText->fetch("GUI:CopyReplay"), TheGameText->fetch("GUI:AreYouSureCopy"), copyReplayFlag, nullptr);
+#endif
 			}
 			break;
 		}
@@ -836,6 +847,9 @@ void deleteReplay()
 		errorStr.translate(translate);
 		MessageBoxOk(TheGameText->fetch("GUI:Error"),errorStr, nullptr);
 	}
+#ifdef __EMSCRIPTEN__
+	GX_FlushIdbfs_Tab("replay-delete");   // GeneralsX @feature WebPort 2026-10-29 persist the delete (IDBFS)
+#endif
 	//Load the listbox shiznit
 	GadgetListBoxReset(listboxReplayFiles);
 	PopulateReplayFileListbox(listboxReplayFiles);
@@ -857,6 +871,37 @@ void copyReplay()
 	translate.translate(GetReplayFilenameFromListbox(listboxReplayFiles, selected));
 	filename.concat(translate);
 
+#ifdef __EMSCRIPTEN__
+	// GeneralsX @feature WebPort 2026-10-29 hand the file to the browser as a download
+	{
+		FILE *fp = fopen(filename.str(), "rb");
+		if (fp == nullptr)
+		{
+			MessageBoxOk(TheGameText->fetch("GUI:Error"), TheGameText->FETCH_OR_SUBSTITUTE("GUI:ReplayLoadFailed", L"The replay file could not be opened or is invalid."), nullptr);
+			return;
+		}
+		fseek(fp, 0, SEEK_END);
+		const long size = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+		std::vector<unsigned char> bytes(size > 0 ? (size_t)size : 1);
+		const size_t got = size > 0 ? fread(bytes.data(), 1, (size_t)size, fp) : 0;
+		fclose(fp);
+		GX_DIAG_LOG("REPLAY: download '%s' (%u bytes)\n", translate.str(), (unsigned)got);
+		EM_ASM({
+			var data = HEAPU8.slice($0, $0 + $1);
+			var name = UTF8ToString($2);
+			var url = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+			var a = document.createElement('a');
+			a.href = url;
+			a.download = name;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		}, bytes.data(), (int)got, translate.str());
+		return;
+	}
+#endif
 	char path[1024];
 	LPITEMIDLIST pidl;
 	SHGetSpecialFolderLocation(nullptr, CSIDL_DESKTOPDIRECTORY, &pidl);

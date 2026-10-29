@@ -60,3 +60,23 @@ END
 GX:BattleSummary
 US: "BATTLE SUMMARY"
 END
+
+GX:ReplayName
+US: "Name"
+END
+
+GX:ReplayDate
+US: "Date"
+END
+
+GX:ReplayVersion
+US: "Version"
+END
+
+GX:DownloadReplay
+US: "DOWNLOAD"
+END
+
+GX:DownloadReplayConfirm
+US: "Download this replay to your computer?"
+END

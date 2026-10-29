@@ -1,0 +1,476 @@
+{
+ "file": "ReplayMenu.wnd",
+ "version": 2,
+ "layout": {
+  "init": "ReplayMenuInit",
+  "update": "ReplayMenuUpdate",
+  "shutdown": "ReplayMenuShutdown"
+ },
+ "creationResolution": [
+  800,
+  600
+ ],
+ "defaults": {
+  "font": [
+   "Arial",
+   12,
+   1
+  ],
+  "headerTemplate": "Label"
+ },
+ "windows": [
+  {
+   "name": "ParentReplayMenu",
+   "type": "USER",
+   "rect": [
+    0,
+    0,
+    800,
+    600
+   ],
+   "status": [
+    "ENABLED"
+   ],
+   "system": "ReplayMenuSystem",
+   "input": "ReplayMenuInput",
+   "colors": {
+    "enabled": [
+     10,
+     12,
+     16,
+     255
+    ],
+    "enabledBorder": [
+     10,
+     12,
+     16,
+     255
+    ]
+   },
+   "children": [
+    {
+     "name": "ReplayPanel",
+     "type": "USER",
+     "rect": [
+      40,
+      30,
+      720,
+      540
+     ],
+     "status": [
+      "ENABLED",
+      "NOINPUT"
+     ],
+     "colors": {
+      "enabled": [
+       26,
+       30,
+       38,
+       240
+      ],
+      "enabledBorder": [
+       90,
+       100,
+       120,
+       255
+      ]
+     },
+     "children": [
+      {
+       "name": "StaticTextTitle",
+       "type": "STATICTEXT",
+       "rect": [
+        56,
+        44,
+        400,
+        26
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Label",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GUI:LoadReplay",
+       "font": [
+        "Arial",
+        16,
+        1
+       ],
+       "textColor": {
+        "enabled": [
+         255,
+         214,
+         120,
+         255
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         255
+        ]
+       }
+      },
+      {
+       "name": "StaticTextHeader0",
+       "type": "STATICTEXT",
+       "rect": [
+        60,
+        80,
+        216,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:ReplayName"
+      },
+      {
+       "name": "StaticTextHeader1",
+       "type": "STATICTEXT",
+       "rect": [
+        280,
+        80,
+        202,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:ReplayDate"
+      },
+      {
+       "name": "StaticTextHeader2",
+       "type": "STATICTEXT",
+       "rect": [
+        486,
+        80,
+        79,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:ReplayVersion"
+      },
+      {
+       "name": "StaticTextHeader3",
+       "type": "STATICTEXT",
+       "rect": [
+        569,
+        80,
+        175,
+        18
+       ],
+       "status": [
+        "ENABLED",
+        "NOINPUT"
+       ],
+       "headerTemplate": "Small",
+       "staticText": {
+        "centered": false
+       },
+       "colors": {
+        "enabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "enabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabled": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "disabledBorder": [
+         0,
+         0,
+         0,
+         0
+        ]
+       },
+       "text": "GX:MapPreview"
+      }
+     ]
+    },
+    {
+     "name": "ListboxReplayFiles",
+     "type": "SCROLLLISTBOX",
+     "rect": [
+      56,
+      100,
+      688,
+      380
+     ],
+     "status": [
+      "ENABLED"
+     ],
+     "listbox": {
+      "length": 200,
+      "scrollBar": true,
+      "columns": 4,
+      "columnWidths": [
+       32,
+       30,
+       12,
+       26
+      ],
+      "forceSelect": true
+     },
+     "colors": {
+      "enabled": [
+       34,
+       38,
+       48,
+       255
+      ],
+      "enabledBorder": [
+       110,
+       120,
+       140,
+       255
+      ],
+      "hilite": [
+       60,
+       80,
+       120,
+       255
+      ],
+      "hiliteBorder": [
+       190,
+       205,
+       230,
+       255
+      ],
+      "disabled": [
+       24,
+       24,
+       28,
+       255
+      ],
+      "disabledBorder": [
+       60,
+       60,
+       66,
+       255
+      ]
+     },
+     "headerTemplate": "Small"
+    },
+    {
+     "name": "ButtonLoadReplay",
+     "type": "PUSHBUTTON",
+     "rect": [
+      56,
+      500,
+      160,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Load",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonDeleteReplay",
+     "type": "PUSHBUTTON",
+     "rect": [
+      228,
+      500,
+      160,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:DeleteReplay",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonCopyReplay",
+     "type": "PUSHBUTTON",
+     "rect": [
+      400,
+      500,
+      160,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GX:DownloadReplay",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    },
+    {
+     "name": "ButtonBack",
+     "type": "PUSHBUTTON",
+     "rect": [
+      584,
+      500,
+      160,
+      36
+     ],
+     "status": [
+      "ENABLED",
+      "IMAGE"
+     ],
+     "text": "GUI:Back",
+     "images": {
+      "enabled": "GxButton",
+      "disabled": "GxButtonDis",
+      "hilite": "GxButtonHi"
+     },
+     "headerTemplate": "Button"
+    }
+   ]
+  }
+ ]
+}

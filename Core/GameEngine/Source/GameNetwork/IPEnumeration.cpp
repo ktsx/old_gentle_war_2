@@ -180,7 +180,10 @@ AsciiString IPEnumeration::getMachineName()
 	if (g_useVirtualNetworking)
 	{
 		AsciiString str;
-		str.format("VirtualMachine_%d_%d_%d_%d", (int)g_virtualIP_a, (int)g_virtualIP_b, (int)g_virtualIP_c, (int)g_virtualIP_d);
+		// GeneralsX @bugfix WebPort 2026-10-30 — the default LAN player name; it is cut to 12 characters
+		// (g_lanPlayerNameLength), which left every "VirtualMachine_10_0_0_N" as "VirtualMachi" and the
+		// LAN refused each join as a duplicate name. The host part of the virtual IP keeps it unique.
+		str.format("Player%d-%d", (int)g_virtualIP_c, (int)g_virtualIP_d);
 		return str;
 	}
 	if (!m_isWinsockInitialized)

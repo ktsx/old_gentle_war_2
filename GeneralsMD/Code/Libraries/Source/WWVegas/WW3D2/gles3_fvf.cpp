@@ -155,6 +155,36 @@ unsigned int GLES3_FVFDecoder::Get_Tex_Offset(unsigned int n) const {
     return texcoord_offset[n];
 }
 
+namespace {
+const int kCachedAttribs = 7;                     // ATTR_POSITION .. ATTR_TEXCOORD3
+unsigned g_attribEnabled = 0;                     // bit per attribute
+float g_attribConst[kCachedAttribs][4];
+
+void Attrib_Enable(int i, bool on) {
+    const unsigned bit = 1u << i;
+    if (((g_attribEnabled & bit) != 0) == on) return;
+    if (on) { glEnableVertexAttribArray(i); g_attribEnabled |= bit; }
+    else    { glDisableVertexAttribArray(i); g_attribEnabled &= ~bit; }
+}
+
+void Attrib_Const(int i, float x, float y, float z, float w) {
+    float *c = g_attribConst[i];
+    if (c[0] == x && c[1] == y && c[2] == z && c[3] == w) return;
+    glVertexAttrib4f(i, x, y, z, w);
+    c[0] = x; c[1] = y; c[2] = z; c[3] = w;
+}
+} // namespace
+
+void GLES3_FVF_Reset_Attrib_Cache() { GLES3_FVFDecoder::Reset_Attrib_Cache(); }
+
+void GLES3_FVFDecoder::Reset_Attrib_Cache() {
+    g_attribEnabled = 0;
+    for (int i = 0; i < kCachedAttribs; i++) {
+        g_attribConst[i][0] = g_attribConst[i][1] = g_attribConst[i][2] = 0.0f;
+        g_attribConst[i][3] = 1.0f;
+    }
+}
+
 // ============================================================================
 // Apply_Vertex_Attribs — Set up glVertexAttribPointer for decoded FVF
 //
@@ -173,7 +203,7 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
         bool is_xyzrhw = (fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW;
         int pos_components = is_xyzrhw ? 4 : 3;
 
-        glEnableVertexAttribArray(ATTR_POSITION);
+        Attrib_Enable(ATTR_POSITION, true);
         glVertexAttribPointer(
             ATTR_POSITION,
             pos_components,
@@ -183,12 +213,12 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
             (const void*)(uintptr_t)(base_offset_bytes + location_offset)
         );
     } else {
-        glDisableVertexAttribArray(ATTR_POSITION);
+        Attrib_Enable(ATTR_POSITION, false);
     }
 
     // --- Normal ---
     if (fvf & D3DFVF_NORMAL) {
-        glEnableVertexAttribArray(ATTR_NORMAL);
+        Attrib_Enable(ATTR_NORMAL, true);
         glVertexAttribPointer(
             ATTR_NORMAL,
             3,
@@ -198,9 +228,9 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
             (const void*)(uintptr_t)(base_offset_bytes + normal_offset)
         );
     } else {
-        glDisableVertexAttribArray(ATTR_NORMAL);
+        Attrib_Enable(ATTR_NORMAL, false);
         // Default normal (0, 0, 1) for vertices without normals
-        glVertexAttrib3f(ATTR_NORMAL, 0.0f, 0.0f, 1.0f);
+        Attrib_Const(ATTR_NORMAL, 0.0f, 0.0f, 1.0f, 1.0f);
     }
 
     // --- Diffuse color ---
@@ -209,7 +239,7 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
     // WebGL2 does NOT support GL_BGRA, so we pass as GL_RGBA and swizzle
     // in the vertex shader (swap .r and .b).
     if (fvf & D3DFVF_DIFFUSE) {
-        glEnableVertexAttribArray(ATTR_COLOR);
+        Attrib_Enable(ATTR_COLOR, true);
         glVertexAttribPointer(
             ATTR_COLOR,
             4,
@@ -219,9 +249,9 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
             (const void*)(uintptr_t)(base_offset_bytes + diffuse_offset)
         );
     } else {
-        glDisableVertexAttribArray(ATTR_COLOR);
+        Attrib_Enable(ATTR_COLOR, false);
         // Default: opaque white (matches DX8 default when no vertex color)
-        glVertexAttrib4f(ATTR_COLOR, 1.0f, 1.0f, 1.0f, 1.0f);
+        Attrib_Const(ATTR_COLOR, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     // --- Texture coordinates ---
@@ -230,7 +260,7 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
         int attr_loc = ATTR_TEXCOORD0 + i;
         if (i < tex_count) {
             unsigned int dim = Get_Tex_Coord_Size(fvf, i);
-            glEnableVertexAttribArray(attr_loc);
+            Attrib_Enable(attr_loc, true);
             glVertexAttribPointer(
                 attr_loc,
                 dim,
@@ -240,8 +270,8 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
                 (const void*)(uintptr_t)(base_offset_bytes + texcoord_offset[i])
             );
         } else {
-            glDisableVertexAttribArray(attr_loc);
-            glVertexAttrib2f(attr_loc, 0.0f, 0.0f);
+            Attrib_Enable(attr_loc, false);
+            Attrib_Const(attr_loc, 0.0f, 0.0f, 0.0f, 1.0f);   // what glVertexAttrib2f(0, 0) set
         }
     }
 }
@@ -251,7 +281,7 @@ void GLES3_FVFDecoder::Apply_Vertex_Attribs(unsigned int stride,
 // ============================================================================
 void GLES3_FVFDecoder::Disable_All_Attribs() {
     for (int i = 0; i <= ATTR_TEXCOORD3; i++) {
-        glDisableVertexAttribArray(i);
+        Attrib_Enable(i, false);
     }
 }
 

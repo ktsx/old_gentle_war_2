@@ -40,6 +40,8 @@ extern SDL_Window *TheSDL3Window;
 // Static state
 // ============================================================================
 #include <unordered_map>
+
+void GLES3_FVF_Reset_Attrib_Cache();   // gles3_fvf.cpp
 extern "C" int GX_DiagEnabled(void);
 
 static GLES3_PipelineState g_State;
@@ -286,6 +288,7 @@ bool GLES3_Init(void* hwnd, bool lite) {
     // Create VAO (required in OpenGL ES 3.0 / WebGL 2.0)
     glGenVertexArrays(1, &g_State.vao);
     glBindVertexArray(g_State.vao);
+    GLES3_FVF_Reset_Attrib_Cache();   // gles3_fvf.cpp: a fresh VAO, nothing enabled
 
     // Default GL state matching DX8 defaults
     glEnable(GL_DEPTH_TEST);
@@ -576,40 +579,45 @@ void GLES3_Set_Viewport(unsigned int x, unsigned int y,
 // DX8Wrapper API — Texture Binding
 // ============================================================================
 
+// GeneralsX @performance WebPort 2026-10-30 — sampling state goes through WebGL2 sampler objects:
+// one per (wrap S, wrap T, mag, min) combination, made once, bound to a unit only when it changes.
+// Setting four texture parameters on every texture bind was ~480 WebGL calls a frame. A sampler
+// overrides the texture's own parameters, so the creation paths that set them need no changes.
+static GLuint g_UnitSampler[8] = {0};
+
+static GLuint GLES3_Sampler_For(GLenum wrap_s, GLenum wrap_t, GLenum mag, GLenum min) {
+    static std::unordered_map<unsigned long long, GLuint> samplers;
+    const unsigned long long key = ((unsigned long long)wrap_s << 48) ^ ((unsigned long long)wrap_t << 32) ^
+                                   ((unsigned long long)mag << 16) ^ (unsigned long long)min;
+    std::unordered_map<unsigned long long, GLuint>::iterator it = samplers.find(key);
+    if (it != samplers.end()) return it->second;
+    GLuint s = 0;
+    glGenSamplers(1, &s);
+    glSamplerParameteri(s, GL_TEXTURE_WRAP_S, wrap_s);
+    glSamplerParameteri(s, GL_TEXTURE_WRAP_T, wrap_t);
+    glSamplerParameteri(s, GL_TEXTURE_MAG_FILTER, mag);
+    glSamplerParameteri(s, GL_TEXTURE_MIN_FILTER, min);
+    samplers[key] = s;
+    return s;
+}
+
 void GLES3_Apply_Texture_Stage_Parameters(unsigned int stage) {
     GLuint tex = g_State.bound_textures[stage];
     if (tex == 0) return;
 
-    glActiveTexture(GL_TEXTURE0 + stage);
-
-    // Apply wrap mode U (S)
     unsigned int u = g_State.texture_stage_state[stage][GLES3_TSS_ADDRESSU];
-    if (u != 0) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GLES3_Helpers::AddressMode_To_GL(u));
-    } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    }
-
-    // Apply wrap mode V (T)
     unsigned int v = g_State.texture_stage_state[stage][GLES3_TSS_ADDRESSV];
-    if (v != 0) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GLES3_Helpers::AddressMode_To_GL(v));
-    } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    }
+    const GLenum wrap_s = u != 0 ? GLES3_Helpers::AddressMode_To_GL(u) : GL_REPEAT;
+    const GLenum wrap_t = v != 0 ? GLES3_Helpers::AddressMode_To_GL(v) : GL_REPEAT;
 
-    // Apply filter modes
     unsigned int mag = g_State.texture_stage_state[stage][GLES3_TSS_MAGFILTER];
-    if (mag != 0) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLES3_Helpers::FilterMode_To_GL(mag));
-    } else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
+    const GLenum gl_mag_filter = mag != 0 ? GLES3_Helpers::FilterMode_To_GL(mag) : GL_LINEAR;
 
     unsigned int min = g_State.texture_stage_state[stage][GLES3_TSS_MINFILTER];
     unsigned int mip = g_State.texture_stage_state[stage][GLES3_TSS_MIPFILTER];
 
-    // Determine if texture has mipmaps
+    // Determine if texture has mipmaps (a mipmapped min filter on a texture without them would
+    // make it incomplete: it samples black)
     bool has_mipmaps = GLES3_Texture_Has_Mipmaps(tex);
 
     if (min == 0) min = 1; // Default D3D8: POINT (1)
@@ -625,8 +633,12 @@ void GLES3_Apply_Texture_Stage_Parameters(unsigned int stage) {
         // D3DTEXF_LINEAR: Linear mipmap interpolation
         gl_min_filter = (min == 1) ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
     }
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_min_filter);
+
+    const GLuint sampler = GLES3_Sampler_For(wrap_s, wrap_t, gl_mag_filter, gl_min_filter);
+    if (g_UnitSampler[stage] != sampler) {
+        glBindSampler(stage, sampler);
+        g_UnitSampler[stage] = sampler;
+    }
 }
 
 void GLES3_Set_Texture(unsigned int stage, GLuint gl_texture) {

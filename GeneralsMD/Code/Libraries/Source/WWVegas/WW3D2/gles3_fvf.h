@@ -151,6 +151,12 @@ public:
     static constexpr int ATTR_TEXCOORD2 = 5;
     static constexpr int ATTR_TEXCOORD3 = 6;
 
+    // GeneralsX @performance WebPort 2026-10-30 — the vertex attribute state of the one VAO
+    // (gles3_wrapper.cpp) is cached: enable/disable and the constant values of absent attributes
+    // are only sent when they change (they were ~700 + ~300 WebGL calls a frame). Call after the
+    // VAO is (re)created: a fresh VAO has every attribute disabled and constants (0,0,0,1).
+    static void Reset_Attrib_Cache();
+
 private:
     unsigned int fvf = 0;
     unsigned int fvf_size = 0;

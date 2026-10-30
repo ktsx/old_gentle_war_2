@@ -429,6 +429,16 @@ jobs:
           sleep 2
           node tools/asset-pipeline/lan-smoke.js http://localhost:8888/GeneralsZH.html ws://localhost:8789/net/ci | tee lan-net-smoke.log
 
+      - name: WebGL calls per frame
+        if: always() && matrix.shard == 'menu-map'
+        run: |
+          set -o pipefail
+          # the shim's state caching (attribute cache, sampler objects) must hold: before it, the map
+          # took ~480 texParameteri and ~720 attribute enables/disables a frame (101 draws)
+          GL_LIMITS="texParameteri=20;enableVertexAttribArray=120;disableVertexAttribArray=120;vertexAttrib2f=10;vertexAttrib4f=60" \
+          node tools/asset-pipeline/gl-calls.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/gxtest.map" | tee gl-calls.log
+          grep -E "GL CALLS" gl-calls.log | sed "s/^/::notice title=gl-calls::/"
+
       - name: Check the terrain is visible
         if: always() && (matrix.shard == 'menu-map')
         run: |
@@ -573,6 +583,7 @@ jobs:
             skirmish-smoke.log
             launcher-smoke.log
             lan-*.log
+            gl-calls.log
             lan-*.png
             net-smoke.log
             net-server.log

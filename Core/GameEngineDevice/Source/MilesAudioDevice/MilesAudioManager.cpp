@@ -1396,7 +1396,20 @@ AsciiString MilesAudioManager::prevMusicTrack()
 //-------------------------------------------------------------------------------------------------
 Bool MilesAudioManager::isMusicPlaying() const
 {
-	return findActiveMusic() != nullptr;
+	if (findActiveMusic() != nullptr)
+		return TRUE;
+	// GeneralsX @bugfix WebPort 2026-10-30 — music asked for this frame counts too: requests are only
+	// processed in update(), so two "start the menu music unless some is playing" checks in one frame
+	// (Shell::showShellMap without a shell map) both saw none and started the track twice.
+	for (std::list<AudioRequest*>::const_iterator it = m_audioRequests.begin(); it != m_audioRequests.end(); ++it) {
+		const AudioRequest *req = *it;
+		if (req->m_request != AR_Play || !req->m_pendingEvent)
+			continue;
+		const AudioEventInfo *info = req->m_pendingEvent->getAudioEventInfo();
+		if (info && info->m_soundType == AT_Music)
+			return TRUE;
+	}
+	return FALSE;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -543,12 +543,16 @@ EM_JS(void, AILBridge_init, (), {
   };
   window['AILBridge'] = B;
   window['GX_audioStats'] = function () {
-    var st = B.stats, playing = 0;
-    for (var k in B.voices) { var v = B.voices[k]; if (v.source || (v.audio && !v.audio.paused)) playing++; }
+    var st = B.stats, playing = 0, streams = 0;
+    for (var k in B.voices) {
+      var v = B.voices[k];
+      if (v.source) playing++;
+      if (v.audio && !v.audio.paused && !v.audio.ended) { playing++; streams++; }
+    }
     return { 'state': B.ctx ? B.ctx.state : 'none', 'started2D': st.started2D, 'started3D': st.started3D,
              'streamsStarted': st.streamsStarted, 'streamsReady': st.streamsReady, 'eos': st.eos, 'eos3D': st.eos3D, 'eosStream': st.eosStream, 'decoded': st.decoded,
              'cacheHits': st.cacheHits, 'decodeErrors': st.decodeErrors, 'streamErrors': st.streamErrors,
-             'notReady': st.notReady, 'playing': playing, 'maxRms': Math.round(st.maxRms * 10000) / 10000 };
+             'notReady': st.notReady, 'playing': playing, 'streamsPlaying': streams, 'maxRms': Math.round(st.maxRms * 10000) / 10000 };
   };
   window['GX_audioResetLevel'] = function () { B.stats.maxRms = 0; };
 });

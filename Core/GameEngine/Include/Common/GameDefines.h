@@ -148,8 +148,15 @@
 #endif
 
 // Disable non retail fixes in the networking, such as putting more data per UDP packet
+// GeneralsX @bugfix WebPort 2026-10-30 — not on the web: wchar_t is 4 bytes there, a LANMessage is
+// 536 bytes, over the retail 476-byte packet limit, and Transport::queueSend dropped every LAN
+// lobby message. Browsers only talk to browsers (no UDP), so the larger non-retail packets are free.
 #ifndef RETAIL_COMPATIBLE_NETWORKING
+#ifdef __EMSCRIPTEN__
+#define RETAIL_COMPATIBLE_NETWORKING (0)
+#else
 #define RETAIL_COMPATIBLE_NETWORKING (1)
+#endif
 #endif
 
 // This is essentially synonymous for RETAIL_COMPATIBLE_CRC. There is a lot wrong with AIGroup, such as use-after-free, double-free, leaks,

@@ -271,6 +271,9 @@ struct LANMessage
 
 #ifndef __EMSCRIPTEN__
 static_assert(sizeof(LANMessage) <= MAX_LANAPI_PACKET_SIZE, "LANMessage struct cannot be larger than the max packet size");
+#else
+// 4-byte wchar_t: larger than the retail limit, so the web build uses the non-retail packet size
+static_assert(sizeof(LANMessage) <= MAX_PACKET_SIZE, "LANMessage struct cannot be larger than the max packet size");
 #endif
 
 

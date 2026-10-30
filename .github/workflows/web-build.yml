@@ -222,10 +222,16 @@ jobs:
   # drawn and lit after the first key press. This is the first test that runs
   # the engine rather than merely compiling it.
   boot-smoke:
-    name: Boot to main menu and launch a map (free assets, Release)
+    # One job per group of scenarios, in parallel (each boots its own engine anyway): the whole
+    # set takes as long as the slowest group (~3 min) instead of their sum (~17 min).
+    name: Boot smoke (${{ matrix.shard }}, free assets, Release)
     needs: build-web
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [menu-map, options, saveload, score, construction, audio-launcher, night, snow]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -254,6 +260,7 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Serve and boot
+        if: matrix.shard == 'menu-map'
         run: |
           set -o pipefail
           cp scripts/serve.py site/serve.py
@@ -266,6 +273,7 @@ jobs:
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1" 120000 menu.png 8000 --begin | tee smoke.log
 
       - name: Check the menu is lit
+        if: matrix.shard == 'menu-map'
         run: |
           set -o pipefail
           python3 -m pip install --quiet pillow
@@ -273,7 +281,7 @@ jobs:
           sed "s/^/::notice title=menu-check::/" menu-check.log
 
       - name: Launch a map
-        if: always()
+        if: always() && (matrix.shard == 'menu-map')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -284,7 +292,7 @@ jobs:
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&gxdraws=40&args=-file+Maps/gxtest.map" 120000 map.png 60000 --begin | tee map-smoke.log
 
       - name: Start a skirmish from the menu
-        if: always()
+        if: always() && (matrix.shard == 'menu-map')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -295,7 +303,7 @@ jobs:
           node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1" 120000 skirmish.png 8000 --begin | tee skirmish-smoke.log
 
       - name: Options and the in-game menu
-        if: always()
+        if: always() && (matrix.shard == 'options')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -310,7 +318,7 @@ jobs:
             | tee ui-smoke.log
 
       - name: Save and load a game
-        if: always()
+        if: always() && (matrix.shard == 'saveload')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -325,7 +333,7 @@ jobs:
             | tee saveload-smoke.log
 
       - name: End a match (score screen, save and play a replay)
-        if: always()
+        if: always() && (matrix.shard == 'score')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -345,7 +353,7 @@ jobs:
             | tee score-smoke.log
 
       - name: Build a barracks
-        if: always()
+        if: always() && (matrix.shard == 'construction')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -359,7 +367,7 @@ jobs:
             | tee build-smoke.log
 
       - name: Audio (music, UI and world sounds)
-        if: always()
+        if: always() && (matrix.shard == 'audio-launcher')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -376,19 +384,19 @@ jobs:
           python3 tools/asset-pipeline/check-audio.py audio-smoke.log | tee audio-check.log
 
       - name: Night and snow maps
-        if: always()
+        if: always() && (matrix.shard == 'night' || matrix.shard == 'snow')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
           # gxnight (time of day 4: moonlight, every object on its NIGHT model) and gxsnow (snowy weather:
           # SNOW models, GxSnow terrain, a map.ini that turns the snowfall on) — variants.ts / map.ts.
-          for m in gxnight gxsnow; do
+          m=gx${{ matrix.shard }}; for m in $m; do
             SMOKE_EXPECT="GAMELOGIC: startNewGame:ENTER;inGame=1 isPaused=0" SMOKE_WAIT_FOR="inGame=1 isPaused=0" \
             node tools/asset-pipeline/smoke.js "http://localhost:8888/GeneralsZH.html?diag=1&args=-file+Maps/$m.map" 120000 $m.png 90000 --begin | tee $m-smoke.log
           done
 
       - name: Launcher (free set, offline, own files)
-        if: always()
+        if: always() && (matrix.shard == 'audio-launcher')
         run: |
           set -o pipefail
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
@@ -397,7 +405,7 @@ jobs:
           node tools/asset-pipeline/launcher-smoke.js http://localhost:8888/ free-out/assets | tee launcher-smoke.log
 
       - name: Check the terrain is visible
-        if: always()
+        if: always() && (matrix.shard == 'menu-map')
         run: |
           set -o pipefail
           python3 -m pip install --quiet pillow
@@ -492,7 +500,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: boot-smoke
+          name: boot-smoke-${{ matrix.shard }}
+          if-no-files-found: ignore
           path: |
             menu.png
             map.png

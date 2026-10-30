@@ -16,6 +16,9 @@
  *                 placeholder atlases for every corpus MappedImage texture, fx-textures.ts particle/shadow/
  *                 track/beam sprites, free-models.ts unit atlas), Art/Terrain/*.tga
  *   MapsZH.big    Maps/<name>/<name>.map
+ *   AudioZH.big   Data/Audio/Sounds/*.wav, Data/Audio/Speech/*.wav (audio.ts: a synthesized stand-in for
+ *                 every sound and speech file the corpus INIs name, a few dozen distinct sounds shared)
+ *   MusicZH.big   Data/Audio/Tracks/* (audio.ts: two generated music loops under every track name)
  *   W3DZH.big     Art/W3D/*.w3d (free-models.ts: procedural models named after the corpus' retail model names;
  *                 placeholder-models.ts: sized stand-ins for every other faction model the INIs reference)
  *
@@ -32,7 +35,8 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { parseStr, buildCsf } from "./strings.ts";
 import { buildWnd } from "./wnd.ts";
-import { packDir } from "./big.ts";
+import { packDir, buildBig } from "./big.ts";
+import { buildFreeAudio } from "./audio.ts";
 import { encodeTga, writeFreeImages } from "./tga.ts";
 import { writeHudSkin } from "./hud-skin.ts";
 import { writePlaceholderAtlases } from "./mapped-images.ts";
@@ -169,10 +173,17 @@ function main() {
   console.log(`TexturesZH.big: ${n3} files`);
   console.log(`MapsZH.big: ${n4} files`);
   console.log(`W3DZH.big: ${n5} files`);
+  {
+    const audio = buildFreeAudio(patchData);
+    writeFileSync(join(assets, "AudioZH.big"), buildBig(audio.sounds));
+    writeFileSync(join(assets, "MusicZH.big"), buildBig(audio.music));
+    console.log(`AudioZH.big: ${audio.sounds.length} sound / speech files, MusicZH.big: ${audio.music.length} tracks — ` +
+      `${audio.archetypes.size} distinct sounds, ${(audio.bytes / 1e6).toFixed(2)} MB of audio data`);
+  }
 
   // 9. assets/manifest.json: what the launcher (web/launcher) downloads into the browser for
   //    offline play — each archive's size and SHA-256, and a version over all of them
-  const archives = ["INIZH.big", "WindowZH.big", "TexturesZH.big", "MapsZH.big", "W3DZH.big"].map((name) => {
+  const archives = ["INIZH.big", "WindowZH.big", "TexturesZH.big", "MapsZH.big", "W3DZH.big", "AudioZH.big", "MusicZH.big"].map((name) => {
     const buf = readFileSync(join(assets, name));
     return { name, size: buf.length, sha256: createHash("sha256").update(buf).digest("hex") };
   });

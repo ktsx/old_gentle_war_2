@@ -842,5 +842,18 @@ extern "C" char* WebAudioBridge_ReadEntireFile(const char* filename, uint32_t* o
   return buf;
 }
 
+// GeneralsX @feature WebPort 2026-10-30 — streamed audio fetches its bytes itself, asynchronously:
+// where in which mounted archive is this file? (False for loose files, e.g. under /userdata.)
+extern "C" bool WebAudioBridge_LocateFile(const char* filename, const char** url, uint32_t* offset, uint32_t* size)
+{
+  const BigFileEntry* e = BigVFS::Find_File(filename);
+  const char* u = e ? BigVFS::Archive_Url(e) : nullptr;
+  if (!u || !*u) return false;
+  *url = u;
+  *offset = e->offset;
+  *size = e->size;
+  return true;
+}
+
 #endif // __EMSCRIPTEN__
 

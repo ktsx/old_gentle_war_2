@@ -28,7 +28,7 @@ const { chromium } = require('playwright');
 (async () => {
   const [url, steps, bootWait] = process.argv.slice(2);
   if (!url || !steps) { console.error('usage: node ui-script.js <url> "<steps>" [bootWaitMs]'); process.exit(2); }
-  const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 } });
   const t0 = Date.now();
   const stamp = () => `${((Date.now() - t0) / 1000).toFixed(1).padStart(6)}s`;

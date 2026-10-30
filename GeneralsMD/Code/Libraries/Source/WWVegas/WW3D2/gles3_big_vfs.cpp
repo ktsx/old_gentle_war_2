@@ -486,6 +486,12 @@ const BigFileEntry *BigVFS::Find_File(const char *path) {
   return &archives[archive_idx].entries[entry_idx];
 }
 
+const char *BigVFS::Archive_Url(const BigFileEntry *entry) {
+  if (!entry || entry->archive_index >= archives.size())
+    return nullptr;
+  return archives[entry->archive_index].url.c_str();
+}
+
 // ============================================================================
 // Read_File_Sync — Synchronous file read via HTTP Range request
 // ============================================================================

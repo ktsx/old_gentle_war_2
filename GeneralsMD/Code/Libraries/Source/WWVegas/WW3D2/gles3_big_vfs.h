@@ -98,6 +98,10 @@ public:
     // Returns pointer to entry, or nullptr if not found
     static const BigFileEntry* Find_File(const char* path);
 
+    // The URL a file's archive is read from (server URL or the asset set's blob: URL), for
+    // consumers that fetch a byte range themselves (streamed audio). nullptr when unknown.
+    static const char* Archive_Url(const BigFileEntry* entry);
+
     // Read a file's data (may trigger async HTTP fetch on first access)
     // path: virtual path (e.g., "data/ini/weapon.ini")
     // out_data: receives pointer to file data (valid until Shutdown)

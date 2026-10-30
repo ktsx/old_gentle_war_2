@@ -9,6 +9,8 @@
 #include <emscripten.h>
 
 extern "C" char* WebAudioBridge_ReadEntireFile(const char* filename, uint32_t* out_size);
+// where a file lies inside a mounted .big: the archive's URL (server or blob:), offset and size
+extern "C" bool WebAudioBridge_LocateFile(const char* filename, const char** url, uint32_t* offset, uint32_t* size);
 
 // IMA ADPCM tables
 static const int indexTable[16] = {
@@ -210,345 +212,358 @@ static void decode_block_stereo(const uint8_t* src, uint32_t block_size, int16_t
     }
 }
 
-EM_JS(void, AILBridge_init, (), {
-    if (!window.AILBridge) {
-        window.AILBridge = {
-            audioContext: null,
-            samples: {},
-            
-            init() {
-                window.gxAudioVerbose && console.log("[AILBridge] init() called");
-                if (!this.audioContext) {
-                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    window.gxAudioVerbose && console.log("[AILBridge] AudioContext created, state:", this.audioContext.state);
-                    if (window['Module']) {
-                        if (!window['Module']['SDL2']) window['Module']['SDL2'] = {};
-                        window['Module']['SDL2']['audioContext'] = this.audioContext;
-                    }
-                } else {
-                    window.gxAudioVerbose && console.log("[AILBridge] AudioContext already exists, state:", this.audioContext.state);
-                }
-            },
-            
-            getSample(id) {
-                if (!this.samples[id]) {
-                    this.samples[id] = {
-                        buffer: null,
-                        source: null,
-                        gainNode: null,
-                        pannerNode: null,
-                        state: 'empty',
-                        playWhenReady: false,
-                        loop: false,
-                        volume: 1.0,
-                        pan: 0.5,
-                        min_dist: 10.0,
-                        max_dist: 1000.0,
-                        x: 0.0, y: 0.0, z: 0.0,
-                        startTime: 0.0,
-                        
-                        // For streaming:
-                        audio: null,
-                        mediaSourceNode: null,
-                        objectURL: null,
-                        duration: 0.0
-                    };
-                }
-                return this.samples[id];
-            },
-            
-            setSampleFile(id, file_ptr, is_3d) {
-                window.gxAudioVerbose && console.log("[AILBridge] setSampleFile() called: id =", id, "file_ptr =", file_ptr, "is_3d =", is_3d);
-                let s = this.getSample(id);
-                s.state = 'decoding';
-                s.playWhenReady = false;
-                
-                if (!file_ptr) {
-                    console.warn("[AILBridge] setSampleFile: file_ptr is null/0 for id =", id);
-                    return;
-                }
-                let riffSize = HEAPU32[(file_ptr + 4) >> 2];
-                let totalSize = riffSize + 8;
-                window.gxAudioVerbose && console.log("[AILBridge] setSampleFile: riffSize =", riffSize, "totalSize =", totalSize);
-                
-                // WebPort: Detect if this is a dummy WAV header wrapping an MP3/Ogg payload.
-                // If the first 4 bytes are "RIFF" and bytes 8..11 are "WAVE", check if the payload
-                // starting at offset 44 has compressed audio magic numbers (MP3 sync frames or OggS).
-                let isCompressed = false;
-                if (totalSize > 44) {
-                    let byte44 = HEAPU8[file_ptr + 44];
-                    let byte45 = HEAPU8[file_ptr + 45];
-                    let byte46 = HEAPU8[file_ptr + 46];
-                    let isMP3 = (byte44 === 0x49 && byte45 === 0x44 && byte46 === 0x33) || // ID3
-                                (byte44 === 0xFF && (byte45 & 0xE0) === 0xE0);             // MP3 Sync
-                    let isOgg = (byte44 === 0x4F && byte45 === 0x67 && byte46 === 0x67 && HEAPU8[file_ptr + 47] === 0x53); // OggS
-                    isCompressed = isMP3 || isOgg;
-                }
 
-                let audioBuffer;
-                if (isCompressed) {
-                    window.gxAudioVerbose && console.log("[AILBridge] Detected wrapped compressed audio. Peeling 44-byte WAV header.");
-                    let compressedBytes = new Uint8Array(HEAPU8.buffer, file_ptr + 44, totalSize - 44).slice();
-                    audioBuffer = compressedBytes.buffer;
-                } else {
-                    let bytes = new Uint8Array(HEAPU8.buffer, file_ptr, totalSize).slice();
-                    audioBuffer = bytes.buffer;
-                }
-                
-                this.audioContext.decodeAudioData(audioBuffer, (buffer) => {
-                    window.gxAudioVerbose && console.log("[AILBridge] decodeAudioData success for sample id =", id, "duration =", buffer.duration);
-                    s.buffer = buffer;
-                    s.state = 'ready';
-                    if (s.playWhenReady) {
-                        window.gxAudioVerbose && console.log("[AILBridge] playing deferred sample id =", id);
-                        this.play(id, is_3d, s.loop);
-                    }
-                }, (err) => {
-                    console.error("[AILBridge] decodeAudioData failed for sample id =", id, ":", err);
-                    s.state = 'error';
-                });
-            },
-            
-            setStreamFile(id, file_ptr, size) {
-                window.gxAudioVerbose && console.log("[AILBridge] setStreamFile() called: id =", id, "file_ptr =", file_ptr, "size =", size);
-                let s = this.getSample(id + 1000);
-                s.state = 'decoding';
-                s.playWhenReady = false;
-                
-                // Clean up previous stream if any
-                if (s.audio) {
-                    try { s.audio.pause(); } catch(e) {}
-                    s.audio = null;
-                }
-                if (s.mediaSourceNode) {
-                    try { s.mediaSourceNode.disconnect(); } catch(e) {}
-                    s.mediaSourceNode = null;
-                }
-                if (s.objectURL) {
-                    try { URL.revokeObjectURL(s.objectURL); } catch(e) {}
-                    s.objectURL = null;
-                }
-                
-                let bytes = new Uint8Array(HEAPU8.buffer, file_ptr, size).slice();
-                let blob = new Blob([bytes], {type: 'audio/mpeg'});
-                let url = URL.createObjectURL(blob);
-                
-                s.objectURL = url;
-                
-                let audio = new Audio(url);
-                audio.preload = 'auto';
-                s.audio = audio;
-                
-                audio.addEventListener('loadedmetadata', () => {
-                    s.duration = audio.duration;
-                    window.gxAudioVerbose && console.log("[AILBridge] Stream id =", id, "metadata loaded: duration =", s.duration);
-                });
-                
-                try {
-                    s.mediaSourceNode = this.audioContext.createMediaElementSource(audio);
-                } catch(e) {
-                    console.error("[AILBridge] createMediaElementSource failed:", e);
-                }
-                
-                s.state = 'ready';
-                if (s.playWhenReady) {
-                    window.gxAudioVerbose && console.log("[AILBridge] playing deferred stream id =", id);
-                    this.play(id + 1000, 0, s.loop);
-                }
-            },
-            
-            play(id, is_3d, loop) {
-                window.gxAudioVerbose && console.log("[AILBridge] play() called: id =", id, "is_3d =", is_3d, "loop =", loop);
-                let s = this.getSample(id);
-                s.loop = loop;
-                if (s.state === 'decoding') {
-                    window.gxAudioVerbose && console.log("[AILBridge] sample/stream id =", id, "is still decoding. Will play when ready.");
-                    s.playWhenReady = true;
-                    return;
-                }
-                if (s.state !== 'ready') {
-                    console.warn("[AILBridge] sample/stream id =", id, "is not ready. State:", s.state);
-                    return;
-                }
-                
-                let ctx = this.audioContext;
-                if (ctx.state === 'suspended') {
-                    window.gxAudioVerbose && console.log("[AILBridge] AudioContext is suspended, attempting to resume...");
-                    ctx.resume().then(() => {
-                        window.gxAudioVerbose && console.log("[AILBridge] AudioContext resumed successfully.");
-                    });
-                }
-                
-                let isStream = (id >= 1000);
-                
-                if (isStream) {
-                    if (!s.audio || !s.mediaSourceNode) {
-                        console.warn("[AILBridge] stream id =", id, "audio or mediaSourceNode is missing!");
-                        return;
-                    }
-                    window.gxAudioVerbose && console.log("[AILBridge] resetting and playing stream for id =", id);
-                    try {
-                        s.audio.pause();
-                        s.audio.currentTime = 0;
-                    } catch(e) {}
-                    
-                    s.audio.loop = loop;
-                    
-                    try { s.mediaSourceNode.disconnect(); } catch(e) {}
-                    
-                    let lastNode = s.mediaSourceNode;
-                    let gainNode = ctx.createGain();
-                    gainNode.gain.value = s.volume;
-                    
-                    if (is_3d) {
-                        let panner = ctx.createPanner();
-                        panner.panningModel = 'HRTF';
-                        panner.distanceModel = 'inverse';
-                        panner.refDistance = s.min_dist;
-                        panner.maxDistance = s.max_dist;
-                        if (panner.positionX) {
-                            panner.positionX.value = s.x;
-                            panner.positionY.value = s.y;
-                            panner.positionZ.value = s.z;
-                        } else {
-                            panner.setPosition(s.x, s.y, s.z);
-                        }
-                        
-                        lastNode.connect(panner);
-                        lastNode = panner;
-                        s.pannerNode = panner;
-                        window.gxAudioVerbose && console.log("[AILBridge] Configured 3D panner for stream id =", id, "pos =", [s.x, s.y, s.z]);
-                    } else {
-                        let panner = ctx.createStereoPanner();
-                        panner.pan.value = (s.pan - 0.5) * 2.0;
-                        
-                        lastNode.connect(panner);
-                        lastNode = panner;
-                        s.pannerNode = panner;
-                        window.gxAudioVerbose && console.log("[AILBridge] Configured Stereo panner for stream id =", id, "pan =", s.pan);
-                    }
-                    
-                    lastNode.connect(gainNode);
-                    gainNode.connect(ctx.destination);
-                    
-                    s.gainNode = gainNode;
-                    s.startTime = ctx.currentTime;
-                    
-                    s.audio.onended = () => {
-                        window.gxAudioVerbose && console.log("[AILBridge] stream.onended fired for id =", id);
-                        if (s.audio) {
-                            Module['_AIL_trigger_sample_eos'](id - 1000, 2);
-                        }
-                    };
-                    
-                    s.audio.play().catch(e => {
-                        console.error("[AILBridge] Failed to play stream id =", id, e);
-                    });
-                    
-                } else {
-                    if (!s.buffer) {
-                        console.warn("[AILBridge] sample id =", id, "buffer is missing!");
-                        return;
-                    }
-                    if (s.source) {
-                        window.gxAudioVerbose && console.log("[AILBridge] stopping active source for id =", id);
-                        try { s.source.stop(); } catch(e) {}
-                        s.source = null;
-                    }
-                    
-                    let source = ctx.createBufferSource();
-                    source.buffer = s.buffer;
-                    source.loop = loop;
-                    
-                    let gainNode = ctx.createGain();
-                    gainNode.gain.value = s.volume;
-                    
-                    let lastNode = source;
-                    
-                    if (is_3d) {
-                        let panner = ctx.createPanner();
-                        panner.panningModel = 'HRTF';
-                        panner.distanceModel = 'inverse';
-                        panner.refDistance = s.min_dist;
-                        panner.maxDistance = s.max_dist;
-                        if (panner.positionX) {
-                            panner.positionX.value = s.x;
-                            panner.positionY.value = s.y;
-                            panner.positionZ.value = s.z;
-                        } else {
-                            panner.setPosition(s.x, s.y, s.z);
-                        }
-                        
-                        lastNode.connect(panner);
-                        lastNode = panner;
-                        s.pannerNode = panner;
-                        window.gxAudioVerbose && console.log("[AILBridge] Configured 3D panner for sample id =", id, "pos =", [s.x, s.y, s.z]);
-                    } else {
-                        let panner = ctx.createStereoPanner();
-                        panner.pan.value = (s.pan - 0.5) * 2.0;
-                        
-                        lastNode.connect(panner);
-                        lastNode = panner;
-                        s.pannerNode = panner;
-                        window.gxAudioVerbose && console.log("[AILBridge] Configured Stereo panner for sample id =", id, "pan =", s.pan);
-                    }
-                    
-                    lastNode.connect(gainNode);
-                    gainNode.connect(ctx.destination);
-                    
-                    s.source = source;
-                    s.gainNode = gainNode;
-                    s.startTime = ctx.currentTime;
-                    
-                    source.onended = () => {
-                        window.gxAudioVerbose && console.log("[AILBridge] source.onended fired for id =", id);
-                        if (s.source === source) {
-                            s.source = null;
-                            Module['_AIL_trigger_sample_eos'](id, is_3d ? 1 : 0);
-                        }
-                    };
-                    
-                    window.gxAudioVerbose && console.log("[AILBridge] starting source playback for id =", id);
-                    source.start(0);
-                }
-            },
-            
-            getStreamPos(id, out_total, out_curr) {
-                let s = this.samples[id + 1000];
-                if (s) {
-                    let total = s.duration ? s.duration : (s.buffer ? s.buffer.duration : 0);
-                    if (out_total) {
-                        HEAP32[out_total >> 2] = Math.round(total * 1000);
-                    }
-                    if (out_curr) {
-                        let curr = 0;
-                        if (s.audio) {
-                            curr = s.audio.currentTime * 1000;
-                        } else if (s.startTime && s.source && s.buffer) {
-                            curr = (this.audioContext.currentTime - s.startTime) * 1000;
-                            if (s.loop) {
-                                curr = curr % (s.buffer.duration * 1000);
-                            } else {
-                                curr = Math.min(curr, s.buffer.duration * 1000);
-                            }
-                        }
-                        HEAP32[out_curr >> 2] = Math.round(curr);
-                    }
-                } else {
-                    if (out_total) HEAP32[out_total >> 2] = 0;
-                    if (out_curr) HEAP32[out_curr >> 2] = 0;
-                }
-            }
-        };
-    }
+// ============================================================================================
+// GeneralsX @feature WebPort 2026-10-30 — the Web Audio side of the Miles API.
+//
+// One JS object, window.AILBridge, owns the AudioContext and a voice per handle, keyed by the
+// handle's JS id: 2D samples 1..128, 3D samples 501..628, streams 1001..1032. Every voice ends in
+// a gain node on one master bus (master gain -> analyser -> destination).
+//
+// End of playback is reported back through AIL_trigger_sample_eos(jsId): MilesAudioManager only
+// learns a sound finished from the EOS callbacks, so every started voice must end in exactly one
+// EOS — also one that never decoded (decode error, missing data), or its channel would never be
+// freed. Stopping a voice (AIL_stop_*, AIL_end_*, release, a new file) bumps its generation and
+// suppresses the EOS of what was playing, as Miles does.
+//
+// Samples: WAV images the engine already holds in memory (AudioFileCache). Decoded AudioBuffers
+// are cached by content (size + sampled bytes), so a sound decodes once, not on every play.
+// Streams (music, speech): the bytes are fetched asynchronously — straight from the archive with
+// a Range request when the file is inside a mounted .big (BigVFS, server or blob: URL), else read
+// once from the engine's file system — and played by an <audio> element through the same bus.
+//
+// window.GX_audioStats() (bracket-named, survives Closure) reports counters and the output level
+// for the CI audio test; ?diag=1 adds "AUDIO:" console lines for streams and failures.
+// ============================================================================================
+EM_JS(void, AILBridge_init, (), {
+  if (window['AILBridge']) return;
+  var diag = /[?&]diag=1/.test(location.search);
+  var verbose = !!window['gxAudioVerbose'];
+  var B = {
+    ctx: null, master: null, analyser: null,
+    voices: {},
+    cache: new Map(), cacheBytes: 0,
+    stats: { started2D: 0, started3D: 0, streamsStarted: 0, streamsReady: 0, eos: 0, eos3D: 0, eosStream: 0, decoded: 0, cacheHits: 0,
+             decodeErrors: 0, streamErrors: 0, notReady: 0, maxRms: 0 },
+
+    init: function () {
+      if (B.ctx) return;
+      var AC = window['AudioContext'] || window['webkitAudioContext'];
+      if (!AC) { console.warn('[AILBridge] no Web Audio'); return; }
+      B.ctx = new AC();
+      B.master = B.ctx.createGain();
+      B.analyser = B.ctx.createAnalyser();
+      B.analyser.fftSize = 2048;
+      B.master.connect(B.analyser);
+      B.analyser.connect(B.ctx.destination);
+      B['audioContext'] = B.ctx;                     // web_shell.html resumes it on the first gesture
+      if (window['Module']) {
+        if (!window['Module']['SDL2']) window['Module']['SDL2'] = {};
+        window['Module']['SDL2']['audioContext'] = B.ctx;
+      }
+      if (diag) {
+        var buf = new Float32Array(B.analyser.fftSize);
+        setInterval(function () {
+          B.analyser.getFloatTimeDomainData(buf);
+          var sum = 0;
+          for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+          var rms = Math.sqrt(sum / buf.length);
+          if (rms > B.stats.maxRms) B.stats.maxRms = rms;
+        }, 100);
+        console.log('AUDIO: context ' + B.ctx.state + ' ' + B.ctx.sampleRate + ' Hz');
+      }
+    },
+
+    voice: function (id) {
+      var v = B.voices[id];
+      if (!v) {
+        v = B.voices[id] = { id: id, gen: 0, file: 0, node: null, state: 'empty', buffer: null, playWhenReady: false, loops: 1, left: 1,
+                             volume: 1, pan: 0.5, rate: 1, x: 0, y: 0, z: 0, minDist: 10, maxDist: 1000,
+                             source: null, gain: null, panner: null, is3d: id >= 500 && id < 1000,
+                             audio: null, url: null, duration: 0, name: '' };
+      }
+      return v;
+    },
+
+    eos: function (v, gen) {
+      if (v.gen !== gen) return;                     // stopped or replaced meanwhile
+      v.gen++;
+      B.stats.eos++;
+      if (v.id >= 1000) B.stats.eosStream++; else if (v.is3d) B.stats.eos3D++;
+      Module['_AIL_trigger_sample_eos'](v.id);
+    },
+    eosLater: function (v) { var g = v.gen; setTimeout(function () { B.eos(v, g); }, 0); },
+
+    // ---- samples -----------------------------------------------------------------------
+    stopSource: function (v) {
+      if (v.source) { var s = v.source; v.source = null; s.onended = null; try { s.stop(); } catch (e) {} }
+    },
+    stop: function (id) {
+      var v = B.voices[id];
+      if (!v) return;
+      v.gen++;
+      v.playWhenReady = false;
+      B.stopSource(v);
+      if (v.audio) { try { v.audio.pause(); } catch (e) {} }
+    },
+    contentKey: function (ptr, size) {
+      var h = size >>> 0, step = Math.max(1, Math.floor(size / 256));
+      for (var i = 0; i < size; i += step) h = (Math.imul(h, 31) + HEAPU8[ptr + i]) >>> 0;
+      return size + ':' + h;
+    },
+    setSampleFile: function (id, ptr, size) {
+      var v = B.voice(id);
+      B.stop(id);
+      var file = ++v.file;                           // a newer file makes this decode stale
+      v.state = 'empty'; v.buffer = null;
+      if (!ptr || !size || !B.ctx) { v.state = 'error'; return; }
+      var key = B.contentKey(ptr, size);
+      var hit = B.cache.get(key);
+      if (hit) { B.cache.delete(key); B.cache.set(key, hit); v.buffer = hit; v.state = 'ready'; B.stats.cacheHits++; return; }
+      // a WAV header wrapping an MP3 / Ogg payload (some mods): decode the payload itself
+      var start = 0;
+      if (size > 48) {
+        var a = HEAPU8[ptr + 44], b = HEAPU8[ptr + 45], c = HEAPU8[ptr + 46], d = HEAPU8[ptr + 47];
+        if ((a === 0x49 && b === 0x44 && c === 0x33) || (a === 0xFF && (b & 0xE0) === 0xE0) ||
+            (a === 0x4F && b === 0x67 && c === 0x67 && d === 0x53)) start = 44;
+      }
+      var bytes = HEAPU8.slice(ptr + start, ptr + size);
+      v.state = 'decoding';
+      B.ctx.decodeAudioData(bytes.buffer).then(function (buffer) {
+        B.stats.decoded++;
+        B.cache.set(key, buffer);
+        B.cacheBytes += buffer.length * buffer.numberOfChannels * 4;
+        while (B.cacheBytes > 96 * 1024 * 1024 && B.cache.size > 1) {
+          var oldKey = B.cache.keys().next().value, old = B.cache.get(oldKey);
+          B.cache.delete(oldKey);
+          B.cacheBytes -= old.length * old.numberOfChannels * 4;
+        }
+        if (v.file !== file) return;
+        v.buffer = buffer; v.state = 'ready';
+        if (v.playWhenReady) { v.playWhenReady = false; B.startSample(v); }
+      }, function (err) {
+        B.stats.decodeErrors++;
+        if (diag) console.warn('AUDIO: decode failed for voice ' + id + ' (' + size + ' bytes): ' + err);
+        if (v.file !== file) return;
+        v.state = 'error';
+        if (v.playWhenReady) { v.playWhenReady = false; B.eosLater(v); }
+      });
+    },
+    setLoops: function (id, count) { var v = B.voice(id); v.loops = count; },
+    play: function (id) {
+      var v = B.voice(id);
+      if (id >= 1000) return B.playStream(v);
+      if (v.is3d) B.stats.started3D++; else B.stats.started2D++;
+      B.stopSource(v);
+      v.gen++;
+      v.left = v.loops;
+      if (v.state === 'decoding') { v.playWhenReady = true; return; }
+      if (v.state !== 'ready' || !B.ctx) { B.stats.notReady++; B.eosLater(v); return; }
+      B.startSample(v);
+    },
+    startSample: function (v) {
+      var ctx = B.ctx;
+      if (ctx.state === 'suspended') ctx.resume().catch(function () {});
+      var src = ctx.createBufferSource();
+      src.buffer = v.buffer;
+      src.loop = v.loops === 0;
+      src.playbackRate.value = v.rate;
+      if (!v.gain) {
+        v.gain = ctx.createGain();
+        if (v.is3d) {
+          v.panner = ctx.createPanner();
+          v.panner.panningModel = 'equalpower';
+          v.panner.distanceModel = 'inverse';
+          v.panner.rolloffFactor = 1;
+        } else {
+          v.panner = ctx.createStereoPanner();
+        }
+        v.panner.connect(v.gain);
+        v.gain.connect(B.master);
+      }
+      v.gain.gain.value = v.volume;
+      B.applyPlace(v);
+      src.connect(v.panner);
+      var gen = v.gen;
+      src.onended = function () {
+        if (v.source !== src || v.gen !== gen) return;
+        v.source = null;
+        if (v.left > 1) { v.left--; B.startSample(v); return; }
+        B.eos(v, gen);
+      };
+      v.source = src;
+      src.start(0);
+    },
+    applyPlace: function (v) {
+      if (!v.panner) return;
+      if (v.is3d) {
+        v.panner.refDistance = Math.max(0.01, v.minDist);
+        v.panner.maxDistance = Math.max(v.panner.refDistance, v.maxDist);
+        if (v.panner.positionX) { v.panner.positionX.value = v.x; v.panner.positionY.value = v.y; v.panner.positionZ.value = v.z; }
+        else v.panner.setPosition(v.x, v.y, v.z);
+      } else {
+        v.panner.pan.value = Math.max(-1, Math.min(1, (v.pan - 0.5) * 2));
+      }
+    },
+    setVolumePan: function (id, volume, pan) {
+      var v = B.voice(id);
+      v.volume = volume; if (pan >= 0) v.pan = pan;
+      if (v.gain) v.gain.gain.value = volume;
+      if (id >= 1000 && v.audio) v.audio.volume = 1;   // the gain node does the work
+      B.applyPlace(v);
+    },
+    setRate: function (id, rate) {
+      var v = B.voice(id);
+      v.rate = rate > 0 ? rate : 1;
+      if (v.source) v.source.playbackRate.value = v.rate;
+      if (v.audio) { try { v.audio.playbackRate = v.rate; } catch (e) {} }
+    },
+    setPosition: function (id, x, y, z) { var v = B.voice(id); v.x = x; v.y = y; v.z = z; B.applyPlace(v); },
+    setDistances: function (id, maxDist, minDist) { var v = B.voice(id); v.maxDist = maxDist; v.minDist = minDist; B.applyPlace(v); },
+    setListener: function (x, y, z, fx, fy, fz, ux, uy, uz, which) {
+      if (!B.ctx) return;
+      var l = B.ctx.listener;
+      if (which === 0) {
+        if (l.positionX) { l.positionX.value = x; l.positionY.value = y; l.positionZ.value = z; } else l.setPosition(x, y, z);
+      } else if (l.forwardX) {
+        l.forwardX.value = fx; l.forwardY.value = fy; l.forwardZ.value = fz; l.upX.value = ux; l.upY.value = uy; l.upZ.value = uz;
+      } else {
+        l.setOrientation(fx, fy, fz, ux, uy, uz);
+      }
+    },
+
+    // ---- streams -----------------------------------------------------------------------
+    resetStream: function (v) {
+      B.stop(v.id);
+      if (v.audio) { try { v.audio.removeAttribute('src'); v.audio.load(); } catch (e) {} v.audio = null; }
+      if (v.node) { try { v.node.disconnect(); } catch (e) {} v.node = null; }
+      if (v.url) { URL.revokeObjectURL(v.url); v.url = null; }
+      v.state = 'empty'; v.duration = 0; v.playWhenReady = false;
+      return ++v.file;
+    },
+    streamFromRange: function (id, url, offset, size, name) {
+      var v = B.voice(id);
+      var file = B.resetStream(v);
+      v.name = name; v.state = 'decoding';
+      if (diag) console.log('AUDIO: stream ' + id + ' "' + name + '" fetching ' + size + ' bytes from the archive');
+      fetch(url, { headers: { 'Range': 'bytes=' + offset + '-' + (offset + size - 1) } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.arrayBuffer();
+        })
+        .then(function (buf) {
+          if (buf.byteLength > size) buf = buf.slice(offset, offset + size);   // a 200: the server ignored Range
+          B.streamReady(v, file, new Uint8Array(buf));
+        })
+        .catch(function (e) { B.streamFailed(v, file, String(e)); });
+    },
+    streamFromBytes: function (id, ptr, size, name) {
+      var v = B.voice(id);
+      var file = B.resetStream(v);
+      v.name = name; v.state = 'decoding';
+      B.streamReady(v, file, HEAPU8.slice(ptr, ptr + size));
+    },
+    streamFailed: function (v, file, why) {
+      if (v.file !== file) return;                   // closed or reopened meanwhile
+      B.stats.streamErrors++;
+      console.warn('AUDIO: stream "' + v.name + '" failed: ' + why);
+      v.state = 'error';
+      if (v.playWhenReady) { v.playWhenReady = false; B.eosLater(v); }
+    },
+    streamReady: function (v, file, bytes) {
+      if (v.file !== file) return;                   // closed or reopened meanwhile
+      var type = 'audio/mpeg';
+      if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) type = 'audio/wav';
+      else if (bytes[0] === 0x4F && bytes[1] === 0x67 && bytes[2] === 0x67 && bytes[3] === 0x53) type = 'audio/ogg';
+      v.url = URL.createObjectURL(new Blob([bytes], { type: type }));
+      var audio = new Audio();
+      audio.preload = 'auto';
+      audio.src = v.url;
+      v.audio = audio;
+      audio.addEventListener('loadedmetadata', function () {
+        v.duration = audio.duration;
+        if (diag) console.log('AUDIO: stream ' + v.id + ' "' + v.name + '" ready (' + type + ', ' + audio.duration.toFixed(1) + ' s)');
+      });
+      audio.addEventListener('error', function () {
+        if (v.audio === audio) B.streamFailed(v, file, 'media error ' + (audio.error ? audio.error.code : '?'));
+      });
+      try {
+        v.node = B.ctx.createMediaElementSource(audio);
+        if (!v.gain) {
+          v.gain = B.ctx.createGain();
+          v.panner = B.ctx.createStereoPanner();
+          v.panner.connect(v.gain);
+          v.gain.connect(B.master);
+        }
+        v.node.connect(v.panner);
+        v.gain.gain.value = v.volume;
+        B.applyPlace(v);
+      } catch (e) {
+        console.warn('AUDIO: createMediaElementSource failed: ' + e);
+      }
+      v.state = 'ready';
+      B.stats.streamsReady++;
+      if (v.playWhenReady) { v.playWhenReady = false; B.startStream(v); }
+    },
+    playStream: function (v) {
+      B.stats.streamsStarted++;
+      v.gen++;
+      v.left = v.loops;
+      if (v.state === 'decoding') { v.playWhenReady = true; return; }
+      if (v.state !== 'ready') { B.stats.notReady++; B.eosLater(v); return; }
+      B.startStream(v);
+    },
+    startStream: function (v) {
+      var audio = v.audio, gen = v.gen;
+      if (B.ctx.state === 'suspended') B.ctx.resume().catch(function () {});
+      audio.loop = v.loops === 0;
+      try { audio.playbackRate = v.rate; } catch (e) {}
+      audio.onended = function () {
+        if (v.gen !== gen || v.audio !== audio) return;
+        if (v.left > 1) { v.left--; audio.currentTime = 0; audio.play().catch(function () {}); return; }
+        B.eos(v, gen);
+      };
+      if (diag) console.log('AUDIO: stream ' + v.id + ' "' + v.name + '" play');
+      audio.play().catch(function (e) { if (diag) console.warn('AUDIO: stream play refused: ' + e); });
+    },
+    pauseStream: function (id, on) {
+      var v = B.voices[id];
+      if (!v || !v.audio) return 0;
+      if (on) { try { v.audio.pause(); } catch (e) {} } else v.audio.play().catch(function () {});
+      return 1;
+    },
+    streamPosition: function (id, which) {
+      var v = B.voices[id];
+      if (!v || !v.audio) return 0;
+      var s = which ? v.audio.currentTime : (isFinite(v.duration) ? v.duration : 0);
+      return Math.round(s * 1000);
+    },
+    seekStream: function (id, ms) { var v = B.voices[id]; if (v && v.audio) { try { v.audio.currentTime = ms / 1000; } catch (e) {} } },
+    closeStream: function (id) { var v = B.voices[id]; if (v) { B.resetStream(v); delete B.voices[id]; } }
+  };
+  window['AILBridge'] = B;
+  window['GX_audioStats'] = function () {
+    var st = B.stats, playing = 0;
+    for (var k in B.voices) { var v = B.voices[k]; if (v.source || (v.audio && !v.audio.paused)) playing++; }
+    return { 'state': B.ctx ? B.ctx.state : 'none', 'started2D': st.started2D, 'started3D': st.started3D,
+             'streamsStarted': st.streamsStarted, 'streamsReady': st.streamsReady, 'eos': st.eos, 'eos3D': st.eos3D, 'eosStream': st.eosStream, 'decoded': st.decoded,
+             'cacheHits': st.cacheHits, 'decodeErrors': st.decodeErrors, 'streamErrors': st.streamErrors,
+             'notReady': st.notReady, 'playing': playing, 'maxRms': Math.round(st.maxRms * 10000) / 10000 };
+  };
+  window['GX_audioResetLevel'] = function () { B.stats.maxRms = 0; };
 });
 
+// ============================================================================================
+// handles
+// ============================================================================================
 #define MAX_SAMPLES 128
 #define MAX_STREAMS 32
+#define JS_ID_3D 500
+#define JS_ID_STREAM 1000
 #define LISTENER_HANDLE ((H3DPOBJECT)9999)
 
 struct SampleState {
-    int id;
+    int id;                    // JS id: 1..128
     bool allocated;
     const void* file_image;
     AIL_sample_callback eos_callback;
@@ -556,11 +571,12 @@ struct SampleState {
     float pan;
     int loop_count;
     int playback_rate;
+    int file_rate;             // the WAV's own rate; playback_rate / file_rate is the pitch
     bool is_playing;
 };
 
 struct Sample3DState {
-    int id;
+    int id;                    // JS id: 501..628
     bool allocated;
     const void* file_image;
     AIL_3dsample_callback eos_callback;
@@ -570,11 +586,12 @@ struct Sample3DState {
     float x, y, z;
     int loop_count;
     int playback_rate;
+    int file_rate;
     bool is_playing;
 };
 
 struct StreamState {
-    int id;
+    int id;                    // JS id: 1001..1032
     bool allocated;
     char filename[256];
     AIL_stream_callback callback;
@@ -588,57 +605,65 @@ static SampleState g_samples[MAX_SAMPLES];
 static Sample3DState g_samples3D[MAX_SAMPLES];
 static StreamState g_streams[MAX_STREAMS];
 
-extern "C" EMSCRIPTEN_KEEPALIVE void AIL_trigger_sample_eos(int id, int type) {
-    if (type == 0) {
-        if (id >= 1 && id <= MAX_SAMPLES) {
-            SampleState* s = &g_samples[id - 1];
-            if (s->allocated) {
-                s->is_playing = false;
-                if (s->eos_callback) {
-                    s->eos_callback((HSAMPLE)s);
-                }
-            }
-        }
-    } else if (type == 1) {
-        if (id >= 1 && id <= MAX_SAMPLES) {
-            Sample3DState* s = &g_samples3D[id - 1];
-            if (s->allocated) {
-                s->is_playing = false;
-                if (s->eos_callback) {
-                    s->eos_callback((H3DSAMPLE)s);
-                }
-            }
-        }
-    } else if (type == 2) {
-        if (id >= 1 && id <= MAX_STREAMS) {
-            StreamState* s = &g_streams[id - 1];
-            if (s->allocated) {
-                s->is_playing = false;
-                if (s->callback) {
-                    s->callback((HSTREAM)s);
-                }
-            }
-        }
+extern "C" EMSCRIPTEN_KEEPALIVE void AIL_trigger_sample_eos(int js_id) {
+    if (js_id >= JS_ID_STREAM) {
+        int i = js_id - JS_ID_STREAM - 1;
+        if (i < 0 || i >= MAX_STREAMS) return;
+        StreamState* s = &g_streams[i];
+        if (!s->allocated) return;
+        s->is_playing = false;
+        if (s->callback) s->callback((HSTREAM)s);
+    } else if (js_id >= JS_ID_3D) {
+        int i = js_id - JS_ID_3D - 1;
+        if (i < 0 || i >= MAX_SAMPLES) return;
+        Sample3DState* s = &g_samples3D[i];
+        if (!s->allocated) return;
+        s->is_playing = false;
+        if (s->eos_callback) s->eos_callback((H3DSAMPLE)s);
+    } else {
+        int i = js_id - 1;
+        if (i < 0 || i >= MAX_SAMPLES) return;
+        SampleState* s = &g_samples[i];
+        if (!s->allocated) return;
+        s->is_playing = false;
+        if (s->eos_callback) s->eos_callback((HSAMPLE)s);
     }
+}
+
+// a RIFF image's total size (header says), or 0 when it is not one
+static uint32_t riff_size(const void* file_image) {
+    const uint8_t* p = (const uint8_t*)file_image;
+    if (!p || memcmp(p, "RIFF", 4) != 0) return 0;
+    return *(const uint32_t*)(p + 4) + 8;
+}
+
+static int wav_rate(const void* file_image) {
+    WavHeaderInfo info;
+    return parse_wav(file_image, info) && info.sample_rate > 0 ? info.sample_rate : 22050;
+}
+
+static void js_stop(int id) { EM_ASM({ window['AILBridge'].stop($0); }, id); }
+static void js_volume_pan(int id, float volume, float pan) {
+    EM_ASM({ window['AILBridge'].setVolumePan($0, $1, $2); }, id, volume, pan);
+}
+static void js_rate(int id, int rate, int file_rate) {
+    EM_ASM({ window['AILBridge'].setRate($0, $1); }, id, file_rate > 0 ? (double)rate / file_rate : 1.0);
+}
+static void js_play(int id, int loop_count) {
+    EM_ASM({ var B = window['AILBridge']; B.setLoops($0, $1); B.play($0); }, id, loop_count);
 }
 
 extern "C" {
 
+// ---- 3D samples ------------------------------------------------------------------------------
 F32 __stdcall AIL_3D_sample_volume(H3DSAMPLE sample) {
-    Sample3DState* s = (Sample3DState*)sample;
-    return s->volume;
+    return ((Sample3DState*)sample)->volume;
 }
 
 void __stdcall AIL_set_3D_sample_volume(H3DSAMPLE sample, F32 volume) {
     Sample3DState* s = (Sample3DState*)sample;
     s->volume = volume;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        s.volume = $1;
-        if (s.gainNode) {
-            s.gainNode.gain.value = $1;
-        }
-    }, s->id, volume);
+    js_volume_pan(s->id, volume, -1.0f);
 }
 
 void __stdcall AIL_end_3D_sample(H3DSAMPLE sample) {
@@ -652,27 +677,17 @@ void __stdcall AIL_resume_3D_sample(H3DSAMPLE sample) {
 void __stdcall AIL_stop_3D_sample(H3DSAMPLE sample) {
     Sample3DState* s = (Sample3DState*)sample;
     s->is_playing = false;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        if (s.source) {
-            try { s.source.stop(); } catch(e) {}
-            s.source = null;
-        }
-        s.playWhenReady = false;
-    }, s->id);
+    js_stop(s->id);
 }
 
 void __stdcall AIL_start_3D_sample(H3DSAMPLE sample) {
     Sample3DState* s = (Sample3DState*)sample;
     s->is_playing = true;
-    EM_ASM({
-        window.AILBridge.play($0, 1, $1);
-    }, s->id, s->loop_count == 0 || s->loop_count > 1);
+    js_play(s->id, s->loop_count);
 }
 
 U32 __stdcall AIL_3D_sample_loop_count(H3DSAMPLE sample) {
-    Sample3DState* s = (Sample3DState*)sample;
-    return s->loop_count;
+    return ((Sample3DState*)sample)->loop_count;
 }
 
 void __stdcall AIL_set_3D_sample_offset(H3DSAMPLE sample, U32 offset) {
@@ -687,188 +702,89 @@ U32 __stdcall AIL_3D_sample_offset(H3DSAMPLE sample) {
 }
 
 S32 __stdcall AIL_3D_sample_playback_rate(H3DSAMPLE sample) {
-    Sample3DState* s = (Sample3DState*)sample;
-    return s->playback_rate;
+    return ((Sample3DState*)sample)->playback_rate;
 }
 
 void __stdcall AIL_set_3D_sample_playback_rate(H3DSAMPLE sample, S32 playback_rate) {
     Sample3DState* s = (Sample3DState*)sample;
     s->playback_rate = playback_rate;
+    js_rate(s->id, playback_rate, s->file_rate);
 }
 
 S32 __stdcall AIL_set_3D_sample_file(H3DSAMPLE sample, const void* file_image) {
     Sample3DState* s = (Sample3DState*)sample;
-    GX_TRACE_LOG("[web_audio_bridge] AIL_set_3D_sample_file: sample=%p, id=%d, file_image=%p\n", (void*)sample, s ? s->id : -1, file_image);
     s->file_image = file_image;
-    if (file_image) {
-        EM_ASM({
-            window.AILBridge.setSampleFile($0, $1, 1);
-        }, s->id, file_image);
-    }
+    s->file_rate = s->playback_rate = wav_rate(file_image);
+    EM_ASM({ var B = window['AILBridge']; B.setSampleFile($0, $1, $2); B.setRate($0, 1); }, s->id, file_image, riff_size(file_image));
     return 1;
-}
-
-HPROVIDER __stdcall AIL_set_sample_processor(HSAMPLE sample, SAMPLESTAGE pipeline_stage, HPROVIDER provider) {
-    return 0;
-}
-
-void __stdcall AIL_set_filter_sample_preference(HSAMPLE sample, const char* name, const void* val) {
-}
-
-void __stdcall AIL_release_sample_handle(HSAMPLE sample) {
-    SampleState* s = (SampleState*)sample;
-    s->allocated = false;
-}
-
-void __stdcall AIL_close_3D_provider(HPROVIDER lib) {
-}
-
-S32 __stdcall AIL_set_preference(U32 number, S32 value) {
-    return 1;
-}
-
-S32 __stdcall AIL_waveOutOpen(HDIGDRIVER* driver, LPHWAVEOUT* waveout, S32 id, LPWAVEFORMAT format) {
-    return 0;
-}
-
-void __stdcall AIL_waveOutClose(HDIGDRIVER driver) {
 }
 
 void __stdcall AIL_set_3D_sample_loop_count(H3DSAMPLE sample, U32 count) {
+    ((Sample3DState*)sample)->loop_count = count;
+}
+
+void __stdcall AIL_set_3D_sample_effects_level(H3DSAMPLE sample, F32 effect_level) {
+}
+
+void __stdcall AIL_set_3D_sample_occlusion(H3DSAMPLE sample, F32 occlusion) {
+}
+
+void __stdcall AIL_set_3D_sample_distances(H3DSAMPLE sample, F32 max_dist, F32 min_dist) {
     Sample3DState* s = (Sample3DState*)sample;
-    s->loop_count = count;
+    s->max_dist = max_dist;
+    s->min_dist = min_dist;
+    EM_ASM({ window['AILBridge'].setDistances($0, $1, $2); }, s->id, max_dist, min_dist);
 }
 
-void __stdcall AIL_set_stream_playback_rate(HSTREAM stream, S32 rate) {
+void __stdcall AIL_set_3D_velocity_vector(H3DPOBJECT sample, F32 x, F32 y, F32 z) {
 }
 
-S32 __stdcall AIL_stream_playback_rate(HSTREAM stream) {
-    return 22050;
-}
-
-void __stdcall AIL_stream_ms_position(HSTREAM sample, S32* total_milliseconds, S32* current_milliseconds) {
-    StreamState* s = (StreamState*)sample;
-    EM_ASM({
-        window.AILBridge.getStreamPos($0, $1, $2);
-    }, s->id, total_milliseconds, current_milliseconds);
-}
-
-void __stdcall AIL_set_stream_ms_position(HSTREAM stream, S32 pos) {
-    StreamState* s = (StreamState*)stream;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0 + 1000);
-        if (s.audio) {
-            try { s.audio.currentTime = $1 / 1000.0; } catch(e) {}
-        }
-    }, s->id, pos);
-}
-
-S32 __stdcall AIL_stream_loop_count(HSTREAM stream) {
-    StreamState* s = (StreamState*)stream;
-    return s->loop_count;
-}
-
-void __stdcall AIL_set_stream_loop_block(HSTREAM stream, S32 loop_start, S32 loop_end) {
-}
-
-void __stdcall AIL_set_stream_loop_count(HSTREAM stream, S32 count) {
-    StreamState* s = (StreamState*)stream;
-    s->loop_count = count;
-}
-
-int __stdcall AIL_stream_volume(HSTREAM stream) {
-    StreamState* s = (StreamState*)stream;
-    return (int)(s->volume * 127.0f);
-}
-
-void __stdcall AIL_set_stream_volume(HSTREAM stream, int volume) {
-    StreamState* s = (StreamState*)stream;
-    s->volume = (float)volume / 127.0f;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0 + 1000);
-        s.volume = $1;
-        if (s.gainNode) {
-            s.gainNode.gain.value = $1;
-        }
-    }, s->id, s->volume);
-}
-
-int __stdcall AIL_stream_pan(HSTREAM stream) {
-    StreamState* s = (StreamState*)stream;
-    return (int)(s->pan * 127.0f);
-}
-
-void __stdcall AIL_set_stream_pan(HSTREAM stream, int pan) {
-    StreamState* s = (StreamState*)stream;
-    s->pan = (float)pan / 127.0f;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0 + 1000);
-        s.pan = $1;
-        if (s.pannerNode && s.pannerNode.pan) {
-            s.pannerNode.pan.value = ($1 - 0.5) * 2.0;
-        }
-    }, s->id, s->pan);
-}
-
-void __stdcall AIL_close_stream(HSTREAM stream) {
-    StreamState* s = (StreamState*)stream;
-    s->allocated = false;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0 + 1000);
-        if (s.audio) {
-            try { s.audio.pause(); } catch(e) {}
-            s.audio = null;
-        }
-        if (s.mediaSourceNode) {
-            try { s.mediaSourceNode.disconnect(); } catch(e) {}
-            s.mediaSourceNode = null;
-        }
-        if (s.objectURL) {
-            try { URL.revokeObjectURL(s.objectURL); } catch(e) {}
-            s.objectURL = null;
-        }
-        if (s.source) {
-            try { s.source.stop(); } catch(e) {}
-            s.source = null;
-        }
-        delete window.AILBridge.samples[$0 + 1000];
-    }, s->id);
-}
-
-void __stdcall AIL_pause_stream(HSTREAM stream, S32 onoff) {
-    StreamState* s = (StreamState*)stream;
-    if (onoff) {
-        EM_ASM({
-            let s = window.AILBridge.getSample($0 + 1000);
-            if (s.audio) {
-                try { s.audio.pause(); } catch(e) {}
-            } else if (s.source) {
-                try { s.source.stop(); } catch(e) {}
-                s.source = null;
-            }
-        }, s->id);
+// Engine coordinates are Z-up; Web Audio's are Y-up: (X, Y, Z) -> (X, Z, -Y).
+void __stdcall AIL_set_3D_position(H3DPOBJECT obj, F32 X, F32 Y, F32 Z) {
+    if (obj == LISTENER_HANDLE) {
+        EM_ASM({ window['AILBridge'].setListener($0, $1, $2, 0, 0, 0, 0, 0, 0, 0); }, X, Z, -Y);
     } else {
-        if (s->is_playing) {
-            bool has_audio = EM_ASM_INT({
-                let s = window.AILBridge.getSample($0 + 1000);
-                if (s.audio) {
-                    s.audio.play().catch(e => {});
-                    return 1;
-                }
-                return 0;
-            }, s->id);
-            if (!has_audio) {
-                AIL_start_stream(stream);
-            }
-        }
+        Sample3DState* s = (Sample3DState*)obj;
+        s->x = X; s->y = Z; s->z = -Y;
+        EM_ASM({ window['AILBridge'].setPosition($0, $1, $2, $3); }, s->id, X, Z, -Y);
     }
 }
 
-AIL_stream_callback __stdcall AIL_register_stream_callback(HSTREAM stream, AIL_stream_callback callback) {
-    StreamState* s = (StreamState*)stream;
-    AIL_stream_callback old = s->callback;
-    s->callback = callback;
-    return old;
+void __stdcall AIL_set_3D_orientation(H3DPOBJECT obj, F32 X_face, F32 Y_face, F32 Z_face, F32 X_up, F32 Y_up, F32 Z_up) {
+    if (obj != LISTENER_HANDLE) return;
+    // the camera looks down at the map: keep the listener upright, facing the view's ground direction
+    float len = sqrtf(X_face * X_face + Y_face * Y_face);
+    float fx = 0.0f, fy = 1.0f;
+    if (len > 0.0001f) { fx = X_face / len; fy = Y_face / len; }
+    EM_ASM({ window['AILBridge'].setListener(0, 0, 0, $0, 0, $1, 0, 1, 0, 1); }, fx, -fy);
+}
+
+void __stdcall AIL_release_3D_sample_handle(H3DSAMPLE sample) {
+    Sample3DState* s = (Sample3DState*)sample;
+    s->eos_callback = nullptr;
+    s->is_playing = false;
+    s->allocated = false;
+    js_stop(s->id);
+}
+
+H3DSAMPLE __stdcall AIL_allocate_3D_sample_handle(HPROVIDER lib) {
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+        Sample3DState* s = &g_samples3D[i];
+        if (s->allocated) continue;
+        s->allocated = true;
+        s->id = JS_ID_3D + i + 1;
+        s->is_playing = false;
+        s->volume = 1.0f;
+        s->max_dist = 1000.0f;
+        s->min_dist = 10.0f;
+        s->x = s->y = s->z = 0.0f;
+        s->loop_count = 1;
+        s->playback_rate = s->file_rate = 22050;
+        s->eos_callback = nullptr;
+        s->file_image = nullptr;
+        return (H3DSAMPLE)s;
+    }
+    return nullptr;
 }
 
 AIL_3dsample_callback __stdcall AIL_register_3D_EOS_callback(H3DSAMPLE sample, AIL_3dsample_callback EOS) {
@@ -878,85 +794,100 @@ AIL_3dsample_callback __stdcall AIL_register_3D_EOS_callback(H3DSAMPLE sample, A
     return old;
 }
 
-AIL_sample_callback __stdcall AIL_register_EOS_callback(HSAMPLE sample, AIL_sample_callback EOS) {
-    SampleState* s = (SampleState*)sample;
-    AIL_sample_callback old = s->eos_callback;
-    s->eos_callback = EOS;
-    return old;
+void __stdcall AIL_set_3D_user_data(H3DPOBJECT obj, U32 index, S32 value) {
 }
 
-void __stdcall AIL_start_stream(HSTREAM stream) {
-    StreamState* s = (StreamState*)stream;
-    GX_TRACE_LOG("[web_audio_bridge] AIL_start_stream: stream=%p, id=%d, filename='%s', loop_count=%d\n",
-           (void*)stream, s ? s->id : -1, s ? s->filename : "NULL", s ? s->loop_count : -1);
-    s->is_playing = true;
-    EM_ASM({
-        window.AILBridge.play($0 + 1000, 0, $1);
-    }, s->id, s->loop_count == 0 || s->loop_count > 1);
-}
-
-HSTREAM __stdcall AIL_open_stream_by_sample(HDIGDRIVER driver, HSAMPLE sample, const char* file_name, int mem) {
+S32 __stdcall AIL_3D_user_data(H3DPOBJECT sample, U32 index) {
     return 0;
 }
 
-void __stdcall AIL_set_sample_playback_rate(HSAMPLE sample, S32 playback_rate) {
+// ---- 3D providers / listener ----------------------------------------------------------------
+void __stdcall AIL_close_3D_provider(HPROVIDER lib) {
+}
+
+void __stdcall AIL_set_3D_speaker_type(HPROVIDER lib, S32 speaker_type) {
+}
+
+void __stdcall AIL_close_3D_listener(H3DPOBJECT listener) {
+}
+
+S32 __stdcall AIL_enumerate_3D_providers(HPROENUM* next, HPROVIDER* dest, char** name) {
+    if (next && *next == 0) {
+        *dest = (HPROVIDER)1;
+        *name = (char*)"Miles Fast 2D Positional Audio";
+        *next = (HPROENUM)1;
+        return 1;
+    }
+    return 0;
+}
+
+M3DRESULT __stdcall AIL_open_3D_provider(HPROVIDER lib) {
+    return 0;
+}
+
+H3DPOBJECT __stdcall AIL_open_3D_listener(HPROVIDER lib) {
+    return LISTENER_HANDLE;
+}
+
+// ---- 2D samples -----------------------------------------------------------------------------
+HSAMPLE __stdcall AIL_allocate_sample_handle(HDIGDRIVER dig) {
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+        SampleState* s = &g_samples[i];
+        if (s->allocated) continue;
+        s->allocated = true;
+        s->id = i + 1;
+        s->is_playing = false;
+        s->volume = 1.0f;
+        s->pan = 0.5f;
+        s->loop_count = 1;
+        s->playback_rate = s->file_rate = 22050;
+        s->eos_callback = nullptr;
+        s->file_image = nullptr;
+        return (HSAMPLE)s;
+    }
+    return nullptr;
+}
+
+void __stdcall AIL_release_sample_handle(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
-    s->playback_rate = playback_rate;
+    s->eos_callback = nullptr;
+    s->is_playing = false;
+    s->allocated = false;
+    js_stop(s->id);
 }
 
-S32 __stdcall AIL_sample_playback_rate(HSAMPLE sample) {
+void __stdcall AIL_init_sample(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
-    return s->playback_rate;
+    js_stop(s->id);
+    s->file_image = nullptr;
+    s->volume = 1.0f;
+    s->pan = 0.5f;
+    s->loop_count = 1;
+    s->is_playing = false;
 }
 
-void __stdcall AIL_sample_ms_position(HSAMPLE sample, S32* total_ms, S32* current_ms) {
-}
-
-void __stdcall AIL_set_sample_ms_position(HSAMPLE sample, S32 pos) {
-}
-
-S32 __stdcall AIL_sample_loop_count(HSAMPLE sample) {
+S32 __stdcall AIL_set_sample_file(HSAMPLE sample, const void * file_image, S32 block) {
     SampleState* s = (SampleState*)sample;
-    return s->loop_count;
+    s->file_image = file_image;
+    s->file_rate = s->playback_rate = wav_rate(file_image);
+    EM_ASM({ var B = window['AILBridge']; B.setSampleFile($0, $1, $2); B.setRate($0, 1); }, s->id, file_image, riff_size(file_image));
+    return 1;
 }
 
-void __stdcall AIL_set_sample_loop_count(HSAMPLE sample, S32 count) {
-    SampleState* s = (SampleState*)sample;
-    s->loop_count = count;
+S32 __stdcall AIL_set_named_sample_file(HSAMPLE sample, const char* file_name, const void* file_image, S32 file_size, S32 block) {
+    return AIL_set_sample_file(sample, file_image, block);
 }
 
-int __stdcall AIL_sample_volume(HSAMPLE sample) {
+void __stdcall AIL_start_sample(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
-    return (int)(s->volume * 127.0f);
+    s->is_playing = true;
+    js_play(s->id, s->loop_count);
 }
 
-void __stdcall AIL_set_sample_volume(HSAMPLE sample, int volume) {
+void __stdcall AIL_stop_sample(HSAMPLE sample) {
     SampleState* s = (SampleState*)sample;
-    s->volume = (float)volume / 127.0f;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        s.volume = $1;
-        if (s.gainNode) {
-            s.gainNode.gain.value = $1;
-        }
-    }, s->id, s->volume);
-}
-
-int __stdcall AIL_sample_pan(HSAMPLE sample) {
-    SampleState* s = (SampleState*)sample;
-    return (int)(s->pan * 127.0f);
-}
-
-void __stdcall AIL_set_sample_pan(HSAMPLE sample, int pan) {
-    SampleState* s = (SampleState*)sample;
-    s->pan = (float)pan / 127.0f;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        s.pan = $1;
-        if (s.pannerNode && s.pannerNode.pan) {
-            s.pannerNode.pan.value = ($1 - 0.5) * 2.0;
-        }
-    }, s->id, s->pan);
+    s->is_playing = false;
+    js_stop(s->id);
 }
 
 void __stdcall AIL_end_sample(HSAMPLE sample) {
@@ -967,136 +898,241 @@ void __stdcall AIL_resume_sample(HSAMPLE sample) {
     AIL_start_sample(sample);
 }
 
-void __stdcall AIL_stop_sample(HSAMPLE sample) {
+void __stdcall AIL_set_sample_playback_rate(HSAMPLE sample, S32 playback_rate) {
     SampleState* s = (SampleState*)sample;
-    s->is_playing = false;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        if (s.source) {
-            try { s.source.stop(); } catch(e) {}
-            s.source = null;
+    s->playback_rate = playback_rate;
+    js_rate(s->id, playback_rate, s->file_rate);
+}
+
+S32 __stdcall AIL_sample_playback_rate(HSAMPLE sample) {
+    return ((SampleState*)sample)->playback_rate;
+}
+
+void __stdcall AIL_sample_ms_position(HSAMPLE sample, S32* total_ms, S32* current_ms) {
+    if (total_ms) *total_ms = 0;
+    if (current_ms) *current_ms = 0;
+}
+
+void __stdcall AIL_set_sample_ms_position(HSAMPLE sample, S32 pos) {
+}
+
+S32 __stdcall AIL_sample_loop_count(HSAMPLE sample) {
+    return ((SampleState*)sample)->loop_count;
+}
+
+void __stdcall AIL_set_sample_loop_count(HSAMPLE sample, S32 count) {
+    ((SampleState*)sample)->loop_count = count;
+}
+
+int __stdcall AIL_sample_volume(HSAMPLE sample) {
+    return (int)(((SampleState*)sample)->volume * 127.0f);
+}
+
+void __stdcall AIL_set_sample_volume(HSAMPLE sample, int volume) {
+    SampleState* s = (SampleState*)sample;
+    s->volume = (float)volume / 127.0f;
+    js_volume_pan(s->id, s->volume, s->pan);
+}
+
+int __stdcall AIL_sample_pan(HSAMPLE sample) {
+    return (int)(((SampleState*)sample)->pan * 127.0f);
+}
+
+void __stdcall AIL_set_sample_pan(HSAMPLE sample, int pan) {
+    SampleState* s = (SampleState*)sample;
+    s->pan = (float)pan / 127.0f;
+    js_volume_pan(s->id, s->volume, s->pan);
+}
+
+void __stdcall AIL_set_sample_volume_pan(HSAMPLE sample, F32 volume, F32 pan) {
+    SampleState* s = (SampleState*)sample;
+    s->volume = volume;
+    s->pan = pan;
+    js_volume_pan(s->id, volume, pan);
+}
+
+void __stdcall AIL_sample_volume_pan(HSAMPLE sample, F32 * volume, F32 * pan) {
+    SampleState* s = (SampleState*)sample;
+    if (volume) *volume = s->volume;
+    if (pan) *pan = s->pan;
+}
+
+AIL_sample_callback __stdcall AIL_register_EOS_callback(HSAMPLE sample, AIL_sample_callback EOS) {
+    SampleState* s = (SampleState*)sample;
+    AIL_sample_callback old = s->eos_callback;
+    s->eos_callback = EOS;
+    return old;
+}
+
+HPROVIDER __stdcall AIL_set_sample_processor(HSAMPLE sample, SAMPLESTAGE pipeline_stage, HPROVIDER provider) {
+    return 0;
+}
+
+void __stdcall AIL_set_filter_sample_preference(HSAMPLE sample, const char* name, const void* val) {
+}
+
+void __stdcall AIL_set_sample_user_data(HSAMPLE sample, U32 index, S32 value) {
+}
+
+S32 __stdcall AIL_sample_user_data(HSAMPLE sample, U32 index) {
+    return 0;
+}
+
+void __stdcall AIL_get_DirectSound_info(HSAMPLE sample, AILLPDIRECTSOUND * lplpDS, AILLPDIRECTSOUNDBUFFER * lplpDSB) {
+}
+
+// ---- streams --------------------------------------------------------------------------------
+HSTREAM __stdcall AIL_open_stream(HDIGDRIVER dig, const char * filename, S32 stream_mem) {
+    if (!filename || !*filename) return nullptr;
+    int slot = -1;
+    for (int i = 0; i < MAX_STREAMS; i++) {
+        if (!g_streams[i].allocated) { slot = i; break; }
+    }
+    if (slot < 0) {
+        printf("[web_audio_bridge] AIL_open_stream: no free stream slot for '%s'\n", filename);
+        return nullptr;
+    }
+    StreamState* s = &g_streams[slot];
+    s->id = JS_ID_STREAM + slot + 1;
+
+    // inside a mounted archive: the browser fetches the byte range itself, asynchronously
+    const char* url = nullptr;
+    uint32_t offset = 0, size = 0;
+    if (WebAudioBridge_LocateFile(filename, &url, &offset, &size) && size > 0) {
+        EM_ASM({ window['AILBridge'].streamFromRange($0, UTF8ToString($1), $2, $3, UTF8ToString($4)); },
+               s->id, url, offset, size, filename);
+    } else {
+        // a loose file (user data, a local override): read it once through the engine's file system
+        uint32_t bytes = 0;
+        char* buf = WebAudioBridge_ReadEntireFile(filename, &bytes);
+        if (!buf) {
+            GX_DIAG_LOG("AUDIO: no file for stream '%s'\n", filename);
+            return nullptr;
         }
-        s.playWhenReady = false;
-    }, s->id);
-}
+        EM_ASM({ window['AILBridge'].streamFromBytes($0, $1, $2, UTF8ToString($3)); }, s->id, buf, bytes, filename);
+        delete[] buf;
+    }
 
-void __stdcall AIL_start_sample(HSAMPLE sample) {
-    SampleState* s = (SampleState*)sample;
-    GX_TRACE_LOG("[web_audio_bridge] AIL_start_sample: sample=%p, id=%d, loop_count=%d\n",
-           (void*)sample, s ? s->id : -1, s ? s->loop_count : -1);
-    s->is_playing = true;
-    EM_ASM({
-        window.AILBridge.play($0, 0, $1);
-    }, s->id, s->loop_count == 0 || s->loop_count > 1);
-}
-
-void __stdcall AIL_init_sample(HSAMPLE sample) {
-    SampleState* s = (SampleState*)sample;
-    s->file_image = nullptr;
+    s->allocated = true;
+    strncpy(s->filename, filename, sizeof(s->filename) - 1);
+    s->filename[sizeof(s->filename) - 1] = 0;
     s->volume = 1.0f;
     s->pan = 0.5f;
     s->loop_count = 1;
+    s->callback = nullptr;
     s->is_playing = false;
+    EM_ASM({ window['AILBridge'].setVolumePan($0, 1, 0.5); }, s->id);
+    return (HSTREAM)s;
 }
 
-S32 __stdcall AIL_set_named_sample_file(HSAMPLE sample, const char* file_name, const void* file_image, S32 file_size, S32 block) {
-    return AIL_set_sample_file(sample, file_image, block);
+HSTREAM __stdcall AIL_open_stream_by_sample(HDIGDRIVER driver, HSAMPLE sample, const char* file_name, int mem) {
+    return 0;
 }
 
-void __stdcall AIL_set_3D_sample_effects_level(H3DSAMPLE sample, F32 effect_level) {
+void __stdcall AIL_close_stream(HSTREAM stream) {
+    StreamState* s = (StreamState*)stream;
+    s->allocated = false;
+    s->callback = nullptr;
+    s->is_playing = false;
+    EM_ASM({ window['AILBridge'].closeStream($0); }, s->id);
 }
 
-void __stdcall AIL_set_3D_sample_distances(H3DSAMPLE sample, F32 max_dist, F32 min_dist) {
-    Sample3DState* s = (Sample3DState*)sample;
-    s->max_dist = max_dist;
-    s->min_dist = min_dist;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        s.max_dist = $1;
-        s.min_dist = $2;
-        if (s.pannerNode) {
-            s.pannerNode.maxDistance = $1;
-            s.pannerNode.refDistance = $2;
-        }
-    }, s->id, max_dist, min_dist);
+void __stdcall AIL_start_stream(HSTREAM stream) {
+    StreamState* s = (StreamState*)stream;
+    s->is_playing = true;
+    js_play(s->id, s->loop_count);
 }
 
-void __stdcall AIL_set_3D_velocity_vector(H3DPOBJECT sample, F32 x, F32 y, F32 z) {
-}
-
-void __stdcall AIL_set_3D_position(H3DPOBJECT obj, F32 X, F32 Y, F32 Z) {
-    // Translate coordinates: X_wa = X, Y_wa = Z, Z_wa = -Y
-    float wa_x = X;
-    float wa_y = Z;
-    float wa_z = -Y;
-    if (obj == LISTENER_HANDLE) {
-        EM_ASM({
-            if (window.AILBridge.audioContext) {
-                let listener = window.AILBridge.audioContext.listener;
-                if (listener.positionX) {
-                    listener.positionX.value = $0;
-                    listener.positionY.value = $1;
-                    listener.positionZ.value = $2;
-                } else {
-                    listener.setPosition($0, $1, $2);
-                }
-            }
-        }, wa_x, wa_y, wa_z);
+void __stdcall AIL_pause_stream(HSTREAM stream, S32 onoff) {
+    StreamState* s = (StreamState*)stream;
+    if (onoff) {
+        EM_ASM({ window['AILBridge'].pauseStream($0, 1); }, s->id);
+    } else if (s->is_playing) {
+        if (!EM_ASM_INT({ return window['AILBridge'].pauseStream($0, 0); }, s->id)) AIL_start_stream(stream);
     } else {
-        Sample3DState* s = (Sample3DState*)obj;
-        s->x = wa_x; s->y = wa_y; s->z = wa_z;
-        EM_ASM({
-            let s = window.AILBridge.getSample($0);
-            s.x = $1; s.y = $2; s.z = $3;
-            if (s.pannerNode && s.pannerNode.positionX) {
-                s.pannerNode.positionX.value = $1;
-                s.pannerNode.positionY.value = $2;
-                s.pannerNode.positionZ.value = $3;
-            }
-        }, s->id, wa_x, wa_y, wa_z);
+        AIL_start_stream(stream);
     }
 }
 
-void __stdcall AIL_set_3D_orientation(H3DPOBJECT obj, F32 X_face, F32 Y_face, F32 Z_face, F32 X_up, F32 Y_up, F32 Z_up) {
-    if (obj == LISTENER_HANDLE) {
-        // Project face vector onto Generals X-Y plane (Z_face = 0)
-        float proj_x = X_face;
-        float proj_y = Y_face;
-        float len = sqrtf(proj_x * proj_x + proj_y * proj_y);
-        if (len > 0.0001f) {
-            proj_x /= len;
-            proj_y /= len;
-        } else {
-            proj_x = 0.0f;
-            proj_y = 1.0f;
-        }
-        
-        // Map to Web Audio coordinates: X_wa = X, Y_wa = Z, Z_wa = -Y
-        float wa_face_x = proj_x;
-        float wa_face_y = 0.0f;
-        float wa_face_z = -proj_y;
-        
-        // Hardcode Web Audio listener's Up vector to standard upright (0, 1, 0)
-        float wa_up_x = 0.0f;
-        float wa_up_y = 1.0f;
-        float wa_up_z = 0.0f;
+AIL_stream_callback __stdcall AIL_register_stream_callback(HSTREAM stream, AIL_stream_callback callback) {
+    StreamState* s = (StreamState*)stream;
+    AIL_stream_callback old = s->callback;
+    s->callback = callback;
+    return old;
+}
 
-        EM_ASM({
-            if (window.AILBridge.audioContext) {
-                let listener = window.AILBridge.audioContext.listener;
-                if (listener.forwardX) {
-                    listener.forwardX.value = $0;
-                    listener.forwardY.value = $1;
-                    listener.forwardZ.value = $2;
-                    listener.upX.value = $3;
-                    listener.upY.value = $4;
-                    listener.upZ.value = $5;
-                } else {
-                    listener.setOrientation($0, $1, $2, $3, $4, $5);
-                }
-            }
-        }, wa_face_x, wa_face_y, wa_face_z, wa_up_x, wa_up_y, wa_up_z);
-    }
+void __stdcall AIL_set_stream_playback_rate(HSTREAM stream, S32 rate) {
+}
+
+S32 __stdcall AIL_stream_playback_rate(HSTREAM stream) {
+    return 22050;
+}
+
+// Before the element has loaded its metadata the length is unknown and reported as 0.
+void __stdcall AIL_stream_ms_position(HSTREAM stream, S32* total_milliseconds, S32* current_milliseconds) {
+    StreamState* s = (StreamState*)stream;
+    if (total_milliseconds) *total_milliseconds = EM_ASM_INT({ return window['AILBridge'].streamPosition($0, 0); }, s->id);
+    if (current_milliseconds) *current_milliseconds = EM_ASM_INT({ return window['AILBridge'].streamPosition($0, 1); }, s->id);
+}
+
+void __stdcall AIL_set_stream_ms_position(HSTREAM stream, S32 pos) {
+    EM_ASM({ window['AILBridge'].seekStream($0, $1); }, ((StreamState*)stream)->id, pos);
+}
+
+S32 __stdcall AIL_stream_loop_count(HSTREAM stream) {
+    return ((StreamState*)stream)->loop_count;
+}
+
+void __stdcall AIL_set_stream_loop_block(HSTREAM stream, S32 loop_start, S32 loop_end) {
+}
+
+void __stdcall AIL_set_stream_loop_count(HSTREAM stream, S32 count) {
+    ((StreamState*)stream)->loop_count = count;
+}
+
+int __stdcall AIL_stream_volume(HSTREAM stream) {
+    return (int)(((StreamState*)stream)->volume * 127.0f);
+}
+
+void __stdcall AIL_set_stream_volume(HSTREAM stream, int volume) {
+    StreamState* s = (StreamState*)stream;
+    s->volume = (float)volume / 127.0f;
+    js_volume_pan(s->id, s->volume, s->pan);
+}
+
+int __stdcall AIL_stream_pan(HSTREAM stream) {
+    return (int)(((StreamState*)stream)->pan * 127.0f);
+}
+
+void __stdcall AIL_set_stream_pan(HSTREAM stream, int pan) {
+    StreamState* s = (StreamState*)stream;
+    s->pan = (float)pan / 127.0f;
+    js_volume_pan(s->id, s->volume, s->pan);
+}
+
+void __stdcall AIL_set_stream_volume_pan(HSTREAM stream, F32 volume, F32 pan) {
+    StreamState* s = (StreamState*)stream;
+    s->volume = volume;
+    s->pan = pan;
+    js_volume_pan(s->id, volume, pan);
+}
+
+void __stdcall AIL_stream_volume_pan(HSTREAM stream, F32 * volume, F32 * pan) {
+    StreamState* s = (StreamState*)stream;
+    if (volume) *volume = s->volume;
+    if (pan) *pan = s->pan;
+}
+
+// ---- misc ------------------------------------------------------------------------------------
+S32 __stdcall AIL_set_preference(U32 number, S32 value) {
+    return 1;
+}
+
+S32 __stdcall AIL_waveOutOpen(HDIGDRIVER* driver, LPHWAVEOUT* waveout, S32 id, LPWAVEFORMAT format) {
+    return 0;
+}
+
+void __stdcall AIL_waveOutClose(HDIGDRIVER driver) {
 }
 
 S32 __stdcall AIL_WAV_info(const void* data, AILSOUNDINFO* info) {
@@ -1134,95 +1170,14 @@ S32 __stdcall AIL_enumerate_filters(HPROENUM* next, HPROVIDER* dest, char** name
 void __stdcall AIL_set_file_callbacks(AIL_file_open_callback opencb, AIL_file_close_callback closecb, AIL_file_seek_callback seekcb, AIL_file_read_callback readcb) {
 }
 
-void __stdcall AIL_release_3D_sample_handle(H3DSAMPLE sample) {
-    Sample3DState* s = (Sample3DState*)sample;
-    s->allocated = false;
-}
-
-H3DSAMPLE __stdcall AIL_allocate_3D_sample_handle(HPROVIDER lib) {
-    for (int i = 0; i < MAX_SAMPLES; i++) {
-        if (!g_samples3D[i].allocated) {
-            g_samples3D[i].allocated = true;
-            g_samples3D[i].id = i + 500; // offset 3D sample IDs to prevent collision
-            g_samples3D[i].is_playing = false;
-            g_samples3D[i].volume = 1.0f;
-            g_samples3D[i].max_dist = 1000.0f;
-            g_samples3D[i].min_dist = 10.0f;
-            g_samples3D[i].x = 0.0f; g_samples3D[i].y = 0.0f; g_samples3D[i].z = 0.0f;
-            g_samples3D[i].loop_count = 1;
-            g_samples3D[i].playback_rate = 22050;
-            g_samples3D[i].eos_callback = nullptr;
-            g_samples3D[i].file_image = nullptr;
-            return (H3DSAMPLE)&g_samples3D[i];
-        }
-    }
-    return nullptr;
-}
-
-void __stdcall AIL_set_3D_user_data(H3DPOBJECT obj, U32 index, S32 value) {
-}
-
 void __stdcall AIL_unlock() {
 }
 
 void __stdcall AIL_lock() {
 }
 
-void __stdcall AIL_set_3D_speaker_type(HPROVIDER lib, S32 speaker_type) {
-}
-
-void __stdcall AIL_close_3D_listener(H3DPOBJECT listener) {
-}
-
-S32 __stdcall AIL_enumerate_3D_providers(HPROENUM* next, HPROVIDER* dest, char** name) {
-    if (next && *next == 0) {
-        *dest = (HPROVIDER)1;
-        *name = (char*)"Miles Fast 2D Positional Audio";
-        *next = (HPROENUM)1;
-        return 1;
-    }
-    return 0;
-}
-
-M3DRESULT __stdcall AIL_open_3D_provider(HPROVIDER lib) {
-    return 0;
-}
-
 char* __stdcall AIL_last_error() {
     return (char*)"No error";
-}
-
-H3DPOBJECT __stdcall AIL_open_3D_listener(HPROVIDER lib) {
-    return LISTENER_HANDLE;
-}
-
-S32 __stdcall AIL_3D_user_data(H3DPOBJECT sample, U32 index) {
-    return 0;
-}
-
-S32 __stdcall AIL_sample_user_data(HSAMPLE sample, U32 index) {
-    return 0;
-}
-
-HSAMPLE __stdcall AIL_allocate_sample_handle(HDIGDRIVER dig) {
-    for (int i = 0; i < MAX_SAMPLES; i++) {
-        if (!g_samples[i].allocated) {
-            g_samples[i].allocated = true;
-            g_samples[i].id = i + 1;
-            g_samples[i].is_playing = false;
-            g_samples[i].volume = 1.0f;
-            g_samples[i].pan = 0.5f;
-            g_samples[i].loop_count = 1;
-            g_samples[i].playback_rate = 22050;
-            g_samples[i].eos_callback = nullptr;
-            g_samples[i].file_image = nullptr;
-            return (HSAMPLE)&g_samples[i];
-        }
-    }
-    return nullptr;
-}
-
-void __stdcall AIL_set_sample_user_data(HSAMPLE sample, U32 index, S32 value) {
 }
 
 S32 __stdcall AIL_decompress_ADPCM(const AILSOUNDINFO * info, void ** outdata, U32 * outsize) {
@@ -1279,42 +1234,8 @@ S32 __stdcall AIL_decompress_ADPCM(const AILSOUNDINFO * info, void ** outdata, U
     return 1;
 }
 
-void __stdcall AIL_get_DirectSound_info(HSAMPLE sample, AILLPDIRECTSOUND * lplpDS, AILLPDIRECTSOUNDBUFFER * lplpDSB) {
-}
-
 void __stdcall AIL_mem_free_lock(void * ptr) {
     if (ptr) free(ptr);
-}
-
-HSTREAM __stdcall AIL_open_stream(HDIGDRIVER dig, const char * filename, S32 stream_mem) {
-    GX_TRACE_LOG("[web_audio_bridge] AIL_open_stream: filename='%s', stream_mem=%d\n", filename, stream_mem);
-    for (int i = 0; i < MAX_STREAMS; i++) {
-        if (!g_streams[i].allocated) {
-            g_streams[i].allocated = true;
-            g_streams[i].id = i + 1;
-            strncpy(g_streams[i].filename, filename, sizeof(g_streams[i].filename) - 1);
-            g_streams[i].volume = 1.0f;
-            g_streams[i].pan = 0.5f;
-            g_streams[i].loop_count = 1;
-            g_streams[i].callback = nullptr;
-            g_streams[i].is_playing = false;
-
-            uint32_t size = 0;
-            char* buf = WebAudioBridge_ReadEntireFile(filename, &size);
-            GX_TRACE_LOG("[web_audio_bridge] AIL_open_stream: WebAudioBridge_ReadEntireFile returned %p, size = %u\n", (void*)buf, size);
-            if (buf) {
-                EM_ASM({
-                    window.AILBridge.setStreamFile($0, $1, $2);
-                }, g_streams[i].id, buf, size);
-                delete[] buf;
-            } else {
-                printf("[web_audio_bridge] AIL_open_stream WARNING: WebAudioBridge_ReadEntireFile failed or returned NULL\n");
-            }
-            return (HSTREAM)&g_streams[i];
-        }
-    }
-    printf("[web_audio_bridge] AIL_open_stream ERROR: No free stream slot available\n");
-    return nullptr;
 }
 
 void __stdcall AIL_quick_unload(HAUDIO audio) {
@@ -1327,17 +1248,17 @@ HAUDIO __stdcall AIL_quick_load_and_play(const char * filename, U32 loop_count, 
 void __stdcall AIL_quick_set_volume(HAUDIO audio, F32 volume, F32 extravol) {
 }
 
-S32 __stdcall AIL_quick_startup(S32 use_digital, S32 use_MIDI, U32 output_rate, S32 output_bits, S32 output_channels) {
-    GX_TRACE_LOG("[web_audio_bridge] AIL_quick_startup: use_digital=%d, use_MIDI=%d, rate=%u, bits=%d, channels=%d\n",
-           use_digital, use_MIDI, output_rate, output_bits, output_channels);
+static void bridge_start() {
 #if GX_TRACE_LOGGING
     // Debug builds only: let the AILBridge EM_JS console traces through.
-    EM_ASM({ window.gxAudioVerbose = true; });
+    EM_ASM({ window['gxAudioVerbose'] = true; });
 #endif
     AILBridge_init();
-    EM_ASM({
-        window.AILBridge.init();
-    });
+    EM_ASM({ window['AILBridge'].init(); });
+}
+
+S32 __stdcall AIL_quick_startup(S32 use_digital, S32 use_MIDI, U32 output_rate, S32 output_bits, S32 output_channels) {
+    bridge_start();
     return 1;
 }
 
@@ -1347,82 +1268,12 @@ void __stdcall AIL_quick_handles(HDIGDRIVER * pdig, HMDIDRIVER * pmdi, HDLSDEVIC
     if (pdls) *pdls = (HDLSDEVICE)1;
 }
 
-void __stdcall AIL_sample_volume_pan(HSAMPLE sample, F32 * volume, F32 * pan) {
-    SampleState* s = (SampleState*)sample;
-    if (volume) *volume = s->volume;
-    if (pan) *pan = s->pan;
-}
-
-void __stdcall AIL_set_3D_sample_occlusion(H3DSAMPLE sample, F32 occlusion) {
-}
-
 char * __stdcall AIL_set_redist_directory(const char * dir) {
     return nullptr;
 }
 
-S32 __stdcall AIL_set_sample_file(HSAMPLE sample, const void * file_image, S32 block) {
-    SampleState* s = (SampleState*)sample;
-    GX_TRACE_LOG("[web_audio_bridge] AIL_set_sample_file: sample=%p, id=%d, file_image=%p, block=%d\n",
-           (void*)sample, s ? s->id : -1, file_image, block);
-    s->file_image = file_image;
-    if (file_image) {
-        EM_ASM({
-            window.AILBridge.setSampleFile($0, $1, 0);
-        }, s->id, file_image);
-    }
-    return 1;
-}
-
-void __stdcall AIL_set_sample_volume_pan(HSAMPLE sample, F32 volume, F32 pan) {
-    SampleState* s = (SampleState*)sample;
-    s->volume = volume;
-    s->pan = pan;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0);
-        s.volume = $1;
-        s.pan = $2;
-        if (s.gainNode) {
-            s.gainNode.gain.value = $1;
-        }
-        if (s.pannerNode && s.pannerNode.pan) {
-            s.pannerNode.pan.value = ($2 - 0.5) * 2.0;
-        }
-    }, s->id, volume, pan);
-}
-
-void __stdcall AIL_set_stream_volume_pan(HSTREAM stream, F32 volume, F32 pan) {
-    StreamState* s = (StreamState*)stream;
-    s->volume = volume;
-    s->pan = pan;
-    EM_ASM({
-        let s = window.AILBridge.getSample($0 + 1000);
-        s.volume = $1;
-        s.pan = $2;
-        if (s.gainNode) {
-            s.gainNode.gain.value = $1;
-        }
-        if (s.pannerNode && s.pannerNode.pan) {
-            s.pannerNode.pan.value = ($2 - 0.5) * 2.0;
-        }
-    }, s->id, volume, pan);
-}
-
-void __stdcall AIL_stream_volume_pan(HSTREAM stream, F32 * volume, F32 * pan) {
-    StreamState* s = (StreamState*)stream;
-    if (volume) *volume = s->volume;
-    if (pan) *pan = s->pan;
-}
-
 S32 __stdcall AIL_startup() {
-    GX_TRACE_LOG("[web_audio_bridge] AIL_startup called\n");
-#if GX_TRACE_LOGGING
-    // Debug builds only: let the AILBridge EM_JS console traces through.
-    EM_ASM({ window.gxAudioVerbose = true; });
-#endif
-    AILBridge_init();
-    EM_ASM({
-        window.AILBridge.init();
-    });
+    bridge_start();
     return 1;
 }
 

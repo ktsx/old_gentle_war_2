@@ -99,20 +99,32 @@ export function findBigEntry(archive: BigArchive, path: string): BigEntry | unde
   return archive.entries.find((e) => norm(e.path) === want);
 }
 
-/** Build a BIGF archive from {path → bytes}. Paths use backslashes inside the archive. */
+/**
+ * Build a BIGF archive from {path → bytes}. Paths use backslashes inside the archive.
+ * Entries passing the same Buffer object share one copy of the data (audio.ts maps thousands of
+ * file names onto a few dozen sounds); the format allows any number of entries per byte range.
+ */
 export function buildBig(files: { path: string; data: Buffer }[]): Buffer {
   const tableParts: Buffer[] = [];
   let tableSize = 16;
   for (const f of files) tableSize += 8 + Buffer.byteLength(f.path, "latin1") + 1;
   // Game archives align the header size; the engine doesn't care, so we keep it exact.
   let offset = tableSize;
+  const placed = new Map<Buffer, number>();
+  const blobs: Buffer[] = [];
   for (const f of files) {
     const rec = Buffer.alloc(8 + Buffer.byteLength(f.path, "latin1") + 1);
-    rec.writeUInt32BE(offset, 0);
+    let at = placed.get(f.data);
+    if (at === undefined) {
+      at = offset;
+      placed.set(f.data, at);
+      blobs.push(f.data);
+      offset += f.data.length;
+    }
+    rec.writeUInt32BE(at, 0);
     rec.writeUInt32BE(f.data.length, 4);
     rec.write(f.path.replace(/\//g, "\\"), 8, "latin1");
     tableParts.push(rec);
-    offset += f.data.length;
   }
   const total = offset;
   const head = Buffer.alloc(16);
@@ -120,7 +132,7 @@ export function buildBig(files: { path: string; data: Buffer }[]): Buffer {
   head.writeUInt32LE(total, 4);
   head.writeUInt32BE(files.length, 8);
   head.writeUInt32BE(tableSize, 12);
-  return Buffer.concat([head, ...tableParts, ...files.map((f) => f.data)]);
+  return Buffer.concat([head, ...tableParts, ...blobs]);
 }
 
 /** Pack every file under `dir` into `outFile`; returns the file count. Paths are stored with backslashes. */

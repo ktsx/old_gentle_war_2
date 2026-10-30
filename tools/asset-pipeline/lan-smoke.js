@@ -35,7 +35,7 @@ const P = {
     page.on('console', (m) => {
       const t = m.text();
       lines.push(t);
-      if (/LAN|SHELL: (push|doPush)|GAMELOGIC: startNewGame:ENTER|NETWORK|NET:|FATAL|inGame=1|Virtual|GXNet/.test(t) && !/TICK-DIAG/.test(t)) console.log(`${stamp()} [${who}] ${t.slice(0, 220)}`);
+      if (/LAN|SHELL: (push|doPush)|GAMELOGIC: startNewGame:ENTER|NETWORK|NET:|FATAL|inGame=1|Virtual|GXNet|TICK-DIAG|DISCONNECT|Disconnect/.test(t) ) console.log(`${stamp()} [${who}] ${t.slice(0, 220)}`);
     });
     page.on('pageerror', (e) => { lines.push(`[PAGEERROR] ${e}`); console.log(`${stamp()} [${who}] PAGEERROR ${String(e).slice(0, 200)}`); });
     const q = net ? `diag=1&net=${encodeURIComponent(net)}` : `diag=1&virtual_net&ip=${ip}`;
@@ -87,13 +87,16 @@ const P = {
     if (!ok) failures.push(`${p.who}: match did not start`);
     await p.page.screenshot({ path: `lan-${p.who}-game.png` });
   }
-  // both sides advance: logic frames keep rising in lockstep
-  const frame = (p) => { const m = [...p.lines].reverse().map((l) => /logicFrame=(\d+)/.exec(l)).find(Boolean); return m ? Number(m[1]) : -1; };
+  // both sides advance in lockstep. TICK-DIAG prints every 30-60 logic frames and two engines on
+  // one headless machine run at ~1-2 fps, so wait (up to 4 min) for each to log 30 frames more.
+  const frame = (p) => { const m = [...p.lines].reverse().map((l) => /logicFrame=(\d+) inGame=1/.exec(l)).find(Boolean); return m ? Number(m[1]) : -1; };
   const f0 = [frame(host), frame(client)];
-  await host.page.waitForTimeout(20000);
+  const until = Date.now() + 240000;
+  while (Date.now() < until && !(frame(host) >= f0[0] + 30 && frame(client) >= f0[1] + 30)) await host.page.waitForTimeout(2000);
   const f1 = [frame(host), frame(client)];
   console.log(`${stamp()} logic frames host ${f0[0]} -> ${f1[0]}, client ${f0[1]} -> ${f1[1]}`);
-  if (!(f1[0] > f0[0] && f1[1] > f0[1])) failures.push(`logic stalled (host ${f0[0]}->${f1[0]}, client ${f0[1]}->${f1[1]})`);
+  if (!(f1[0] >= f0[0] + 30 && f1[1] >= f0[1] + 30)) failures.push(`logic stalled (host ${f0[0]}->${f1[0]}, client ${f0[1]}->${f1[1]})`);
+  for (const p of [host, client]) await p.page.screenshot({ path: `lan-${p.who}-later.png` });
   for (const p of [host, client]) if (p.lines.some((l) => /FATAL C\+\+ CRASH|\[PAGEERROR\]/.test(l))) failures.push(`${p.who}: crash / page error`);
   await browser.close();
   if (failures.length) { console.error('=== LAN SMOKE: FAIL ===\n' + failures.join('\n')); process.exit(2); }

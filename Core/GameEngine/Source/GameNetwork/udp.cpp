@@ -42,6 +42,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
+#include <Utility/gx_trace.h>
 
 //-------------------------------------------------------------------------
 
@@ -230,6 +231,7 @@ Int UDP::Bind(UnsignedInt IP,UnsignedShort Port)
     myIP = IP ? IP : AssembleIp(g_virtualIP_a, g_virtualIP_b, g_virtualIP_c, g_virtualIP_d);
     myPort = Port ? Port : g_nextEphemeralPort++;
     g_virtualQueues[myPort].clear();     // a fresh socket starts empty
+    GX_DIAG_LOG("NET: bind %u.%u.%u.%u:%u (virtual)\n", (myIP >> 24) & 255, (myIP >> 16) & 255, (myIP >> 8) & 255, myIP & 255, (unsigned)myPort);
     addr.sin_family = AF_INET;
     addr.sin_port = htons(myPort);
     addr.sin_addr.s_addr = htonl(myIP);
@@ -331,6 +333,11 @@ Int UDP::Write(const unsigned char *msg,UnsignedInt len,UnsignedInt IP,UnsignedS
     const bool local = (IP == self) || ((IP >> 24) == 127);
     if (broadcast || local)
       virtualEnqueue(port, msg, (int)len, self, myPort);
+    static unsigned s_writes = 0;
+    if (++s_writes <= 10 || s_writes % 200 == 0)
+      GX_DIAG_LOG("NET: write #%u %u bytes %u.%u.%u.%u:%u -> %u.%u.%u.%u:%u%s\n", s_writes, (unsigned)len,
+        (self >> 24) & 255, (self >> 16) & 255, (self >> 8) & 255, self & 255, (unsigned)myPort,
+        (IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255, (unsigned)port, local ? " (local)" : broadcast ? " (broadcast)" : "");
 #ifdef __EMSCRIPTEN__
     if (!local)
     {
@@ -386,6 +393,10 @@ Int UDP::Read(unsigned char *msg,UnsignedInt len,sockaddr_in *from)
     }
     VirtualPacket packet = it->second.front();
     it->second.pop_front();
+    static unsigned s_reads = 0;
+    if (++s_reads <= 10 || s_reads % 200 == 0)
+      GX_DIAG_LOG("NET: read #%u %u bytes on :%u from %u.%u.%u.%u:%u\n", s_reads, (unsigned)packet.data.size(), (unsigned)myPort,
+        (packet.fromIP >> 24) & 255, (packet.fromIP >> 16) & 255, (packet.fromIP >> 8) & 255, packet.fromIP & 255, (unsigned)packet.fromPort);
 
     unsigned int toCopy = packet.data.size();
     if (toCopy > len)

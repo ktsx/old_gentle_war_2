@@ -723,7 +723,12 @@ typedef struct WSAData {
   unsigned short iMaxUdpDg;
   char *lpVendorInfo;
 } WSADATA, *LPWSADATA;
-inline int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData) { return 0; }
+// GeneralsX @bugfix WebPort 2026-10-30 — report the version asked for: Transport::init rejects a
+// WSADATA whose wVersion is not 2.2, and the uninitialised struct made every LAN bind fail.
+inline int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData) {
+  if (lpWSAData) { lpWSAData->wVersion = wVersionRequired; lpWSAData->wHighVersion = wVersionRequired; }
+  return 0;
+}
 inline int WSACleanup() { return 0; }
 // Remap WSA error codes to POSIX equivalents for Emscripten socket code.
 // Use #undef to avoid -Wmacro-redefined (these are also defined as numeric

@@ -83,8 +83,11 @@ const read = (k: string) => { try { return localStorage.getItem(k); } catch { re
 const write = (k: string, v: string | null) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* private mode */ } };
 
 function play(query: string) {
-  const extra = location.search.includes("diag=1") ? "&diag=1" : "";   // pass the diagnostics flag through
-  location.href = `GeneralsZH.html?${query}${extra}`;
+  // pass the diagnostics flag and a network room (?net=ws://host:8789/net/<room>, web/net) through
+  const own = new URLSearchParams(location.search);
+  const q = new URLSearchParams(query);
+  for (const k of ["diag", "net"]) { const v = own.get(k); if (v) q.set(k, v); }
+  location.href = `GeneralsZH.html?${q.toString()}`;
 }
 
 // ------------------------------------------------------------------------------------------

@@ -202,6 +202,8 @@ jobs:
           cp scripts/serve.py build-web/GeneralsMD/serve.py
           # the launcher (web/launcher): the site's index.html, service worker, manifest and icons
           node --experimental-strip-types web/launcher/build.ts launcher-dist
+          # the network client (web/net): gxnet.js, loaded by the engine page for ?net=ws://…/net/<room>
+          node --experimental-strip-types web/net/build.ts launcher-dist
           TAG='${{ matrix.release_tag }}'
           if [ "$GITHUB_REF" != "refs/heads/main" ]; then TAG="${TAG/ci-latest/ci-branch}"; fi
           gh release delete "$TAG" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
@@ -246,6 +248,7 @@ jobs:
           node --experimental-strip-types tools/asset-pipeline/build-free-assets.ts free-out --cache "$RUNNER_TEMP/free-cache"
           mkdir -p site/assets && cp free-out/assets/*.big free-out/assets/manifest.json site/assets/
           node --experimental-strip-types web/launcher/build.ts site
+          node --experimental-strip-types web/net/build.ts site
           ls -l site site/assets
 
       - name: Install Playwright Chromium

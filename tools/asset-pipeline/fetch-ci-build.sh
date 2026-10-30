@@ -30,7 +30,7 @@ until [ "$(gh api "repos/$repo/releases/tags/$tag" --jq .target_commitish 2>/dev
   sleep 15
 done
 echo "release $tag = ${sha:0:9} after $(( $(date +%s) - start )) s"
-for a in GeneralsZH.html GeneralsZH.js GeneralsZH.wasm GeneralsZH.symbols serve.py index.html launcher.js sw.js manifest.webmanifest icon-192.png icon-512.png; do
+for a in GeneralsZH.html GeneralsZH.js GeneralsZH.wasm GeneralsZH.symbols serve.py index.html launcher.js sw.js manifest.webmanifest icon-192.png icon-512.png gxnet.js; do
   id=$(gh api "repos/$repo/releases/tags/$tag" --jq ".assets[] | select(.name==\"$a\") | .id")
   [ -n "$id" ] || continue
   gh api -H "Accept: application/octet-stream" "repos/$repo/releases/assets/$id" > "$out/$a"

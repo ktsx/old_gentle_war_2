@@ -36,7 +36,8 @@
 #include "GameNetwork/udp.h"
 #include "GameNetwork/networkutil.h"
 
-#include <queue>
+#include <deque>
+#include <map>
 #include <vector>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -124,6 +125,13 @@ AsciiString GetWSAErrorString( Int error )
 #define EMSCRIPTEN_KEEPALIVE
 #endif
 
+// GeneralsX @feature WebPort 2026-10-30 — virtual UDP. The browser has no sockets: a UDP socket
+// here is a queue per bound port, filled from JS (GX_Network_PushPacket: the shell's transport —
+// gxnet.js over WebRTC / the relay server, or a BroadcastChannel between tabs) and drained by
+// UDP::Read; UDP::Write hands packets to window.GeneralsX.onSendPacket with the socket's own port.
+// Like Winsock, a broadcast (255.255.255.255 or x.x.x.255) also reaches the sender's own sockets
+// (the LAN lobby lists the local player from its own announcement), and a packet to the own IP
+// or 127.x never leaves the page. On the web this is the only networking, so it is on by default.
 struct VirtualPacket
 {
   std::vector<unsigned char> data;
@@ -131,8 +139,14 @@ struct VirtualPacket
   unsigned short fromPort;
 };
 
-static std::queue<VirtualPacket> g_virtualPacketQueue;
+static std::map<unsigned short, std::deque<VirtualPacket> > g_virtualQueues;   // by destination port
+static const size_t kVirtualQueueMax = 2048;
+static unsigned short g_nextEphemeralPort = 50000;
+#ifdef __EMSCRIPTEN__
+bool g_useVirtualNetworking = true;
+#else
 bool g_useVirtualNetworking = false;
+#endif
 unsigned char g_virtualIP_a = 127;
 unsigned char g_virtualIP_b = 0;
 unsigned char g_virtualIP_c = 0;
@@ -142,10 +156,7 @@ extern "C" {
 EMSCRIPTEN_KEEPALIVE void GX_Network_EnableVirtual(bool enable)
 {
   g_useVirtualNetworking = enable;
-  while (!g_virtualPacketQueue.empty())
-  {
-    g_virtualPacketQueue.pop();
-  }
+  g_virtualQueues.clear();
 }
 
 EMSCRIPTEN_KEEPALIVE void GX_Network_SetVirtualIP(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
@@ -156,15 +167,24 @@ EMSCRIPTEN_KEEPALIVE void GX_Network_SetVirtualIP(unsigned char a, unsigned char
   g_virtualIP_d = d;
 }
 
-EMSCRIPTEN_KEEPALIVE void GX_Network_PushPacket(const unsigned char *data, int len, unsigned int fromIP, unsigned short fromPort)
+static void virtualEnqueue(unsigned short toPort, const unsigned char *data, int len, unsigned int fromIP, unsigned short fromPort)
 {
-  if (!g_useVirtualNetworking)
-    return;
+  std::deque<VirtualPacket> &q = g_virtualQueues[toPort];
+  if (q.size() >= kVirtualQueueMax)
+    q.pop_front();                       // nobody reads this port: keep the newest, like a full socket buffer
   VirtualPacket packet;
   packet.data.assign(data, data + len);
   packet.fromIP = fromIP;
   packet.fromPort = fromPort;
-  g_virtualPacketQueue.push(packet);
+  q.push_back(packet);
+}
+
+// A packet from the network for the socket bound to toPort.
+EMSCRIPTEN_KEEPALIVE void GX_Network_PushPacket(const unsigned char *data, int len, unsigned int fromIP, unsigned short fromPort, unsigned short toPort)
+{
+  if (!g_useVirtualNetworking || len <= 0)
+    return;
+  virtualEnqueue(toPort, data, len, fromIP, fromPort);
 }
 }
 
@@ -175,6 +195,12 @@ UDP::UDP()
 
 UDP::~UDP()
 {
+  if (g_useVirtualNetworking)
+  {
+    if (fd)
+      g_virtualQueues.erase(myPort);     // nothing left to read on a closed socket
+    return;
+  }
 	if (fd)
 		closesocket(fd);
 }
@@ -202,7 +228,8 @@ Int UDP::Bind(UnsignedInt IP,UnsignedShort Port)
   {
     fd = 9999; // Mock file descriptor
     myIP = IP ? IP : AssembleIp(g_virtualIP_a, g_virtualIP_b, g_virtualIP_c, g_virtualIP_d);
-    myPort = Port ? Port : 50000;
+    myPort = Port ? Port : g_nextEphemeralPort++;
+    g_virtualQueues[myPort].clear();     // a fresh socket starts empty
     addr.sin_family = AF_INET;
     addr.sin_port = htons(myPort);
     addr.sin_addr.s_addr = htonl(myIP);
@@ -298,15 +325,22 @@ Int UDP::Write(const unsigned char *msg,UnsignedInt len,UnsignedInt IP,UnsignedS
 {
   if (g_useVirtualNetworking)
   {
+    if ((IP == 0) || (port == 0)) return(ADDRNOTAVAIL);
+    const UnsignedInt self = myIP ? myIP : AssembleIp(g_virtualIP_a, g_virtualIP_b, g_virtualIP_c, g_virtualIP_d);
+    const bool broadcast = (IP == 0xFFFFFFFF) || ((IP & 0xFF) == 0xFF);
+    const bool local = (IP == self) || ((IP >> 24) == 127);
+    if (broadcast || local)
+      virtualEnqueue(port, msg, (int)len, self, myPort);
 #ifdef __EMSCRIPTEN__
-    EM_ASM({
-      if (typeof window !== 'undefined' && window['GeneralsX'] &&
-          typeof window['GeneralsX']['onSendPacket'] === 'function') {
-        var data = new Uint8Array(Module.HEAPU8.buffer, $0, $1);
-        var copy = new Uint8Array(data);
-        window['GeneralsX']['onSendPacket'](copy, $2, $3);
-      }
-    }, msg, len, IP, port);
+    if (!local)
+    {
+      EM_ASM({
+        var g = (typeof window !== 'undefined') ? window['GeneralsX'] : null;
+        if (g && typeof g['onSendPacket'] === 'function') {
+          g['onSendPacket'](HEAPU8.slice($0, $0 + $1), $2 >>> 0, $3, $4);
+        }
+      }, msg, len, IP, port, myPort);
+    }
 #endif
     return (Int)len;
   }
@@ -345,12 +379,13 @@ Int UDP::Read(unsigned char *msg,UnsignedInt len,sockaddr_in *from)
 {
   if (g_useVirtualNetworking)
   {
-    if (g_virtualPacketQueue.empty())
+    std::map<unsigned short, std::deque<VirtualPacket> >::iterator it = g_virtualQueues.find(myPort);
+    if (it == g_virtualQueues.end() || it->second.empty())
     {
       return 0; // No data available
     }
-    VirtualPacket packet = g_virtualPacketQueue.front();
-    g_virtualPacketQueue.pop();
+    VirtualPacket packet = it->second.front();
+    it->second.pop_front();
 
     unsigned int toCopy = packet.data.size();
     if (toCopy > len)

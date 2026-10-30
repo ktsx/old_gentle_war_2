@@ -92,3 +92,7 @@ END
 GX:KeyboardHotkey
 US: "Hotkey:"
 END
+
+GX:Send
+US: "SEND"
+END

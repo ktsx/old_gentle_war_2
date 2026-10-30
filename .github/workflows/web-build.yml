@@ -259,13 +259,16 @@ jobs:
           npm install --no-save playwright@1.49.1
           npx playwright install --with-deps chromium
 
+      - name: Serve
+        run: |
+          cp scripts/serve.py site/serve.py
+          (cd site && python3 serve.py 8888 > ../serve.log 2>&1 &)
+          sleep 2
+
       - name: Serve and boot
         if: matrix.shard == 'menu-map'
         run: |
           set -o pipefail
-          cp scripts/serve.py site/serve.py
-          (cd site && python3 serve.py 8888 > ../serve.log 2>&1 &)
-          sleep 2
           # Begin, press Space (reveals the menu), click SOLO PLAY, BACK, EXIT GAME; ?diag=1 traces must show
           # the button presses reaching MainMenuSystem and the transition gate clearing.
           SMOKE_KEYS=Space SMOKE_CLICKS="512,274;512,504;512,504" \

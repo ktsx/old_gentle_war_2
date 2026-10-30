@@ -85,9 +85,9 @@ const write = (k: string, v: string | null) => { try { v === null ? localStorage
 function play(query: string) {
   // pass the diagnostics flag and a network room (?net=ws://host:8789/net/<room>, web/net) through
   const own = new URLSearchParams(location.search);
-  const q = new URLSearchParams(query);
-  for (const k of ["diag", "net"]) { const v = own.get(k); if (v) q.set(k, v); }
-  location.href = `GeneralsZH.html?${q.toString()}`;
+  let q = query;                                         // kept literal: "assets=opfs:free"
+  for (const k of ["diag", "net"]) { const v = own.get(k); if (v) q += `&${k}=${encodeURIComponent(v)}`; }
+  location.href = `GeneralsZH.html?${q}`;
 }
 
 // ------------------------------------------------------------------------------------------

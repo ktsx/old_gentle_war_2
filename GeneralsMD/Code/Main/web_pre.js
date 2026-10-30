@@ -47,7 +47,7 @@ Module['preRun'].push(function gxIdbfsPreRun() {
 Module['preRun'].push(function gxAssetSetPreRun() {
   // Bracket access and promise chains throughout: the Release build runs this through Closure
   // (ADVANCED), which would rename the OPFS API's property names it has no externs for.
-  var m = /[?&]assets=opfs:([A-Za-z0-9_-]+)/.exec(location.search);
+  var m = /^opfs:([A-Za-z0-9_-]+)$/.exec(new URLSearchParams(location.search).get('assets') || '');
   if (!m) return;
   var set = m[1];
   var storage = navigator['storage'];

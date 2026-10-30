@@ -143,6 +143,27 @@ struct VirtualPacket
 static std::map<unsigned short, std::deque<VirtualPacket> > g_virtualQueues;   // by destination port
 static const size_t kVirtualQueueMax = 2048;
 static unsigned short g_nextEphemeralPort = 50000;
+
+// ?diag=1: packets per port, summarised every 5 s while there is traffic
+struct VirtualPortStats { unsigned sent, recv, dropped; };
+static std::map<unsigned short, VirtualPortStats> g_virtualStats;
+static void virtualStatsTick()
+{
+  static UnsignedInt s_last = 0;
+  const UnsignedInt now = timeGetTime();
+  if (now - s_last < 5000)
+    return;
+  s_last = now;
+  for (std::map<unsigned short, VirtualPortStats>::iterator it = g_virtualStats.begin(); it != g_virtualStats.end(); ++it)
+  {
+    if (!it->second.sent && !it->second.recv && !it->second.dropped)
+      continue;
+    std::map<unsigned short, std::deque<VirtualPacket> >::iterator q = g_virtualQueues.find(it->first);
+    GX_DIAG_LOG("NET: port %u last 5 s: sent %u, read %u, dropped %u, queued %u\n", (unsigned)it->first,
+      it->second.sent, it->second.recv, it->second.dropped, q == g_virtualQueues.end() ? 0u : (unsigned)q->second.size());
+    it->second.sent = it->second.recv = it->second.dropped = 0;
+  }
+}
 #ifdef __EMSCRIPTEN__
 bool g_useVirtualNetworking = true;
 #else
@@ -172,7 +193,10 @@ static void virtualEnqueue(unsigned short toPort, const unsigned char *data, int
 {
   std::deque<VirtualPacket> &q = g_virtualQueues[toPort];
   if (q.size() >= kVirtualQueueMax)
+  {
     q.pop_front();                       // nobody reads this port: keep the newest, like a full socket buffer
+    g_virtualStats[toPort].dropped++;
+  }
   VirtualPacket packet;
   packet.data.assign(data, data + len);
   packet.fromIP = fromIP;
@@ -333,6 +357,8 @@ Int UDP::Write(const unsigned char *msg,UnsignedInt len,UnsignedInt IP,UnsignedS
     const bool local = (IP == self) || ((IP >> 24) == 127);
     if (broadcast || local)
       virtualEnqueue(port, msg, (int)len, self, myPort);
+    g_virtualStats[myPort].sent++;
+    virtualStatsTick();
     static unsigned s_writes = 0;
     if (++s_writes <= 10 || s_writes % 200 == 0)
       GX_DIAG_LOG("NET: write #%u %u bytes %u.%u.%u.%u:%u -> %u.%u.%u.%u:%u%s\n", s_writes, (unsigned)len,
@@ -386,11 +412,13 @@ Int UDP::Read(unsigned char *msg,UnsignedInt len,sockaddr_in *from)
 {
   if (g_useVirtualNetworking)
   {
+    virtualStatsTick();
     std::map<unsigned short, std::deque<VirtualPacket> >::iterator it = g_virtualQueues.find(myPort);
     if (it == g_virtualQueues.end() || it->second.empty())
     {
       return 0; // No data available
     }
+    g_virtualStats[myPort].recv++;
     VirtualPacket packet = it->second.front();
     it->second.pop_front();
     static unsigned s_reads = 0;

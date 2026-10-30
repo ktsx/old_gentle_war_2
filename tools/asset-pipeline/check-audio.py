@@ -38,6 +38,7 @@ checks = {
     "game": lambda s: [
         ("3D samples started", s["started3D"] >= 1),
         ("3D samples ended", s["eos3D"] >= 1),
+        ("the engine heard of it (3D callbacks delivered)", s["delivered3D"] >= 1),
         ("no decode errors", s["decodeErrors"] == 0),
         ("voices bounded (< 40 playing)", s["playing"] < 40),
     ],

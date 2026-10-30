@@ -365,12 +365,13 @@ jobs:
           curl -sf http://localhost:8888/GeneralsZH.html > /dev/null || { (cd site && python3 serve.py 8888 >> ../serve.log 2>&1 &); sleep 2; }
           # free set: AudioZH.big / MusicZH.big (audio.ts). Menu: the shell track is fetched from the
           # archive and plays (output level > 0). SOLO PLAY: a UI click sample plays and ends. Skirmish:
-          # select the dozer (voice), send it off (world sounds), then 3D samples must have ended too —
-          # their end-of-sample callbacks are what free the engine's 3D channels.
+          # play USA (Skirmish.ini, PlayerTemplate 2: GLA's worker has no 3D move sound), select the dozer
+          # (voice), send it off twice (DozerUSAMoveStart, a world sound), then 3D samples must have ended
+          # too — their end-of-sample callbacks are what free the engine's 3D channels.
           C="(w=>(s=>'AUDIOCHECK '+w+' '+JSON.stringify(s))(GX_audioStats()))"
           UI_EXPECT="AUDIO: stream;AUDIOCHECK menu;AUDIOCHECK click;AUDIOCHECK game" \
           node tools/asset-pipeline/ui-script.js "http://localhost:8888/GeneralsZH.html?diag=1" \
-            "wait 8000;js $C('menu');click 512,274;wait 1500;js $C('click');click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key I;wait 1000;click 600,420;wait 1500;key I;click 420,330;wait 20000;js $C('game');shot audio-game.png" \
+            "wait 8000;js $C('menu');js FS.writeFile('/userdata/Skirmish.ini','PlayerTemplate = 2\\n');click 512,274;wait 1500;js $C('click');click 512,412;click 891,722;waitfor 150000 inGame=1 isPaused=0;wait 3000;key I;wait 1000;click 600,420;wait 1500;key I;click 420,330;wait 20000;js $C('game');shot audio-game.png" \
             | tee audio-smoke.log
           python3 tools/asset-pipeline/check-audio.py audio-smoke.log | tee audio-check.log
 

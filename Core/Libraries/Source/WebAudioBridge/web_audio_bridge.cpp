@@ -243,7 +243,7 @@ EM_JS(void, AILBridge_init, (), {
     ctx: null, master: null, analyser: null,
     voices: {},
     cache: new Map(), cacheBytes: 0,
-    stats: { started2D: 0, started3D: 0, streamsStarted: 0, streamsReady: 0, eos: 0, eos3D: 0, eosStream: 0, decoded: 0, cacheHits: 0,
+    stats: { started2D: 0, started3D: 0, streamsStarted: 0, streamsReady: 0, eos: 0, eos3D: 0, eosStream: 0, delivered3D: 0, decoded: 0, cacheHits: 0,
              decodeErrors: 0, streamErrors: 0, notReady: 0, maxRms: 0 },
 
     init: function () {
@@ -290,7 +290,8 @@ EM_JS(void, AILBridge_init, (), {
       v.gen++;
       B.stats.eos++;
       if (v.id >= 1000) B.stats.eosStream++; else if (v.is3d) B.stats.eos3D++;
-      Module['_AIL_trigger_sample_eos'](v.id);
+      // 1 when the engine's callback ran for this handle (what frees its channel)
+      if (Module['_AIL_trigger_sample_eos'](v.id) && v.is3d) B.stats.delivered3D++;
     },
     eosLater: function (v) { var g = v.gen; setTimeout(function () { B.eos(v, g); }, 0); },
 
@@ -550,7 +551,7 @@ EM_JS(void, AILBridge_init, (), {
       if (v.audio && !v.audio.paused && !v.audio.ended) { playing++; streams++; }
     }
     return { 'state': B.ctx ? B.ctx.state : 'none', 'started2D': st.started2D, 'started3D': st.started3D,
-             'streamsStarted': st.streamsStarted, 'streamsReady': st.streamsReady, 'eos': st.eos, 'eos3D': st.eos3D, 'eosStream': st.eosStream, 'decoded': st.decoded,
+             'streamsStarted': st.streamsStarted, 'streamsReady': st.streamsReady, 'eos': st.eos, 'eos3D': st.eos3D, 'delivered3D': st.delivered3D, 'eosStream': st.eosStream, 'decoded': st.decoded,
              'cacheHits': st.cacheHits, 'decodeErrors': st.decodeErrors, 'streamErrors': st.streamErrors,
              'notReady': st.notReady, 'playing': playing, 'streamsPlaying': streams, 'maxRms': Math.round(st.maxRms * 10000) / 10000 };
   };
@@ -609,29 +610,34 @@ static SampleState g_samples[MAX_SAMPLES];
 static Sample3DState g_samples3D[MAX_SAMPLES];
 static StreamState g_streams[MAX_STREAMS];
 
-extern "C" EMSCRIPTEN_KEEPALIVE void AIL_trigger_sample_eos(int js_id) {
+// Returns 1 when the handle's callback ran.
+extern "C" EMSCRIPTEN_KEEPALIVE int AIL_trigger_sample_eos(int js_id) {
     if (js_id >= JS_ID_STREAM) {
         int i = js_id - JS_ID_STREAM - 1;
-        if (i < 0 || i >= MAX_STREAMS) return;
+        if (i < 0 || i >= MAX_STREAMS) return 0;
         StreamState* s = &g_streams[i];
-        if (!s->allocated) return;
+        if (!s->allocated) return 0;
         s->is_playing = false;
-        if (s->callback) s->callback((HSTREAM)s);
+        if (!s->callback) return 0;
+        s->callback((HSTREAM)s);
     } else if (js_id >= JS_ID_3D) {
         int i = js_id - JS_ID_3D - 1;
-        if (i < 0 || i >= MAX_SAMPLES) return;
+        if (i < 0 || i >= MAX_SAMPLES) return 0;
         Sample3DState* s = &g_samples3D[i];
-        if (!s->allocated) return;
+        if (!s->allocated) return 0;
         s->is_playing = false;
-        if (s->eos_callback) s->eos_callback((H3DSAMPLE)s);
+        if (!s->eos_callback) return 0;
+        s->eos_callback((H3DSAMPLE)s);
     } else {
         int i = js_id - 1;
-        if (i < 0 || i >= MAX_SAMPLES) return;
+        if (i < 0 || i >= MAX_SAMPLES) return 0;
         SampleState* s = &g_samples[i];
-        if (!s->allocated) return;
+        if (!s->allocated) return 0;
         s->is_playing = false;
-        if (s->eos_callback) s->eos_callback((HSAMPLE)s);
+        if (!s->eos_callback) return 0;
+        s->eos_callback((HSAMPLE)s);
     }
+    return 1;
 }
 
 // a RIFF image's total size (header says), or 0 when it is not one

@@ -61,6 +61,7 @@ const P = {
     if (!(await p.waitFor(/SHELL: doPush 'Menus\/MainMenu.wnd' -> created/, 120000))) failures.push(`${p.who}: no main menu`);
     await p.page.waitForTimeout(4000);
     await p.click(P.multiplayer, 'MULTIPLAYER');
+    await p.page.waitForTimeout(3000);            // the submenu slides in
     await p.click(P.network, 'NETWORK');
     if (!(await p.waitFor(/doPush 'Menus\/LanLobbyMenu.wnd' -> created/, 20000))) failures.push(`${p.who}: no LAN lobby`);
   }

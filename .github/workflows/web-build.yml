@@ -233,7 +233,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [menu-map, options, saveload, score, construction, audio-launcher, night, snow]
+        shard: [menu-map, options, saveload, score, construction, audio-launcher, night, snow, lan-tab, lan-net]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -410,6 +410,25 @@ jobs:
           # (service worker + stored set); then the free archives picked as "own files".
           node tools/asset-pipeline/launcher-smoke.js http://localhost:8888/ free-out/assets | tee launcher-smoke.log
 
+      - name: LAN game between two engines (tab LAN)
+        if: always() && matrix.shard == 'lan-tab'
+        run: |
+          set -o pipefail
+          # two pages of one browser, the shell's BroadcastChannel as the LAN: host CREATE GAME, client
+          # JOIN + ACCEPT, host PLAY GAME; both matches must run and advance (lan-smoke.js)
+          node tools/asset-pipeline/lan-smoke.js http://localhost:8888/GeneralsZH.html | tee lan-tab-smoke.log
+
+      - name: LAN game over the network server (WebRTC)
+        if: always() && matrix.shard == 'lan-net'
+        run: |
+          set -o pipefail
+          # web/net: the transport alone first (two browser contexts, WebRTC + relay), then two engines
+          # in separate contexts joined through the signaling server
+          node tools/asset-pipeline/net-smoke.js | tee net-smoke.log
+          (node --experimental-strip-types web/net/server.ts 8789 > net-server.log 2>&1 &)
+          sleep 2
+          node tools/asset-pipeline/lan-smoke.js http://localhost:8888/GeneralsZH.html ws://localhost:8789/net/ci | tee lan-net-smoke.log
+
       - name: Check the terrain is visible
         if: always() && (matrix.shard == 'menu-map')
         run: |
@@ -487,6 +506,14 @@ jobs:
           done
           [ -f audio-check.log ] && grep -E "^(menu|click|game):|AUDIO CHECK" audio-check.log | cut -c1-900 | tail -4 | sed "s/^/::notice title=audio::/" || true
 
+      - name: Annotate LAN
+        if: always()
+        run: |
+          for f in lan-tab-smoke.log lan-net-smoke.log net-smoke.log; do [ -f "$f" ] || continue
+            grep -E "FAIL|PAGEERROR|FATAL|did not|no LAN|stalled" "$f" | cut -c1-900 | head -6 | sed "s/^/::error title=$f::/"
+            grep -E "logic frames|SMOKE: OK|via|rtc" "$f" | cut -c1-900 | tail -3 | sed "s/^/::notice title=$f::/"
+          done
+
       - name: Annotate model draws
         if: always()
         run: |
@@ -545,6 +572,10 @@ jobs:
             map-smoke.log
             skirmish-smoke.log
             launcher-smoke.log
+            lan-*.log
+            lan-*.png
+            net-smoke.log
+            net-server.log
             audio-smoke.log
             audio-game.png
             launcher-*.png

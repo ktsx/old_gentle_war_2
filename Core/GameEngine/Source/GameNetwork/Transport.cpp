@@ -24,6 +24,7 @@
 
 
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
+#include <Utility/gx_trace.h>
 
 #include "Common/crc.h"
 #include "GameNetwork/Transport.h"
@@ -391,6 +392,7 @@ Bool Transport::queueSend(UnsignedInt addr, UnsignedShort port, const UnsignedBy
 	if (len < 1 || len > MAX_PACKET_SIZE)
 	{
 		DEBUG_LOG(("Transport::queueSend - Invalid Packet size"));
+		GX_DIAG_LOG("NET: queueSend dropped a %d-byte message (max %d)\n", len, (int)MAX_PACKET_SIZE);
 		return false;
 	}
 
@@ -421,6 +423,7 @@ Bool Transport::queueSend(UnsignedInt addr, UnsignedShort port, const UnsignedBy
 		}
 	}
 	DEBUG_LOG(("Send Queue is getting full, dropping packets"));
+	GX_DIAG_LOG("NET: send queue full, dropping a message\n");
 	return false;
 }
 

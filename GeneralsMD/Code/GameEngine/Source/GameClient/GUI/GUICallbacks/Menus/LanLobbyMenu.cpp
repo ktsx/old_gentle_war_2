@@ -41,6 +41,7 @@
 #include "Common/QuotedPrintable.h"
 #include "Common/OptionPreferences.h"
 #include "GameClient/AnimateWindowManager.h"
+#include <Utility/gx_trace.h>
 #include "GameClient/ClientInstance.h"
 #include "GameClient/GameText.h"
 #include "GameClient/MapUtil.h"
@@ -609,6 +610,17 @@ void LanLobbyMenuUpdate( WindowLayout * layout, void *userData)
 	if(LANisShuttingDown && TheShell->isAnimFinished() && TheTransitionHandler->isFinished())
 		shutdownComplete(layout);
 
+	// GeneralsX @feature WebPort 2026-10-30 — ?diag=1: what the lobby waits on (the LAN only talks from here)
+	{
+		static UnsignedInt s_lastDiag = 0;
+		const UnsignedInt nowDiag = timeGetTime();
+		if (nowDiag - s_lastDiag > 3000)
+		{
+			s_lastDiag = nowDiag;
+			GX_DIAG_LOG("LAN: lobby update animFinished=%d transitionsFinished=%d buttonPushed=%d lan=%d\n",
+				(int)TheShell->isAnimFinished(), (int)TheTransitionHandler->isFinished(), (int)LANbuttonPushed, TheLAN ? 1 : 0);
+		}
+	}
 	if (TheShell->isAnimFinished() && !LANbuttonPushed && TheLAN)
 		TheLAN->update();
 
